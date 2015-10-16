@@ -9,7 +9,6 @@ ExecStart=/usr/bin/haproxy-systemd-wrapper -f /etc/haproxy/haproxy.cfg -p /run/h
 ExecReload=/bin/kill -USR2 $MAINPID
 KillMode=mixed
 Restart=always
-User=haproxy
 
 [Install]
 WantedBy=multi-user.target

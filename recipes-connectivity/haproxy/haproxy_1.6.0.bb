@@ -60,12 +60,17 @@ do_install() {
     install -D -m 0644 ${WORKDIR}/haproxy.service ${D}${systemd_unitdir}/system/haproxy.service
     install -D -m 0755 ${WORKDIR}/haproxy_gencert.sh ${D}${sbindir}/haproxy_gencert.sh
     install -D -m 0644 ${WORKDIR}/haproxy.cfg ${D}${sysconfdir}/haproxy/haproxy.cfg
+
+    #install ssl folder for certificate
+    install -m 700 -d ${D}/${sysconfdir}/ssl/haproxy
+    chown haproxy:haproxy ${D}/${sysconfdir}/ssl/haproxy
 }
 
 FILES_${PN} = "${bindir} \
                ${sysconfdir} \
                ${sbindir} \
                ${systemd_unitdir} \
+               ${sysconfdir}/ssl/haproxy \
               "
 
 SYSTEMD_SERVICE_${PN} = "haproxy.service"

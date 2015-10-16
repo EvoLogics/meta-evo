@@ -3,7 +3,7 @@
 set -e
 
 tmpdir="/tmp"
-certdir="/etc/ssl/private"
+certdir="/etc/ssl/haproxy"
 
 if [ -f $certdir/server.pem ] ; then
     echo "certificate already exists."
