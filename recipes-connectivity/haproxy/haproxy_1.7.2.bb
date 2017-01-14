@@ -6,14 +6,14 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=2d862e836f92129cdc0ecccc54eed5e0"
 
 DEPENDS = "libpcre openssl zlib"
 
-SRC_URI = "http://www.haproxy.org/download/1.6/src/haproxy-1.6.0.tar.gz \
+SRC_URI = "http://www.haproxy.org/download/1.7/src/haproxy-1.7.2.tar.gz \
            file://haproxy.cfg \
            file://haproxy.service \
            file://haproxy_gencert.sh \
           "
 
-SRC_URI[md5sum] = "2361c7dd0a709a1b235215225875f34c"
-SRC_URI[sha256sum] = "e83a272b7d3638cf1d37bba58d3e75f497c1862315ee5bb7f5efc1d98d26e25b"
+SRC_URI[md5sum] = "7330b36f3764ebe409e9305803dc30e2"
+SRC_URI[sha256sum] = "f95b40f52a4d61feaae363c9b15bf411c16fe8f61fddb297c7afcca0072e4b2f"
 
 inherit systemd useradd
 
