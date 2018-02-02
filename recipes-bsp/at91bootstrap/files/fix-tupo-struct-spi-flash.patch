@@ -1,0 +1,13 @@
+diff --git a/driver/spi_flash/spi_flash.c b/driver/spi_flash/spi_flash.c
+index 5cbb9bd..13cc58a 100644
+--- a/driver/spi_flash/spi_flash.c
++++ b/driver/spi_flash/spi_flash.c
+@@ -209,7 +209,7 @@ int spi_flash_setup(struct spi_flash *flash,
+ }
+ 
+ #if defined(CONFIG_LOAD_LINUX) || defined(CONFIG_LOAD_ANDROID)
+-static int update_image_length(spi_flash_t *flash,
++static int update_image_length(struct spi_flash *flash,
+ 			       unsigned int offset,
+ 			       unsigned char *dest,
+ 			       unsigned char flag)

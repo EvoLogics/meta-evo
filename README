@@ -1,0 +1,11 @@
+This layer provides support for boards used by EvoLogics GmbH
+=============================================================
+
+For more information about the EvoLogics product line see:
+    https://evologics.de/en/products/index.html
+
+Supported SoCs / MACHINE names
+    - SAMA5D2 product family / sama5d2-roadrunner-evomini2
+
+Maintainers:
+    Maksym Komar <komar@evologics.de>

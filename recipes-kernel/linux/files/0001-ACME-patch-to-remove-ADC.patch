@@ -1,0 +1,59 @@
+From 3e9f382d5775583c697cea0d7a8bc19f7334f6eb Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Tue, 16 Jan 2018 17:56:13 +0100
+Subject: [PATCH] ACME patch to remove ADC
+
+---
+ drivers/iio/adc/at91-sama5d2_adc.c | 24 ------------------------
+ 1 file changed, 24 deletions(-)
+
+diff --git a/drivers/iio/adc/at91-sama5d2_adc.c b/drivers/iio/adc/at91-sama5d2_adc.c
+index 57e1eb23c45d..e97c4e1f8f92 100644
+--- a/drivers/iio/adc/at91-sama5d2_adc.c
++++ b/drivers/iio/adc/at91-sama5d2_adc.c
+@@ -682,33 +682,11 @@ static int at91_adc_probe(struct platform_device *pdev)
+ 	if (IS_ERR(st->per_clk))
+ 		return PTR_ERR(st->per_clk);
+ 
+-	st->reg = devm_regulator_get(&pdev->dev, "vddana");
+-	if (IS_ERR(st->reg))
+-		return PTR_ERR(st->reg);
+-
+-	st->vref = devm_regulator_get(&pdev->dev, "vref");
+-	if (IS_ERR(st->vref))
+-		return PTR_ERR(st->vref);
+-
+ 	ret = devm_request_irq(&pdev->dev, st->irq, at91_adc_interrupt, 0,
+ 			       pdev->dev.driver->name, indio_dev);
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = regulator_enable(st->reg);
+-	if (ret)
+-		return ret;
+-
+-	ret = regulator_enable(st->vref);
+-	if (ret)
+-		goto reg_disable;
+-
+-	st->vref_uv = regulator_get_voltage(st->vref);
+-	if (st->vref_uv <= 0) {
+-		ret = -EINVAL;
+-		goto vref_disable;
+-	}
+-
+ 	at91_adc_hw_init(st);
+ 
+ 	ret = clk_prepare_enable(st->per_clk);
+@@ -745,8 +723,6 @@ static int at91_adc_probe(struct platform_device *pdev)
+ 	clk_disable_unprepare(st->per_clk);
+ vref_disable:
+ 	regulator_disable(st->vref);
+-reg_disable:
+-	regulator_disable(st->reg);
+ 	return ret;
+ }
+ 
+-- 
+2.15.1
+

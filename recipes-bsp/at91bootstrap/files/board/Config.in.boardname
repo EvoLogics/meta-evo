@@ -1,0 +1,4 @@
+#
+# Config.in.boardname for contributed board name
+#
+source "contrib/board/acme/sama5d2_roadrunner/Config.in.boardname"
