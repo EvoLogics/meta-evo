@@ -1,0 +1,25 @@
+From 27459d0f211e744cf9b9ed81f0e0aa9335d94ff4 Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Tue, 16 Jan 2018 15:36:48 +0100
+Subject: [PATCH 2/2] bootargs can be not only NULL but empty string
+
+---
+ driver/load_kernel.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/driver/load_kernel.c b/driver/load_kernel.c
+index 7b513b2..f94920d 100644
+--- a/driver/load_kernel.c
++++ b/driver/load_kernel.c
+@@ -61,7 +61,7 @@ static int setup_dt_blob(void *blob)
+ 	dbg_info("\nUsing device tree in place at %x\n",
+ 						(unsigned int)blob);
+ 
+-	if (bootargs) {
++	if (bootargs && *bootargs != 0) {
+ 		char *p;
+ 
+ 		/* set "/chosen" node */
+-- 
+2.15.1
+
