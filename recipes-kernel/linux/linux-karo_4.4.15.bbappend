@@ -6,6 +6,7 @@ PR .= ".0"
 SRC_URI += "\
     file://imx6dl-${MACHINE}-defconfig \
     file://imx6dl-${MACHINE}.dts;subdir=${S}/arch/arm/boot/dts \
+    file://imx6qdl-tx6-evobb.dtsi;subdir=${S}/arch/arm/boot/dts \
 "
 
 do_configure_prepend() {
