@@ -196,6 +196,23 @@
 		mux-int-port = <1>;
 		mux-ext-port = <5>;
 	};
+
+	icplus {
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_icplus>;
+		resets = <&icplus_reset>;
+		reset-names = "reset";
+		status = "okay";
+	};
+
+
+	icplus_reset: gpio-reset {
+		compatible = "gpio-reset";
+		reset-gpios = <&gpio2 25 GPIO_ACTIVE_LOW>;
+		reset-delay-us = <10000>;
+		#reset-cells = <0>;
+	};
+
 };
 
 &audmux {
@@ -699,6 +716,13 @@
 			MX6QDL_PAD_SD3_CLK__GPIO7_IO03		0x170b0 /* SD2 CD */
 		>;
 	};
+
+	pinctrl_icplus: icplusgrp {
+		fsl,pins = <
+			MX6QDL_PAD_EIM_OE__GPIO2_IO25		0x17059
+		>;
+	};
+
 };
 
 /*

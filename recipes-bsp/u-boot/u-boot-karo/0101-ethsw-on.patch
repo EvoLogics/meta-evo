@@ -1,0 +1,60 @@
+---
+ board/karo/tx6/tx6qdl.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/board/karo/tx6/tx6qdl.c b/board/karo/tx6/tx6qdl.c
+index ae195b0..7c2fd19 100644
+--- a/board/karo/tx6/tx6qdl.c
++++ b/board/karo/tx6/tx6qdl.c
+@@ -36,6 +36,11 @@
+ #define TX6_FEC_INT_GPIO		IMX_GPIO_NR(7, 1)
+ #define TX6_LED_GPIO			IMX_GPIO_NR(2, 20)
+ 
++#define TX6_ICP_RST_GPIO                IMX_GPIO_NR(2, 25)
++#define TX6_ICP_AFT_GPIO                IMX_GPIO_NR(2, 26)
++#define TX6_ICP_WOLEN_GPIO              IMX_GPIO_NR(2, 27)
++#define TX6_ICP_POFF_GPIO               IMX_GPIO_NR(6, 31)
++
+ #define TX6_LCD_PWR_GPIO		IMX_GPIO_NR(2, 31)
+ #define TX6_LCD_RST_GPIO		IMX_GPIO_NR(3, 29)
+ #define TX6_LCD_BACKLIGHT_GPIO		IMX_GPIO_NR(1, 1)
+@@ -86,6 +91,14 @@ static const iomux_v3_cfg_t tx6qdl_pads[] = {
+ 	/* RESET_OUT */
+ 	MX6_PAD_GPIO_17__GPIO7_IO12 | TX6_DEFAULT_PAD_CTRL,
+ 
++	/* ETHSW pins */
++	MX6_PAD_EIM_BCLK__GPIO6_IO31 | TX6_DEFAULT_PAD_CTRL,
++	MX6_PAD_EIM_OE__GPIO2_IO25 | TX6_DEFAULT_PAD_CTRL,
++	MX6_PAD_EIM_RW__GPIO2_IO26 | TX6_DEFAULT_PAD_CTRL,
++	MX6_PAD_EIM_LBA__GPIO2_IO27 | TX6_DEFAULT_PAD_CTRL,
++	MX6_PAD_EIM_EB0__GPIO2_IO28 | TX6_DEFAULT_PAD_CTRL,
++	MX6_PAD_EIM_EB1__GPIO2_IO29 | TX6_DEFAULT_PAD_CTRL,
++
+ 	/* UART pads */
+ #if CONFIG_MXC_UART_BASE == UART1_BASE
+ 	MX6_PAD_SD3_DAT7__UART1_TX_DATA | TX6_DEFAULT_PAD_CTRL,
+@@ -157,6 +170,11 @@ static const struct gpio tx6qdl_gpios[] = {
+ 	{ TX6_FEC_PWR_GPIO, GPIOFLAG_OUTPUT_INIT_HIGH, "FEC PHY PWR", },
+ 	{ TX6_FEC_RST_GPIO, GPIOFLAG_OUTPUT_INIT_LOW, "FEC PHY RESET", },
+ 	{ TX6_FEC_INT_GPIO, GPIOFLAG_INPUT, "FEC PHY INT", },
++
++        { TX6_ICP_POFF_GPIO, GPIOFLAG_OUTPUT_INIT_HIGH, "ICP POFF", },
++        { TX6_ICP_WOLEN_GPIO, GPIOFLAG_OUTPUT_INIT_LOW, "ICP WOLEN", },
++        { TX6_ICP_AFT_GPIO, GPIOFLAG_OUTPUT_INIT_LOW, "ICP AFT", },
++        { TX6_ICP_RST_GPIO, GPIOFLAG_OUTPUT_INIT_LOW, "ICP RESET", },
+ };
+ 
+ static int pmic_addr __data;
+@@ -776,7 +794,8 @@ int board_eth_init(bd_t *bis)
+ 	imx_iomux_v3_setup_multiple_pads(tx6qdl_fec_pads,
+ 					 ARRAY_SIZE(tx6qdl_fec_pads));
+ 
+-	/* Deassert RESET to the external phy */
++	/* Deassert RESET to the external phy and ethsw */
++	gpio_set_value(TX6_ICP_RST_GPIO, 1);
+ 	gpio_set_value(TX6_FEC_RST_GPIO, 1);
+ 
+ 	ret = cpu_eth_init(bis);
+-- 
+2.7.4
+
