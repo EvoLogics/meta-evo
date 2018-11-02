@@ -4,12 +4,12 @@ SUMMARY = "Linux Kernel for Ka-Ro electronics TX6 Computer-On-Modules on EvoLogi
 PR .= ".0"
 
 SRC_URI += "\
-    file://imx6dl-${MACHINE}-defconfig \
-    file://imx6dl-${MACHINE}.dts;subdir=${S}/arch/arm/boot/dts \
+    file://defconfig-imx6qdl-evobb \
+    file://imx6-${MACHINE}.dts;subdir=${S}/arch/arm/boot/dts \
     file://imx6qdl-tx6-evobb.dtsi;subdir=${S}/arch/arm/boot/dts \
 "
 
 do_configure_prepend() {
-    cp ${WORKDIR}/imx6dl-${MACHINE}-defconfig ${WORKDIR}/defconfig
+    cp ${WORKDIR}/defconfig-imx6qdl-evobb ${WORKDIR}/defconfig
 }
 
