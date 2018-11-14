@@ -8,9 +8,9 @@ PROVIDES = "u-boot"
 
 PV = "v2015.10-rc2+git${SRCPV}"
 
-SRCREV = "63652ce377ee8ce60a6217aefe238313d0989c60"
+SRCREV = "15e7c9962827c2474ba655567cf644831d746501"
 SRCBRANCH = "master"
-SRC_URI = "git://git.karo-electronics.de/karo-tx-uboot.git;branch=${SRCBRANCH} \
+SRC_URI = "git://github.com/karo-electronics/karo-tx-uboot.git;branch=${SRCBRANCH} \
 	   file://mx6-soc-l2en.patch \
 	   file://mx6-clock-div.patch \
            file://0001-duplicate-const.patch \
