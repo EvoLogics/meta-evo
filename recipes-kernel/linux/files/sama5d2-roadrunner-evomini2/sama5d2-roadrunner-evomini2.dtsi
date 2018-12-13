@@ -1,0 +1,596 @@
+/*
+ * acme-roadrunner-evomini2.dtsi - DTS include for the evomini2 board
+ *
+ *  Copyright (C) 2015 Atmel,
+ *                2015 Nicolas Ferre <nicolas.ferre@atmel.com>
+ *                2017 Sergio Tanzilli <tanzilli@acmesystems.it>
+ *
+ * This file is dual-licensed: you can use it either under the terms
+ * of the GPL or the X11 license, at your option. Note that this dual
+ * licensing only applies to this file, and not this project as a
+ * whole.
+ *
+ *  a) This file is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This file is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ * Or, alternatively,
+ *
+ *  b) Permission is hereby granted, free of charge, to any person
+ *     obtaining a copy of this software and associated documentation
+ *     files (the "Software"), to deal in the Software without
+ *     restriction, including without limitation the rights to use,
+ *     copy, modify, merge, publish, distribute, sublicense, and/or
+ *     sell copies of the Software, and to permit persons to whom the
+ *     Software is furnished to do so, subject to the following
+ *     conditions:
+ *
+ *     The above copyright notice and this permission notice shall be
+ *     included in all copies or substantial portions of the Software.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ *     OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ *     NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *     HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ *     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ *     OTHER DEALINGS IN THE SOFTWARE.
+ */
+#include "sama5d2.dtsi"
+#include "sama5d2-pinfunc.h"
+#include <dt-bindings/dma/at91.h>
+#include <dt-bindings/pinctrl/at91.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/mfd/atmel-flexcom.h>
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+	model = "Acme Systems RoadRunner on EvoLogics Baseboard";
+	compatible = "atmel,sama5d2-evomini2", "atmel,sama5d2", "atmel,sama5";
+
+	aliases {
+		ssc0 = &ssc0;
+		serial0 = &uart1;
+		serial1 = &uart0;
+		serial2 = &uart3;
+		serial5 = &uart5;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+		//bootargs = "mem=256M console=ttyS0,115200 root=/dev/mmcblk0p2 rootfstype=ext4 rw rootwait debug";
+
+		//bootargs = "mem=256M console=ttyS0,115200 ubi.mtd=rootfs root=ubi0:sama5d2-roadrunner-evomini2-rootfs rootfstype=ubifs rw debug";
+		bootargs = "mem=256M console=ttyS0,115200 ubi.mtd=rootfs root=ubi0:sama5d2-roadrunner-evomini2-rootfs rootfstype=ubifs rw debug";
+		//bootargs = "mem=256M console=ttyS0,115200 root=/dev/mtdblock3 rw rootfstype=jffs2 debug";
+		//bootargs = "mem=256M console=ttyS0,115200 ubi.mtd=rootfs root=ubi0:sama5d2-roadrunner-evomini2-rootfs rootfstype=ubifs rw debug init=/bin/sh";
+		//bootargs = "mem=256M console=ttyS0,115200 ubi.mtd=rootfs root=ubi0:sama5d2-roadrunner-evomini2-rootfs rootfstype=ubifs rw debug init=/bin/sh dynamic_debug.verbose=1 dyndbg=\"module ubi +p; module ubifs +p\" loglevel=8";
+		//bootargs = "mem=256M console=ttyS0,115200 ubi.mtd=rootfs root=ubi0:sama5d2-roadrunner-evomini2-rootfs rootfstype=ubifs rw debug dynamic_debug.verbose=1 dyndbg=\"module ubi +p; module ubifs +p\"";
+
+		//bootargs = "mem=256M console=ttyS0,115200 ubi.mtd=rootfs ubi.block=0,0 root=/dev/ubiblock0_0 rootfstype=ubifs rootwait=1 rw debug dynamic_debug.verbose=1 dyndbg=\"module ubi +p; module ubifs +p\"";
+
+
+		//bootargs = "mem=256M console=ttyS0,115200 root=/dev/mtdblock3 rw rootfstype=jffs2 dynamic_debug.verbose=1 dyndbg=\"module spi_nor +flmp; file atmel-quadspi.c +flmp\" debug loglevel=8";
+		//bootargs = "mem=256M console=ttyS0,115200 root=/dev/mtdblock3 rw rootfstype=jffs2 dynamic_debug.verbose=1 dyndbg=\"module spi_nor +flmp; file atmel-quadspi.c +flmp\"";
+
+		//bootargs = "mem=256M console=ttyS0,115200 root=/dev/mtdblock3 rw rootfstype=jffs2 dyndbg='format atmel_quadspi +p'";
+
+		//bootargs = "mem=256M console=ttyS0,115200 ubi.mtd=rootfs root=ubi0:sama5d2-roadrunner-evomini2-rootfs rootfstype=ubifs rootwait=1 rw loglevel=8 debug noinitrd ubi.fm_autoconvert=1 ddebug_query=\"format UBIFS DBG rcvry\" ddebug_query=\"format UBIFS DBG mnt\" ddebug_query=\"format UBIFS DBG scan\"";
+		//bootargs = "mem=256M console=ttyS0,115200 ubi.mtd=rootfs root=ubi0:sama5d2-roadrunner-evomini2-rootfs rootfstype=ubifs rootwait=1 rw loglevel=8 debug noinitrd ubi.fm_autoconvert=1 ddebug_query=\"format UBIFS DBG rcvry\" ddebug_query=\"format UBIFS DBG mnt\" ddebug_query=\"format UBIFS DBG scan\"";
+
+		//bootargs = "mem=256M console=ttyS0,115200 root=31:03 rw rootfstype=jffs2 rootwait debug";
+	};
+
+	memory {
+		reg = <0x20000000 0x80000>;
+	};
+
+	clocks {
+		slow_xtal {
+			clock-frequency = <32768>;
+		};
+
+		main_xtal {
+			clock-frequency = <12000000>;
+		};
+	};
+
+	ahb {
+		usb0: gadget@00300000 {
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_usba_vbus>;
+			status = "okay";
+		};
+
+		usb1: ohci@00400000 {
+			num-ports = <3>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_usb_default>;
+			status = "okay";
+		};
+
+		usb2: ehci@00500000 {
+			status = "okay";
+		};
+
+		sdmmc0: sdio-host@a0000000 {
+			bus-width = <4>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_sdmmc0_default>;
+			broken-cd;
+			no-1-8-v;
+			disable-wp;
+			status = "okay";
+		};
+
+		apb {
+            can0: can@f8054000 {
+                pinctrl-names = "default";
+                pinctrl-0 = <&pinctrl_can0_default>;
+                status = "okay";
+            };
+            can1: can@fc050000 {
+                pinctrl-names = "default";
+                pinctrl-0 = <&pinctrl_can1_default>;
+                status = "okay";
+            };
+			qspi0: spi@f0020000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_qspi0_default>;
+				status = "okay";
+
+				flash@0 {
+					#address-cells = <1>;
+					#size-cells = <1>;
+					//compatible = "micron,n25q128a13", "jedec,spi-nor";
+					compatible = "jedec,spi-nor";
+					reg = <0>;
+					spi-max-frequency = <83000000>;
+					m25p,fast-read;
+
+					at91bootstrap@00000000 {
+						label = "at91bootstrap";
+						reg = <0x00000000 0x00010000>;
+					};
+
+					dtb@00010000 {
+						label = "dtb";
+						reg = <0x00010000 0x00010000>;
+					};
+
+					kernel@00040000 {
+						label = "kernel";
+						reg = <0x00020000 0x00400000>;
+					};
+
+					rootfs@00420000 {
+						label = "rootfs";
+						//reg = <0x00420000 0x000be0000>; // 16 MiB
+						//reg = <0x00420000 0x001df0000>; // 32 MiB
+						reg = <0x00420000 0x003be0000>; // 64 MiB
+						//reg = <0x00420000 0x007be0000>; // 128 MiB
+						//reg = <0x00420000 0x000000000>;
+					};
+
+					rest@08000000 {
+						label = "rest";
+						//reg = <0x00420000 0x00000000>;
+						//reg = <0x01000000 0x00000000>; // rest for rootfs 16 MiB
+						//reg = <0x02210000 0x00000000>;   // rest for rootfs 32 MiB
+						//reg = <0x08000000 0x00000000>; // rest for rootfs 128 MiB (?)
+					};
+				};
+			};
+
+			spi1: spi@fc000000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_spi1_default>;
+				status = "okay";
+				device@0 {
+					compatible = "spidev";
+					spi-max-frequency = <50000000>;	 // 50 MHz
+					reg = <0>;
+				};
+			};
+
+			ssc0: ssc@f8004000 {
+				compatible = "atmel,at91sam9g45-ssc";
+				reg = <0xf8004000 0x4000>;
+				interrupts = <43 IRQ_TYPE_LEVEL_HIGH 4>;
+				dmas = <&dma0
+					(AT91_XDMAC_DT_MEM_IF(0) | AT91_XDMAC_DT_PER_IF(1) |
+					AT91_XDMAC_DT_PERID(21))>,
+					   <&dma0
+					(AT91_XDMAC_DT_MEM_IF(0) | AT91_XDMAC_DT_PER_IF(1) |
+					AT91_XDMAC_DT_PERID(22))>;
+				dma-names = "tx", "rx";
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_ssc0_tx &pinctrl_ssc0_rx>;
+				clocks = <&ssc0_clk>;
+				clock-names = "pclk";
+				/* status = "disabled"; */
+				status = "okay";
+			};
+
+			macb0: ethernet@f8008000 {
+				phy-mode = "rmii";
+				status = "disabled";
+				ethernet-phy@1 {
+					reg = <0x1>;
+					interrupt-parent = <&pioA>;
+					interrupts = <73 IRQ_TYPE_LEVEL_LOW>;
+				};
+			};
+
+			/* Debug port */
+
+			uart0: serial@f801c000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_uart0_default>;
+				status = "okay";
+			};
+
+			uart1: serial@f8020000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_uart1_default>;
+				status = "okay";
+			};
+
+			i2c0: i2c@f8028000 {
+				dmas = <0>, <0>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_i2c0_default>;
+				i2c-sda-hold-time-ns = <350>;
+				status = "disabled";
+			};
+
+			flx0: flexcom@f8034000 {
+				atmel,flexcom-mode = <ATMEL_FLEXCOM_MODE_USART>;
+				status = "disabled"; /* conflict with ISC_D2 & ISC_D3 data pins */
+			};
+
+			shdwc@f8048010 {
+				atmel,shdwc-debouncer = <976>;
+
+				input@0 {
+					reg = <0>;
+					atmel,wakeup-type = "low";
+				};
+			};
+
+			watchdog@f8048040 {
+				status = "okay";
+			};
+
+			gpio@fc038000 {
+				compatible = "atmel,sama5d2-gpio";
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_gpio>;
+				status = "okay";
+			};
+
+			uart3: serial@fc008000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_uart3_default>;
+				status = "okay";
+			};
+
+			flx4: flexcom@fc018000 {
+				atmel,flexcom-mode = <ATMEL_FLEXCOM_MODE_USART>;
+				status = "disable";
+
+				uart5: serial@200 {
+					compatible = "atmel,at91sam9260-usart";
+					reg = <0x200 0x200>;
+					interrupts = <23 IRQ_TYPE_LEVEL_HIGH 7>;
+					clocks = <&flx4_clk>;
+					clock-names = "usart";
+					atmel,fifo-size = <32>;
+					status = "disable";
+				};
+
+			};
+
+			i2c1: i2c@fc028000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_i2c1_default>;
+				status = "okay";
+
+				eeprom@57 {
+					compatible = "at,24c02";
+					reg = <0x57>;
+				};
+			};
+
+			adc: adc@fc030000 {
+				compatible = "atmel,sama5d2-adc";
+				vddana-supply = <&vdd_3v3_lp_reg>;
+				vref-supply = <&vdd_3v3_lp_reg>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_adc_default>;
+				status = "okay";
+
+				vdd_3v3_lp_reg: REG_LDO2 {
+					regulator-name = "VDD_3V3_LP";
+					regulator-min-microvolt = <3300000>;
+					regulator-max-microvolt = <3300000>;
+					regulator-always-on;
+				};
+			};
+
+			/* sscdev: sscdev { */
+			irqman: irqman {
+				/* pinctrl-names = "default"; */
+				/* pinctrl-0 = <&pinctrl_sscdev>; */
+				compatible = "irqman";
+				ssc = <&ssc0>;
+				/* input */
+				fpga-busy-gpios  = <&pioA PIN_PC6  GPIO_ACTIVE_HIGH>;
+				tbuf-empty-gpios = <&pioA PIN_PC5  GPIO_ACTIVE_HIGH>;
+				boot-jumper-gpios = <&pioA PIN_PB13 GPIO_ACTIVE_HIGH>;
+				/* input_0 ?? */
+				/* input_1 ?? */
+
+				/* output */
+				fpga-reset-gpios = <&pioA PIN_PB30 GPIO_ACTIVE_HIGH>;
+				tx-done-gpios	= <&pioA PIN_PB28 GPIO_ACTIVE_HIGH>;
+				tx-on-gpios	  = <&pioA PIN_PB29 GPIO_ACTIVE_HIGH>;
+				keep-alive-gpios = <&pioA PIN_PD7  GPIO_ACTIVE_HIGH>;
+				reset-gpios	  = <&pioA PIN_PB31 GPIO_ACTIVE_HIGH>;
+				power-gpios	  = <&pioA PIN_PD8  GPIO_ACTIVE_HIGH>;
+
+				optocoupler0-gpios = <&pioA PIN_PD6  GPIO_ACTIVE_HIGH>;
+
+				/* irq */
+				dsp-irq-gpios	= <&pioA PIN_PB3  GPIO_ACTIVE_HIGH>;
+				irq1-gpios	   = <&pioA PIN_PB2  GPIO_ACTIVE_HIGH>;
+				fiq-gpios		= <&pioA PIN_PB4  GPIO_ACTIVE_HIGH>;
+			};
+
+			pinctrl@fc038000 {
+				pinctrl_can0_default: can0_default {
+					pinmux = <PIN_PC10__CANTX0>,
+						 <PIN_PC11__CANRX0>;
+					bias-disable;
+				};
+
+				pinctrl_can1_default: can1_default {
+					pinmux = <PIN_PC26__CANTX1>,
+						 <PIN_PC27__CANRX1>;
+					bias-disable;
+				};
+
+				pinctrl_sscdev: sscdev_default {
+					pinmux = <PIN_PD8__GPIO>,  /* power */
+							 <PIN_PB31__GPIO>, /* reset */
+							 <PIN_PB30__GPIO>, /* fpga reset */
+							 <PIN_PB28__GPIO>, /* tx done */
+
+							 <PIN_PB29__GPIO>, /* tx on */
+							 <PIN_PD7__GPIO>,  /* keep alive */
+							 <PIN_PC6__GPIO>,  /* fpga busy */
+							 <PIN_PC5__GPIO>,  /* tbud empty */
+
+							 <PIN_PB3__GPIO>,  /* dsp irq */
+							 <PIN_PB2__GPIO>;  /* irq1 */
+					bias-pull-up;
+				};
+
+				/* Set as GPIO the pins that are not by default */
+				pinctrl_gpio: gpio_default {
+					pinmux = <PIN_PD4__GPIO>,
+							 <PIN_PD5__GPIO>,
+							 <PIN_PD21__GPIO>, /* CAN 0 enable */
+							 <PIN_PD22__GPIO>, /* CAN 1 enable */
+							 <PIN_PD14__GPIO>, /* eth grx1 */
+							 <PIN_PD15__GPIO>, /* eth gtx0 */
+							 <PIN_PD16__GPIO>, /* eth gtx1 */
+							 <PIN_PD17__GPIO>; /* eth gmdc */
+
+					/* ENA_FUSE2V5 - PB0 "def low"
+					 BOOT_MODE   - PB13  "low that jumper is installed"
+					 CFG.STRAP0 PC12
+					 CFG.STRAP1 PC13
+					 CFG.STRAP2 PC14
+					 CFG.STRAP3 PC15
+					 CFG.STRAP4 PC 9
+					 power-fuses-gpios = <&pioA PIN_PB10 GPIO_ACTIVE_HIGH>;
+					*/
+					bias-pull-up;
+				};
+				/*
+				 * There is no real pinmux for ADC, if the pin
+				 * is not requested by another peripheral then
+				 * the muxing is done when channel is enabled.
+				 * Requesting pins for ADC is GPIO is
+				 * encouraged to prevent conflicts and to
+				 * disable bias in order to be in the same
+				 * state when the pin is not muxed to the adc.
+				 */
+				pinctrl_adc_default: adc_default {
+					pinmux = <PIN_PD23__GPIO>;
+					bias-disable;
+				};
+
+				pinctrl_charger_chglev: charger_chglev {
+					pinmux = <PIN_PA12__GPIO>;
+					bias-disable;
+				};
+
+				pinctrl_charger_irq: charger_irq {
+					pinmux = <PIN_PB13__GPIO>;
+					bias-disable;
+				};
+
+				pinctrl_charger_lbo: charger_lbo {
+					pinmux = <PIN_PC8__GPIO>;
+					bias-pull-up;
+				};
+
+				pinctrl_flx0_default: flx0_default {
+					pinmux = <PIN_PB28__FLEXCOM0_IO0>,
+						 <PIN_PB29__FLEXCOM0_IO1>;
+					bias-disable;
+				};
+
+				pinctrl_flx4_default: flx4_default {
+					pinmux = <PIN_PC28__FLEXCOM4_IO0>,
+                             <PIN_PC29__FLEXCOM4_IO1>,
+                             <PIN_PD0__FLEXCOM4_IO4>;
+					bias-disable;
+				};
+
+				pinctrl_flx4_rts: flx4_rts {
+					pinmux = <PIN_PD0__FLEXCOM4_IO4>;
+					bias-disable;
+				};
+
+				pinctrl_i2c0_default: i2c0_default {
+					pinmux = <PIN_PD21__TWD0>,
+						 <PIN_PD22__TWCK0>;
+					bias-disable;
+				};
+
+				pinctrl_i2c1_default: i2c1_default {
+					pinmux = <PIN_PD19__TWD1>,
+						 <PIN_PD20__TWCK1>;
+					bias-disable;
+				};
+
+				pinctrl_pdmic_default: pdmic_default {
+					pinmux = <PIN_PB26__PDMIC_DAT>,
+						<PIN_PB27__PDMIC_CLK>;
+					bias-disable;
+				};
+
+				pinctrl_sdmmc0_default: sdmmc0_default {
+					cmd_data {
+						pinmux = <PIN_PA1__SDMMC0_CMD>,
+							 <PIN_PA2__SDMMC0_DAT0>,
+							 <PIN_PA3__SDMMC0_DAT1>,
+							 <PIN_PA4__SDMMC0_DAT2>,
+							 <PIN_PA5__SDMMC0_DAT3>;
+						bias-pull-up;
+					};
+
+					conf-ck {
+						pinmux = <PIN_PA0__SDMMC0_CK>;
+						/* drive-strength = <2>; */
+						bias-disable;
+					};
+
+					/* The cd line is used on microSD socket */
+					conf-cd {
+						pinmux = <PIN_PA13__SDMMC0_CD>;
+						bias-pull-down;
+					};
+				};
+
+				pinctrl_qspi0_default: qspi0_default {
+					sck_cs {
+						pinmux = <PIN_PA22__QSPI0_SCK>,
+							 <PIN_PA23__QSPI0_CS>;
+						bias-disable;
+					};
+
+					data {
+						pinmux = <PIN_PA24__QSPI0_IO0>,
+							 <PIN_PA25__QSPI0_IO1>,
+							 <PIN_PA26__QSPI0_IO2>,
+							 <PIN_PA27__QSPI0_IO3>;
+						bias-pull-up;
+					};
+				};
+
+
+				pinctrl_spi0_default: spi0_default {
+					pinmux = <PIN_PA14__SPI0_SPCK>,
+						 <PIN_PA15__SPI0_MOSI>,
+						 <PIN_PA16__SPI0_MISO>,
+						 <PIN_PA17__SPI0_NPCS0>;
+					bias-disable;
+				};
+
+				pinctrl_spi1_default: spi1_default {
+					pinmux = <PIN_PC1__SPI1_SPCK>,
+						 <PIN_PC2__SPI1_MOSI>,
+						 <PIN_PC3__SPI1_MISO>,
+						 <PIN_PC4__SPI1_NPCS0>;
+					bias-disable;
+				};
+
+				ssc0 {
+					pinctrl_ssc0_tx: ssc0_tx {
+						pinmux = <PIN_PB20__TK0>,   /* periph E TK0 */
+								 <PIN_PB21__TF0>,   /* periph E TF0 */
+								 <PIN_PB22__TDO>;   /* periph E TD0 WTF!!!! */
+						bias-pull-up;
+						drive-strength = <2>;
+					};
+
+					pinctrl_ssc0_rx: ssc0_rx {
+						pinmux = <PIN_PB24__RK0>,   /* periph E RK0 */
+								 <PIN_PB25__RF0>,   /* periph E RF0 */
+								 <PIN_PB23__RD0>;	/* periph E RD0 */
+						bias-pull-up;
+						input-schmitt-enable;
+					};
+				};
+
+				ssc1 {
+					pinctrl_ssc1_tx: ssc1_tx {
+						pinmux = <PIN_PB14__TK1>,   /* PC12 periph E TK1 */
+								 <PIN_PB15__TF1>,   /* PC13 periph E TF1 */
+								 <PIN_PB16__TD1>;   /* PC14 periph E TD1 WTF!!!! */
+						bias-pull-up;
+						drive-strength = <2>;
+					};
+
+					pinctrl_ssc1_rx: ssc1_rx {
+						pinmux = <PIN_PB18__RK1>,   /* periph E RK1 */
+								 <PIN_PB19__RF1>,   /* periph E RF1 */
+								 <PIN_PB17__RD1>;	/* periph E RD1 */
+						bias-pull-up;
+						input-schmitt-enable;
+					};
+				};
+
+				pinctrl_uart0_default: uart0_default {
+					pinmux = <PIN_PB26__URXD0>,
+							 <PIN_PB27__UTXD0>;
+					bias-disable;
+				};
+
+				pinctrl_uart1_default: uart1_default {
+					pinmux = <PIN_PD2__URXD1>,
+						 <PIN_PD3__UTXD1>;
+					bias-disable;
+				};
+
+				pinctrl_uart3_default: uart3_default {
+					pinmux = <PIN_PB11__URXD3>,
+						 <PIN_PB12__UTXD3>;
+					bias-disable;
+				};
+
+				pinctrl_usb_default: usb_default {
+					pinmux = <PIN_PB10__GPIO>;
+					bias-disable;
+				};
+
+				pinctrl_usba_vbus: usba_vbus {
+					pinmux = <PIN_PA31__GPIO>;
+					bias-disable;
+				};
+
+			};
+		};
+	};
+};
