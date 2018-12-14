@@ -1,0 +1,118 @@
+#!/bin/sh
+
+die() {
+    echo "$*" >&2
+    exit 1
+}
+
+pin_set_env() {
+    PIN=$1
+    P=${PIN#P*}
+    PIN_NUM=${P:1}
+    PIN_CHAR=${P%%[0-9]*}
+    PIN_DIR=/sys/class/gpio/$PIN
+
+    # AT91_PIOC*32 + number.
+    # PA == 0, PB == 1, PC == 2, PD == 3
+    PIN_NUM=$((32 * ($(printf '%d' "'$PIN_CHAR") - 65) + $PIN_NUM))
+}
+
+pin_export() {
+    pin_set_env $1
+    if [ ! -e $PIN_DIR/direction ]; then
+        echo -n $PIN_NUM > /sys/class/gpio/export
+        echo -n $2 > $PIN_DIR/direction
+    fi
+}
+
+pin_set() {
+    pin_export $1 out
+    echo -n $2 > $PIN_DIR/value
+}
+
+pin_get() {
+    pin_export $1 in
+    cat $PIN_DIR/value
+}
+
+parse_val() {
+    case "$1" in
+        off|0) echo -n 0;;
+        on|1)  echo -n 1;;
+        *) die "need parameters 'on'/'off' or empty" ;;
+    esac
+}
+
+get_straps() {
+    echo "$(pin_get PC9)$(pin_get PC15)$(pin_get PC14)$(pin_get PC13)$(pin_get PC12)"
+}
+
+get_hwtype() {
+    STRAPS="$(get_straps)"
+    case "$STRAPS" in
+        11111) echo eth   ;;
+        11110) echo can   ;;
+        11101) echo rs422 ;;
+        11100) echo rs485 ;;
+        *) die "unsupported straps: $STRAPS" ;;
+    esac
+}
+
+set_dev_power() {
+    VAL=$(parse_val "$2")
+    case "$1" in
+        rs232)      pin_set PC25 $VAL       ;;
+        eth)        pin_set PC17 $((!$VAL)) ;;
+        rs485)      pin_set PC17 $VAL       ;;
+        rs422)      pin_set PC17 $VAL       ;;
+        rs485-term) pin_set PC31 $VAL       ;; # ?? enable 0 or 1?
+        can0)       pin_set PD21 $((!$VAL)) ;;
+        can1)       pin_set PD22 $((!$VAL)) ;;
+        can)        pin_set PD21 $((!$VAL)) ;
+                    pin_set PD22 $((!$VAL)) ;;
+        *) die "unknown hardware type: $1"  ;;
+    esac
+}
+
+get_dev_status() {
+    case "$1" in
+        rs232)      echo $(pin_get PC22) ;;
+        eth)        echo $(pin_get PC16) ;;
+        rs485)      echo $(pin_get PC16) ;;
+        rs422)      echo $(pin_get PC16) ;;
+        rs485-term) echo unknown ;;
+        can0)       echo unknown ;;
+        can1)       echo unknown ;;
+        can)        echo unknown ;;
+        *)          die "unknown device: $1";;
+    esac
+}
+
+show_status() {
+    DEV="$(get_hwtype)"
+
+    echo $DEV $(get_dev_status $DEV)
+    #echo RS232 has signal: $(get_dev_status rs232)
+}
+
+usage() {
+    cat << END
+Usage: $(basename $0) [on|off]|[[eth|rs485|rs422|rs485-term|can|can0|can1] [on|off|type]]
+END
+}
+
+case "$1" in
+    -h) usage ;;
+    "")    show_status ;;
+    on)   set_dev_power $(get_hwtype) 1 ;;
+    off)  set_dev_power $(get_hwtype) 0 ;;
+    type) get_hwtype ;;
+    *)
+        if [ -z "$2" ]; then
+            echo "$1 status: $(get_dev_status "$1")"
+        else
+            set_dev_power "$1" "$2"
+        fi
+    ;;
+esac
+

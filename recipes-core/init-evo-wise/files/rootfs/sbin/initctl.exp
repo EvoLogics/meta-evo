@@ -1,0 +1,54 @@
+#!/bin/sh
+# vim: ft=tcl
+# the next line restarts using expect \
+    LC_TYPE=C exec expect -f "$0" -- "$@"
+    
+################################
+# http://wiki.tcl.tk/2224
+# package require Tclx
+
+proc shutdown {} {
+}
+
+proc daemonize {} {
+  close stdin
+  close stdout
+  close stderr
+  if {[fork]} {exit 0}
+#  id process group set
+  if {[fork]} {exit 0}
+  set fd [open /dev/null r]
+  set fd [open /dev/null w]
+  set fd [open /dev/null w]
+  cd /
+  umask 022
+#  return [id process]
+}
+    
+#signal ignore  SIGHUP
+#signal unblock {QUIT TERM}
+#signal trap    {QUIT TERM} shutdown
+################################
+#strace 10   
+#exp_internal -f /tmp/initctl.log 1
+
+exec rm -f /dev/initctl
+exec mknod -m 600 /dev/initctl p
+
+#daemonize
+spawn -noecho -open [open /dev/initctl]
+set sid $spawn_id
+
+expect -i sid -timeout -1 INIT_HALT {
+	exec echo reboot > /dev/console
+	exec sync
+	exec /sbin/reboot -f
+	exp_continue
+} -re .+ {
+	exp_continue
+} eof {
+	spawn -noecho -open [open /dev/initctl]
+	set sid $spawn_id
+	exp_continue
+}
+

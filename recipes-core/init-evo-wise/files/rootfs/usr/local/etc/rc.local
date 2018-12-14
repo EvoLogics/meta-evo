@@ -1,0 +1,9 @@
+#!/bin/sh
+# init script called once at first boot from /sbin/init
+
+DROPBEAR_RSAKEY=/etc/dropbear/dropbear_rsa_host_key
+dropbearkey -t rsa -f $DROPBEAR_RSAKEY
+cd /
+
+# remove self
+sleep 1 && rm -r /usr/local/etc/rc.local&

@@ -1,0 +1,32 @@
+#!/bin/sh
+
+RANDOM_MAC=0
+if [ "$1" = "-r" ]; then
+	RANDOM_MAC=1
+fi
+
+fw_printenv | awk -vrnd_rnd=$RANDOM_MAC '
+	sub(/serial#=/,"") {
+		split($0, s, "/");
+		prefix = sprintf("%02x:%02x", s[1], s[2]);
+	}
+	sub(/ethaddr=/,"") {
+		# we chage 2nd and 3rd bytes in MAC,
+		# because in 1st byte bit 0 mean "unicast/multicast"
+		sub(/:([^:]*:[^:]*)/,"REPLACE");
+		mac = $0
+	}
+	END {
+		if(rnd_mac || prefix == "" || mac == "") {
+			srand();
+            # clean broatcast bit and set up "local allocated mac" bit
+            mac = sprintf("%02x", or(and(int(rand()*256), 0xfe), 0x02));
+			for(i=0; i < 5; i++) {
+				mac=mac":"sprintf("%02x", int(rand()*256));
+			}
+		} else {
+			sub(/REPLACE/, ":"prefix, mac);
+		}
+		printf("%s", mac);
+	}'
+	

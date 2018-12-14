@@ -1,0 +1,135 @@
+#!/bin/sh
+
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+
+mkdir -p /dev/pts /dev/shm
+
+case "$1" in
+    6)
+        [ -e /opt/lxc/sandbox/enable ] && /etc/init.d/lxc stop
+        sync
+        reboot -f
+        exit
+        ;;
+    u)
+        set -x
+        kill -9 -1
+        sleep 2
+        mount | awk '$3 ~ /root-old/{print $3}' | sort -r | xargs umount
+        ubidetach -p /dev/mtd3
+        set +x
+        
+        export PS1='\u@updating:\w\$ '
+        /bin/sh
+            #while :; do
+            #    if [ ! -e /var/lock/nogetty ]; then
+            #       # to make possible init script catch signals
+            #        /sbin/getty 115200 ttyS0&
+            #        wait $!
+            #    fi
+            #    sleep 0.5
+            # done
+       ;;
+esac
+
+if [ -e /opt/lxc/sandbox/enable ]; then
+	WISE=true
+	REAL_ROOT=toor
+                                                                               
+else
+	REAL_ROOT=root
+	WISE=false
+fi
+
+mount -a
+
+echo 2 > /proc/cpu/alignment
+echo 0 > /proc/sys/net/ipv4/icmp_echo_ignore_broadcasts
+
+hostname -F /etc/hostname
+
+[ -x /sbin/evo-hw ] && /sbin/evo-hw on
+
+ifconfig lo up
+
+IPADDRDEF=192.168.0.124
+NETMASKDEF=255.255.255.0
+IPADDR=$IPADDRDEF
+if [ -f /usr/local/etc/config/ipaddr ]; then
+        IPADDR=$(cat /usr/local/etc/config/ipaddr)
+fi
+if [ -f /usr/local/etc/config/netmask ]; then
+        NETMASK=$(cat /usr/local/etc/config/netmask)
+fi
+
+ifconfig eth0 $IPADDR netmask $NETMASK 2> /dev/null
+if [ $? -ne 0 ]; then
+        ifconfig eth0 $IPADDRDEF netmask $NETMASKDEF
+fi
+
+#ifconfig eth0:0 10.0.2.1
+#insmod /usr/local/bin/tun.ko
+#mkdir /dev/net
+#mknod /dev/net/tun c 10 200
+#tunctl -t tun0
+#
+#echo 1 > /proc/sys/net/ipv4/ip_forward
+
+mkdir -p /var/volatile/cache \
+         /var/volatile/lock  \
+         /var/volatile/log   \
+         /var/volatile/run   \
+         /var/volatile/tmp
+
+export LD_LIBRARY_PATH=/usr/local/lib
+[ -e /usr/local/etc/rc.local ] && sh /usr/local/etc/rc.local&
+
+sleep 2
+
+ln -fs /dev/null /var/run/lastlog
+ln -fs /dev/null /var/run/utmp
+ln -fs /dev/null /var/log/wtmp
+
+syslogd -S -D -C64
+klogd
+
+restart_sig() {
+    exec /sbin/init u
+}
+
+trap 'reboot -f' SIGTERM
+#trap 'exec /sbin/init u' SIGHUP
+trap 'restart_sig' SIGHUP
+
+# start-stop-daemon
+/sbin/initctl.exp > /dev/null 2>&1&
+
+httpd -h /usr/local/www
+inetd
+dropbear -r /etc/dropbear/dropbear_rsa_host_key
+
+modprobe ppp_async
+
+if $WISE; then
+
+	ubiattach -p /dev/mtd8
+	ubiattach -p /dev/mtd10
+	
+	mount -t cgroup cgroup /sys/fs/cgroup
+	mount -t ubifs -o sync /dev/ubi4_0 /opt/lxc/sandbox/rootfs
+	
+	modprobe ext4
+	#test -b /dev/mmcblk0p1 && mount -t ext4 -o errors=continue /dev/mmcblk0p1 /media/card 
+	
+	/etc/init.d/lxc start
+fi
+
+while :; do
+     if [ ! -e /var/lock/nogetty ]; then
+        # to make possible init script catch signals
+        /sbin/getty 115200 ttyS0&
+        wait $!
+    fi
+    sleep 0.5
+done
+
