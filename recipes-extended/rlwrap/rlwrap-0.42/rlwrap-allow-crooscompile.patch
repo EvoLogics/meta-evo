@@ -1,0 +1,63 @@
+--- a/configure.ac	2018-02-16 15:58:57.484148628 +0100
++++ b/configure.ac	2018-02-16 16:44:40.765916404 +0100
+@@ -137,25 +137,26 @@
+                    [Define as the type for the argument to the putc function of tputs ('int' or 'char')])
+ ac_c_werror_flag=$_savedwerror_flag       
+ 
+-AC_MSG_CHECKING([whether your getopt() correctly understands double colons in option string]) 
+-AC_RUN_IFELSE(
+-    [AC_LANG_PROGRAM( [[ const char optstring[] = "+:a::b";
+-		         char  * myargv [] = {"progname", "-a", "-b"}; 
+-		         int myargc = 3;
+-			 extern char *optarg;
+-		      ]] , [[
+-		         int opt = getopt(myargc, myargv, optstring);
+-		         if (opt != 'a' || optarg) /* optarg != NULL means that -b is seen as argument of -a */ 
+-		           exit (-1);
+-		        else
+-		           exit(0); ]] )],
+-    [AC_DEFINE(GETOPT_GROKS_OPTIONAL_ARGS, 1, Define if your getopt() correctly understands double colons in the option string)
++dnl AC_MSG_CHECKING([whether your getopt() correctly understands double colons in option string]) 
++dnl AC_RUN_IFELSE(
++dnl     [AC_LANG_PROGRAM( [[ const char optstring[] = "+:a::b";
++dnl 		         char  * myargv [] = {"progname", "-a", "-b"}; 
++dnl 		         int myargc = 3;
++dnl 			 extern char *optarg;
++dnl 		      ]] , [[
++dnl 		         int opt = getopt(myargc, myargv, optstring);
++dnl 		         if (opt != 'a' || optarg) /* optarg != NULL means that -b is seen as argument of -a */ 
++dnl 		           exit (-1);
++dnl 		        else
++dnl 		           exit(0); ]] )],
++dnl     [AC_DEFINE(GETOPT_GROKS_OPTIONAL_ARGS, 1, Define if your getopt() correctly understands double colons in the option string)
++     AC_DEFINE(GETOPT_GROKS_OPTIONAL_ARGS, 1, Define if your getopt() correctly understands double colons in the option string)
+      AC_SUBST(HAVE_OPTIONAL_ARGS,yes)
+-     ac_double_colons="yes"],
+-    [AC_SUBST(HAVE_OPTIONAL_ARGS,no)
+-     ac_double_colons="no"],
+-    [echo
+-     AC_MSG_WARN([This test doens't work when cross-compiling. Edit GETOPT_GROKS_OPTIONAL_ARGS in config.h by hand])])
++     ac_double_colons="yes"
++dnl    [AC_SUBST(HAVE_OPTIONAL_ARGS,no)
++dnl     ac_double_colons="no"],
++dnl    [echo
++dnl     AC_MSG_WARN([This test doens't work when cross-compiling. Edit GETOPT_GROKS_OPTIONAL_ARGS in config.h by hand])])
+ AC_MSG_RESULT($ac_double_colons)
+ 
+ 
+@@ -348,11 +349,11 @@
+ # check for existence of myself under $opt_proc_mountpoint/$$/cwd If the user specified --disable-proc-mountpoint we'll still do these tests
+ # but they wil fail unless /no is a procfs mountpoint ;-)
+ 
+-echo "Will rlwrap find command's working directory under ${opt_proc_mountpoint}/<commands pid>/cwd? let's see..."                                 
+-AC_CHECK_FILES($opt_proc_mountpoint/$$/cwd/configure.ac,[                                                                                      
+-                 AC_DEFINE(HAVE_PROC_PID_CWD, 1 ,[Define to 1 if <opt_proc_mountpoint>/<pid>/cwd is a link to working directory of process <pid>]) 
++dnl echo "Will rlwrap find command's working directory under ${opt_proc_mountpoint}/<commands pid>/cwd? let's see..."                                 
++dnl AC_CHECK_FILES($opt_proc_mountpoint/$$/cwd/configure.ac,[                                                                                      
++dnl                  AC_DEFINE(HAVE_PROC_PID_CWD, 1 ,[Define to 1 if <opt_proc_mountpoint>/<pid>/cwd is a link to working directory of process <pid>]) 
+                  AC_SUBST(HAVE_PROC_PID_CWD,[yes])
+-              ],[AC_SUBST(HAVE_PROC_PID_CWD,[no])])
++dnl              ],[AC_SUBST(HAVE_PROC_PID_CWD,[no])])
+ 
+ 
+ AC_DEFINE_UNQUOTED(PROC_MOUNTPOINT, "[$opt_proc_mountpoint]", [Define to location of Linux-style procfs mountpoint if provided and valid])
