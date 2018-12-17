@@ -15,6 +15,7 @@ SRC_URI = "git://github.com/karo-electronics/karo-tx-uboot.git;branch=${SRCBRANC
 	   file://mx6-clock-div.patch \
            file://0001-duplicate-const.patch \
            file://0002-gcc6plus-fix.patch \
+           file://0003-net-Use-packed-structures.patch \
 	  "
 
 S = "${WORKDIR}/git"
