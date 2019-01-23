@@ -3,6 +3,7 @@
 
 DROPBEAR_RSAKEY=/etc/dropbear/dropbear_rsa_host_key
 dropbearkey -t rsa -f $DROPBEAR_RSAKEY
+dropbear -r $DROPBEAR_RSAKEY
 cd /
 
 # remove self
