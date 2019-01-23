@@ -6,6 +6,9 @@ LICENSE = "MIT"
 IMAGE_FEATURES += "ssh-server-dropbear package-management"
 
 IMAGE_INSTALL = "\
+    swupdate \
+    swupdate-www \
+    \
     libgpiod \
     evo-helpers \
     \
