@@ -103,20 +103,20 @@
 	};
 
 	ahb {
-		usb0: gadget@00300000 {
+		usb0: gadget@300000 {
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_usba_vbus>;
 			status = "okay";
 		};
 
-		usb1: ohci@00400000 {
+		usb1: ohci@400000 {
 			num-ports = <3>;
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_usb_default>;
 			status = "okay";
 		};
 
-		usb2: ehci@00500000 {
+		usb2: ehci@500000 {
 			status = "okay";
 		};
 
@@ -530,7 +530,7 @@
 					pinctrl_ssc0_tx: ssc0_tx {
 						pinmux = <PIN_PB20__TK0>,   /* periph E TK0 */
 								 <PIN_PB21__TF0>,   /* periph E TF0 */
-								 <PIN_PB22__TDO>;   /* periph E TD0 WTF!!!! */
+								 <PIN_PB22__TD0>;   /* periph E TD0 WTF!!!! */
 						bias-pull-up;
 						drive-strength = <2>;
 					};
@@ -548,7 +548,7 @@
 					pinctrl_ssc1_tx: ssc1_tx {
 						pinmux = <PIN_PB14__TK1>,   /* PC12 periph E TK1 */
 								 <PIN_PB15__TF1>,   /* PC13 periph E TF1 */
-								 <PIN_PB16__TD1>;   /* PC14 periph E TD1 WTF!!!! */
+								 <PIN_PB16__TD1>;   /* PC14 periph E TD1 */
 						bias-pull-up;
 						drive-strength = <2>;
 					};
