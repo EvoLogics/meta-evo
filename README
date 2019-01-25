@@ -29,7 +29,7 @@ URI: https://git.yoctoproject.org/git/meta-freescale
 Branch: rocko
 
 - meta-freescale-3rdparty
-URI: https://github.com/victor-av/meta-freescale-3rdparty
+URI: https://github.com/evologics/meta-freescale-3rdparty
 Branch: rocko
 
 Build procedure

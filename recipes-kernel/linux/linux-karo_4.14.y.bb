@@ -12,7 +12,7 @@ LOCALVERSION = "-karo"
 
 # v4.14.84 
 SRCREV = "9fc8575802d3447a639293dbad4c5ad5acc7f9dc"
-KERNEL_SRC = "git://github.com/victor-av/karo-tx-linux;protocol=git"
+KERNEL_SRC = "git://github.com/evologics/linux-karo-tx;protocol=git"
 
 SRC_URI = "${KERNEL_SRC};branch=${SRCBRANCH} \
            file://defconfig \
