@@ -4,6 +4,7 @@ COMPATIBLE_MACHINE := "(sama5d2-roadrunner-.*)"
 
 SRC_URI += "\
     file://${MACHINE}_defconfig \
+    file://fix-sdmmc0-pins-to-work-with-qspi-flash.patch \
 "
 
 # fixed problem with gcc 8
