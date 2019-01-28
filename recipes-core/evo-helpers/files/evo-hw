@@ -58,18 +58,38 @@ get_hwtype() {
     esac
 }
 
+
+get_dt_status() {
+    case "$1" in
+        eth)
+            ETH_STATUS=/sys/firmware/devicetree/base/ahb/apb/ethernet@f8008000/status
+            if [ -f $ETH_STATUS ] && grep -qw okay $ETH_STATUS; then
+                return 0
+            else
+                echo WARNING: ethernet disabled it dt. Force switch off >&2
+                return 1
+            fi
+        ;;
+        can)
+            echo TODO: check CAN dt status >&2
+            return 0
+        ;;
+    esac
+}
+
 set_dev_power() {
     VAL=$(parse_val "$2")
     case "$1" in
-        rs232)      pin_set PC25 $VAL       ;;
-        eth)        pin_set PC17 $((!$VAL)) ;;
-        rs485)      pin_set PC17 $VAL       ;;
-        rs422)      pin_set PC17 $VAL       ;;
-        rs485-term) pin_set PC31 $VAL       ;; # ?? enable 0 or 1?
-        can0)       pin_set PD21 $((!$VAL)) ;;
-        can1)       pin_set PD22 $((!$VAL)) ;;
-        can)        pin_set PD21 $((!$VAL)) ;
-                    pin_set PD22 $((!$VAL)) ;;
+        eth)        get_dt_status "$1" && pin_set PC17 $((!$VAL)) || pin_set PC17 1;;
+        rs232)      pin_set PC25 $VAL ;;
+        rs485)      pin_set PC17 $VAL ;;
+        rs422)      pin_set PC17 $VAL ;;
+        rs485-term) pin_set PC31 $VAL ;; # ?? enable 0 or 1?
+        can0)       get_dt_status "$1" && pin_set PD21 $((!$VAL)) || pin_set PD21 1;;
+        can1)       get_dt_status "$1" && pin_set PD22 $((!$VAL)) || pin_set PD22 1;;
+        can)
+                    get_dt_status "$1" && pin_set PD21 $((!$VAL)) || pin_set PD21 1;
+                    get_dt_status "$1" && pin_set PD22 $((!$VAL)) || pin_set PD22 1;;
         *) die "unknown hardware type: $1"  ;;
     esac
 }
@@ -103,7 +123,7 @@ END
 
 case "$1" in
     -h) usage ;;
-    "")    show_status ;;
+    "")   show_status ;;
     on)   set_dev_power $(get_hwtype) 1 ;;
     off)  set_dev_power $(get_hwtype) 0 ;;
     type) get_hwtype ;;
