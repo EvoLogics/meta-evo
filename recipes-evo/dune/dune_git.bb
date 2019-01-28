@@ -1,6 +1,3 @@
-#
-# 
-#
 SUMMARY = "DUNE: Unified Navigation Environment"
 DESCRIPTION = "DUNE: Unified Navigation Environment is a runtime environment \
 for unmanned systems on-board software. \
@@ -9,10 +6,13 @@ e.g. code or control, navigation, communication, sensor and \
 actuator access, etc. \
 It provides an operating-system and architecture independent platform \
 abstraction layer, written in C++, enhancing portability among different CPU \
-architectures and operating systems. \
-http://lsts.fe.up.pt/toolchain/dune"
+architectures and operating systems."
 
-LICENSE = "ModEUPLv1.1 | Commercial"
+HOMEPAGE = "http://lsts.fe.up.pt/toolchain/dune"
+
+# DUNE uses _modified_ version of the EUPL-1.1 for non-commercial purposes.
+# For detailed licensing terms and conditions please see https://github.com/LSTS/dune/
+LICENSE = "EUPL-1.1"
 LIC_FILES_CHKSUM = "file://LICENCE.md;md5=b10079f5f43a149da9e871f5aebe9a4b"
 
 PR = "r0"
