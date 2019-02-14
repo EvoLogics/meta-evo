@@ -68,7 +68,7 @@
 		//bootargs = "mem=256M console=ttyS0,115200 root=/dev/mmcblk0p2 rootfstype=ext4 rw rootwait debug";
 
 		//bootargs = "mem=256M console=ttyS0,115200 ubi.mtd=rootfs root=ubi0:sama5d2-roadrunner-evomini2-rootfs rootfstype=ubifs rw debug";
-		bootargs = "mem=256M console=ttyS0,115200 ubi.mtd=rootfs root=ubi0:sama5d2-roadrunner-evomini2-rootfs rootfstype=ubifs ro";
+		bootargs = "mem=256M console=ttyS0,115200 ubi.mtd=rootfs root=ubi0:sama5d2-roadrunner-evomini2-rootfs rootfstype=ubifs quiet ro";
 		//bootargs = "mem=256M console=ttyS0,115200 root=/dev/mtdblock3 rw rootfstype=jffs2 debug";
 		//bootargs = "mem=256M console=ttyS0,115200 ubi.mtd=rootfs root=ubi0:sama5d2-roadrunner-evomini2-rootfs rootfstype=ubifs rw debug init=/bin/sh";
 		//bootargs = "mem=256M console=ttyS0,115200 ubi.mtd=rootfs root=ubi0:sama5d2-roadrunner-evomini2-rootfs rootfstype=ubifs rw debug init=/bin/sh dynamic_debug.verbose=1 dyndbg=\"module ubi +p; module ubifs +p\" loglevel=8";
