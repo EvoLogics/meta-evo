@@ -12,11 +12,13 @@ SRC_URI += "\
     file://adc-force-set-ncpha.patch \
     file://${MACHINE}.dtsi \
     file://${MACHINE}-eth.dts \
-    file://${MACHINE}-can.dts \
+    file://${MACHINE}-rs232.dts \
     file://${MACHINE}-rs422.dts \
     file://${MACHINE}-rs485.dts \
+    file://${MACHINE}-can.dts \
     file://${MACHINE}_defconfig \
 "
+
 do_configure_prepend() {
     cp ${WORKDIR}/${MACHINE}.dtsi ${S}/arch/arm/boot/dts/
     cp ${WORKDIR}/${MACHINE}-*.dts ${S}/arch/arm/boot/dts/

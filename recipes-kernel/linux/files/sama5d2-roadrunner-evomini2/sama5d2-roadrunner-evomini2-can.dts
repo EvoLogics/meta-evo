@@ -2,6 +2,8 @@
 #include "sama5d2-roadrunner-evomini2.dtsi"
 
 / {
+    model = "Acme Systems RoadRunner on EvoLogics Baseboard CAN";
+
 	ahb {
 		apb {
 			uart1: serial@f8020000 {
