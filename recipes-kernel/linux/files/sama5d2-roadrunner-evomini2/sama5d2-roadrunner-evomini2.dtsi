@@ -331,6 +331,9 @@
 				/* pinctrl-0 = <&pinctrl_sscdev>; */
 				compatible = "irqman";
 				ssc = <&ssc0>;
+				io-channels = <&adc 4>;
+				io-channel-names = "bat0";
+
 				/* input */
 				fpga-busy-gpios  = <&pioA PIN_PC6  GPIO_ACTIVE_HIGH>;
 				tbuf-empty-gpios = <&pioA PIN_PC5  GPIO_ACTIVE_HIGH>;
