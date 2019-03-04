@@ -15,5 +15,9 @@ cd /
 echo config::0:0:0:/tmp:/usr/local/bin/sersh >> /etc/passwd
 echo 'config:!:0:0:99999:7:::' >> /etc/shadow
 echo /usr/local/bin/sersh >> /etc/shells
+
+# needed for sersh 'ip' command
+ln -s /sbin/ip /bin/ip
+
 # remove self
 sleep 2 && rm -f /usr/local/etc/rc.local && mount -o remount,ro / &
