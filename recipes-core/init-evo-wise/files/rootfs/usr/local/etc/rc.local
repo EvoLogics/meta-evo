@@ -1,5 +1,6 @@
 #!/bin/sh
 # init script called once at first boot from /sbin/init
+echo '=== First boot initial setup ==='
 
 mount -o remount,rw /
 
@@ -11,5 +12,8 @@ dropbearkey -t rsa -f $DROPBEAR_RSAKEY
 dropbear -r $DROPBEAR_RSAKEY
 cd /
 
+echo config::0:0:0:/tmp:/usr/local/bin/sersh >> /etc/passwd
+echo 'config:!:0:0:99999:7:::' >> /etc/shadow
+echo /usr/local/bin/sersh >> /etc/shells
 # remove self
 sleep 2 && rm -f /usr/local/etc/rc.local && mount -o remount,ro / &
