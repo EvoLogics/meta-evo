@@ -17,13 +17,13 @@ do_install_append() {
     ln -sf issue.base issue
 
     cd ${D}${localstatedir}
-    ln -sfr ${localstatedir}/volatile/lock
-    ln -sfr ${localstatedir}/volatile/log
-    ln -sfr ${localstatedir}/volatile/run
+    ln -sf volatile/lock
+    ln -sf volatile/log
+    ln -sf volatile/run
 
     cd ${D}
     [ -d tmp ] && rmdir tmp
-    ln -sfr ${localstatedir}/volatile/tmp
+    ln -sf ${localstatedir}/volatile/tmp
 
     # create mount points for evologics 'safe etc' setup
     mkdir -p ${D}/usr/local/etc/vol1 ${D}/usr/local/etc/vol2

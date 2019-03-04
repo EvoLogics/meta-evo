@@ -4,7 +4,7 @@
 mount -o remount,rw /
 
 [ -d /run ] && rmdir /run
-ln -sfr /var/volatile/run /run
+ln -sf /var/volatile/run /run
 
 DROPBEAR_RSAKEY=/etc/dropbear/dropbear_rsa_host_key
 dropbearkey -t rsa -f $DROPBEAR_RSAKEY
