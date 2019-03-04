@@ -28,8 +28,6 @@ IMAGE_INSTALL = "\
     dtc-misc \
     mtd-utils \
     \
-    tar \
-    \
     sthttpd \
     iptables \
     \
@@ -47,6 +45,13 @@ IMAGE_INSTALL = "\
     ${CORE_IMAGE_EXTRA_INSTALL} \
     can-utils \
     iproute2 \
+    \
+    erlang \
+    erlang-sasl \
+    erlang-stdlib \
+    erlang-kernel \
+    erlang-erts \
+    erlang-crypto \
     "
 
 DEPENDS += "\
@@ -63,6 +68,8 @@ DEPENDS += "\
     rsync \
     \
     can-utils \
+    \
+    packagegroup-erlang-embedded \
 "
 
 inherit core-image
