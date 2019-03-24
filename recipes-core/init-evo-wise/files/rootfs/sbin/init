@@ -12,13 +12,13 @@ case "$1" in
         exit
         ;;
     u)
-        set -x
         kill -9 -1
         sleep 2
-        mount | awk '$3 ~ /root-old/{print $3}' | sort -r | xargs umount
+        dropbear -r /etc/dropbear/dropbear_rsa_host_key
+
+        mount | grep -wo '/rootfs-old[^ ]*' | sort -r | xargs umount
         ubidetach -p /dev/mtd3
-        set +x
-        
+
         export PS1='\u@updating:\w\$ '
         /bin/sh
             #while :; do
