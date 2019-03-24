@@ -25,7 +25,6 @@ RDEPENDS_${PN} = "busybox expect"
 
 SRC_URI = "file://rootfs/sbin/init \
            file://rootfs/sbin/initctl.exp \
-           file://rootfs/sbin/evo-gen-mac \
            file://rootfs/etc/init.d/lxc \
            file://rootfs/usr/local/etc/rc.local \
     "
@@ -52,7 +51,6 @@ do_install() {
 	install -d ${D}${base_sbindir}
     install -m 0755 ${WORKDIR}/rootfs/sbin/init ${D}${base_sbindir}
     install -m 0755 ${WORKDIR}/rootfs/sbin/initctl.exp ${D}${base_sbindir}
-    install -m 0755 ${WORKDIR}/rootfs/sbin/evo-gen-mac ${D}${base_sbindir}
 
     mkdir -p ${D}/usr/local/etc
     # install init script runned at start and delete her self

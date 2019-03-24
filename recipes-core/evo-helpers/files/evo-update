@@ -1,0 +1,46 @@
+#!/bin/sh -ex
+NEW_ROOT=/update
+PROG=$(realpath $0)
+ROOT_TGZ=/home/root/core-image-minimal-sama5d2-roadrunner-evomini2.tar.xz
+
+mk_ram_root_tgz() {
+	tar -C $NEW_ROOT -xf $ROOT_TGZ
+	cp /sbin/init $NEW_ROOT/sbin/
+}
+
+mk_ram_root() {
+#    tar --one-file-system -C / -c . | \
+    tar -C / -c \
+         bin etc lib sbin var usr/bin usr/lib usr/sbin usr/share |
+              tar -C $NEW_ROOT -x
+    mkdir -p $NEW_ROOT/tmp $NEW_ROOT/dev $NEW_ROOT/home/root $NEW_ROOT/proc $NEW_ROOT/sys
+    (cd $NEW_ROOT && ln -s /var/volatile/tmp tmp)
+}
+
+mount_ramfs() {
+    mkdir -p $NEW_ROOT
+    mount -t tmpfs tmp $NEW_ROOT
+}
+
+if [ ! -e $NEW_ROOT/bin/sh ]; then
+    mount_ramfs
+    mk_ram_root
+fi
+
+cd $NEW_ROOT
+mount --bind . .
+mkdir -p rootfs-old
+pivot_root . rootfs-old || exec $PROG $@
+
+#keep_run -m
+
+#chroot . sh mount -a
+chroot . sh << END
+	mount -t proc proc proc
+	mount -t mount -t devtmpfs dev dev
+	mount -t sysfs sysfs sys
+END
+
+kill -HUP 1
+sleep 1
+

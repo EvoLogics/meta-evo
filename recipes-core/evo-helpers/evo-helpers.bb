@@ -9,6 +9,9 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.GPLv2;md5=751419260aa954499f
 PR = "r1"
 
 SRC_URI = "file://evo-hw \
+           file://evo-env \
+           file://evo-gen-mac \
+           file://evo-update \
 "
 
 S = "${WORKDIR}"
@@ -24,9 +27,11 @@ do_compile() {
 do_install() {
 	install -d ${D}${base_sbindir}
     install -m 0755 ${WORKDIR}/evo-hw ${D}${base_sbindir}
+    install -m 0755 ${WORKDIR}/evo-env ${D}${base_sbindir}
+    install -m 0755 ${WORKDIR}/evo-gen-mac ${D}${base_sbindir}
+    install -m 0755 ${WORKDIR}/evo-update ${D}${base_sbindir}
 
-    ## /bin/ip needed for sersh
-    #set -x
-    #ln -frs ${D}${base_sbindir}/ip ${D}${base_bindir}/ip
+    ln -srf ${D}${base_sbindir}/evo-env ${D}${base_sbindir}/fw_printenv
+    ln -srf ${D}${base_sbindir}/evo-env ${D}${base_sbindir}/fw_setenv
 }
 

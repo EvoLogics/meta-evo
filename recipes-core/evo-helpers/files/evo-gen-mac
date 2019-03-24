@@ -29,4 +29,3 @@ fw_printenv | awk -vrnd_rnd=$RANDOM_MAC '
 		}
 		printf("%s", mac);
 	}'
-	

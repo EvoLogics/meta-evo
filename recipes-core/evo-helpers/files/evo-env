@@ -1,0 +1,311 @@
+#!/bin/sh
+# vim: ft=tcl
+# the next line restarts using expect \
+    LC_TYPE=C exec expect -f "$0" -- "$@"
+
+array set ::opt {
+    loglevel {fail warn note info norm pass stage}
+    force 0
+    noheader 0
+
+    config_file /dev/mtd1
+    script {}
+}
+
+remove_nulls -d 0
+remove_nulls 0
+log_user 0
+
+set timeout -1
+
+############## start: help function ######################
+array set ::c {
+    none  "\033\[0m"    white "\033\[1;37m"
+    red   "\033\[0;31m" lred  "\033\[1;31m"
+    grn   "\033\[0;32m" lgrn  "\033\[1;32m"
+    yel   "\033\[0;33m" lyel  "\033\[1;33m"
+    mag   "\033\[0;35m" lmag  "\033\[1;35m"
+    lblue "\033\[1;36m" cyan  "\033\[0;36m"
+}
+
+proc die {msg} {
+    msg fail "die: $msg\n" stderr
+    exit 1
+}
+
+proc msg {type msg {out stdout}} {
+    if {[lsearch -exact $::opt(loglevel) $type] == -1} {
+        return
+    }
+
+    switch $type {
+        fail    {set col $::c(lred)}
+        warn    {set col $::c(lmag)}
+        note    {set col $::c(lyel)}
+        info    {set col $::c(white)}
+        dbg     {set col $::c(cyan)}
+        pass    {set col $::c(lgrn)}
+        norm    {set col {}}
+        stage   {
+            set col $::c(yel)
+            set msg "\n====== $msg ======\n"
+        }
+        default {set col {}}
+    }
+    puts -nonewline $out $col$msg$::c(none)
+    flush $out
+}
+
+proc hexdump string {
+    binary scan $string H* hex
+    regexp -all -inline .. $hex
+}
+
+proc hexdump_ascii {string {shift {}}} {
+    for {set i 0} {$i < [string length $string]} {incr i 16} {
+        set row [string range $string $i [expr {$i + 15}]]
+        binary scan $row H* hex
+        set hex [regsub -all {(.{2})} [format %-32s $hex] {\1 }]
+        set row [regsub -all {[^[:print:]]} $row .]
+        puts [format "$shift%08x: %s %-16s" $i $hex $row]
+    }
+}
+
+proc bindump string {
+    binary scan $string b* bin
+    regexp -all -inline .{8} $bin
+}
+
+proc check_for_following {type} {
+    global argv0
+    if {![llength [uplevel set argv]]} {
+        send_error "$argv0: [uplevel set flag] requires following $type"
+        exit 2
+    }
+}
+
+############## end: help function ######################
+array set evo_vars {
+    serial# {
+        name serial#
+        path /
+        type s
+        protected 1
+    }
+    ethaddr {
+        name mac-address
+        path /ahb/apb/ethernet
+        type mac
+        protected 1
+    }
+    ethstatus {
+        name status
+        path /ahb/apb/ethernet
+        type s
+        protected 0
+    }
+    bootargs {
+        name bootargs
+        path /chosen
+        type s
+        protected 0
+    }
+}
+
+proc get_env {var} {
+    if {![info exist ::evo_vars($var)]} {
+        msg err "ERROR: Can't find variable $var"
+        return {}
+    }
+
+    array set param $::evo_vars($var)
+    if {$param(type) == {mac}} {
+        set type i
+    } else {
+        set type $param(type)
+    }
+
+    spawn fdtget -t $type $::opt(config_file) $param(path) $param(name)
+    expect eof
+    set rc $expect_out(buffer)
+    set rc [regsub {\r?\n$} $rc {}]
+
+    foreach {pid spawnid iserror exit_code} [wait] break
+    if {$iserror != 0 && $exit_code != 10} {
+        # exit_code == 10 (ECHILD 10 No child processes)
+        # happend in shell from +++AT#
+        puts stderr "$rc"
+        exit $exit_code
+    }
+
+    if {$param(type) == {mac}} {
+        set rc [format %02x:%02x:%02x:%02x:%02x:%02x {*}$rc]
+    }
+    return $rc
+
+    # fdtget -t s sama5d2-roadrunner-evomini2-eth.dtb /chosen serial#
+    #Error at 'serial#': FDT_ERR_NOTFOUND
+}
+
+proc set_env {var val} {
+    if {![info exist ::evo_vars($var)]} {
+        msg err "ERROR: Can't find variable $var"
+        return {}
+    }
+
+    array set param $::evo_vars($var)
+    if {$param(protected) && !$::opt(force)} {
+        die "Error: Variable $var protected. Use flag -f to force set"
+    }
+
+    if {$param(type) == {mac}} {
+        set type x
+        set val "\[[split val :]]"
+    } else {
+        set type $param(type)
+    }
+    # SERIAL=134/13;
+    # dtc -qI dtb -O dtb -o /tmp/1.dtb /dev/mtd1
+    # && fdtput -t s /tmp/1.dtb /chosen serial# "$SERIAL"
+    # && flash_erase -q /dev/mtd1 0 0
+    # && dtc -qI dtb -O dtb -o /dev/mtd1 /tmp/1.dtb
+    if {[file type $::opt(config_file)] == {characterSpecial}} {
+        die "writing to char dev not yet supported"
+    }
+
+    #puts "fdtput -t $type $::opt(config_file) $param(path) $param(name) $val"
+    exec fdtput -t $type $::opt(config_file) $param(path) $param(name) $val
+}
+
+proc do_printenv {argv argc} {
+    set params $argv
+    if {$argc == 0} {
+        if {$::opt(noheader)} {
+            die "Error: `-n' option requires exactly one argument"
+        }
+        set params [array names ::evo_vars]
+    }
+
+    foreach var $params {
+        if {!$::opt(noheader)} {
+            puts -nonewline "$var="
+        }
+        puts "[get_env $var]"
+    }
+}
+
+proc do_setenv {argv argc} {
+    if {[expr $argc % 2] != 0} {
+        die "Error: must have an even number of arguments"
+    }
+
+    foreach {var val} $argv {
+        set_env $var $val
+    }
+}
+
+proc usage_printenv {} {
+    global argv0
+    send_error "Usage: [regsub .*/ $argv0 {}] \[OPTIONS]... \[--] \[VARIABLE]\n\
+    -h, --help     - this help\n\
+    -c, --config   - configuration dtb file/partition, default: $::opt(config_file)\n\
+    -v, --verbose  - be verbose\n\
+    -n, --noheader - do not repeat variable name in output\n\
+    "
+    exit 1
+}
+
+proc usage_setenv {} {
+    global argv0
+    send_error "Usage: [regsub .*/ $argv0 {}] \[-h|--help] \[-v] \[--] \n\
+    -h, --help     - this help\n\
+    -c, --config   - configuration dtb file/partition, default: $::opt(config_file)\n\
+    -v, --verbose  - be verbose\n\
+    -s, --script   - batch mode to minimize writes\n\
+    -v, --verbose  - be verbose\n\
+    -f, --force  - force action\n\
+    "
+    exit 1
+}
+
+proc parse_common_args {argv_ argc_} {
+   upvar $argv_ argv
+   upvar $argc_ argc
+   while { [llength $argv] > 0 } {
+       set flag [lindex $argv 0]
+       if {0 == [regexp "^-" $flag]} break
+       set argv [lrange $argv 1 end]
+       switch -glob -- $flag {
+           -c - --config { set ::opt(config_file) [lindex $argv 0]; check_for_following string; set argv [lrange $argv 1 end] }
+           -f - --force  { set ::opt(force) 1 }
+           -v - --verbose   { lappend ::opt(loglevel) dbg }
+           -h - --help {
+               switch $progname {
+                   fw_printenv usage_printenv
+                   fw_setenv   usage_setenv
+               }
+           }
+           --  { break }
+           -*  { set argv [linsert $argv 0 $flag]; break }
+       }
+   }
+   set argc [llength $argv]
+}
+
+proc parse_printenv_args {argv_ argc_} {
+   upvar $argv_ argv
+   upvar $argc_ argc
+   while { [llength $argv] > 0 } {
+       set flag [lindex $argv 0]
+       if {0 == [regexp "^-" $flag]} break
+       set argv [lrange $argv 1 end]
+       switch -- $flag {
+           -n - --noheader { set ::opt(noheader) 1 }
+       }
+   }
+   set argc [llength $argv]
+}
+
+proc parse_setenv_args {argv_ argc_} {
+   upvar $argv_ argv
+   upvar $argc_ argc
+   while { [llength $argv] > 0 } {
+       set flag [lindex $argv 0]
+       if {0 == [regexp "^-" $flag]} break
+       set argv [lrange $argv 1 end]
+       switch -- $flag {
+           -s - --script  { set ::opt(script) [lindex $argv 0]; check_for_following string; set argv [lrange $argv 1 end] }
+       }
+   }
+    set argc [llength $argv]
+}
+
+switch [file tail $argv0] {
+    fw_printenv {
+        parse_common_args   argv argc
+        parse_printenv_args argv argc
+        do_printenv $argv $argc
+    }
+    fw_setenv {
+        parse_common_args argv argc
+        parse_setenv_args argv argc
+        do_setenv $argv $argc
+    }
+    evo-env {
+        die "Error: support directly setting dt variables not yet support"
+    }
+    default {
+        die "Error: Identity crisis - may be called as `fw_printenv' or as `fw_setenv' but not as `$argv0'"
+    }
+}
+
+#set argv [string trim $argv \{\}]
+#set argc [llength $argv]
+#
+#puts $argv0
+#exit
+
+#if {$argc != 1} {
+#    usage
+#}
+
