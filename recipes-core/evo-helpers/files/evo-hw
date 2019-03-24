@@ -117,7 +117,7 @@ show_status() {
 
 usage() {
     cat << END
-Usage: $(basename $0) [on|off]|[[eth|rs485|rs422|rs485-term|can|can0|can1] [on|off|type]]
+Usage: $(basename $0) [on|off]|[[P<ABCDE><0-9>|eth|rs485|rs422|rs485-term|can|can0|can1] [on|off|type]]
 END
 }
 
@@ -127,6 +127,13 @@ case "$1" in
     on)   set_dev_power $(get_hwtype) 1 ;;
     off)  set_dev_power $(get_hwtype) 0 ;;
     type) get_hwtype ;;
+    P[ABCDE][0-9]*)
+        if [ -z "$2" ]; then
+            pin_get "$1"
+        else
+            pin_set "$1" "$2"
+        fi
+    ;;
     *)
         if [ -z "$2" ]; then
             echo "$1 status: $(get_dev_status "$1")"
