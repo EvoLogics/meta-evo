@@ -1,0 +1,75 @@
+From 783eed0d8fedc36b60818c981367ae60700d6334 Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Thu, 13 Dec 2018 11:35:13 +0100
+Subject: [PATCH] mtd: spi-nor: Restore 3byte mode at shutdown for atmel_qspi
+
+---
+ drivers/mtd/spi-nor/atmel-quadspi.c | 8 ++++++++
+ drivers/mtd/spi-nor/spi-nor.c       | 9 +++++++++
+ include/linux/mtd/spi-nor.h         | 9 +++++++++
+ 3 files changed, 26 insertions(+)
+
+diff --git a/drivers/mtd/spi-nor/atmel-quadspi.c b/drivers/mtd/spi-nor/atmel-quadspi.c
+index ceaaef47f02e..fe2f69600419 100644
+--- a/drivers/mtd/spi-nor/atmel-quadspi.c
++++ b/drivers/mtd/spi-nor/atmel-quadspi.c
+@@ -737,6 +737,13 @@ static int atmel_qspi_remove(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
++static void atmel_qspi_shutdown(struct platform_device *pdev)
++{
++	struct atmel_qspi *aq = platform_get_drvdata(pdev);
++
++	spi_nor_restore(&aq->nor);
++}
++
+ static int __maybe_unused atmel_qspi_suspend(struct device *dev)
+ {
+ 	struct atmel_qspi *aq = dev_get_drvdata(dev);
+@@ -773,6 +780,7 @@ static struct platform_driver atmel_qspi_driver = {
+ 	},
+ 	.probe		= atmel_qspi_probe,
+ 	.remove		= atmel_qspi_remove,
++	.shutdown	= atmel_qspi_shutdown,
+ };
+ module_platform_driver(atmel_qspi_driver);
+ 
+diff --git a/drivers/mtd/spi-nor/spi-nor.c b/drivers/mtd/spi-nor/spi-nor.c
+index 24da5f66bad5..c1309be92bb2 100644
+--- a/drivers/mtd/spi-nor/spi-nor.c
++++ b/drivers/mtd/spi-nor/spi-nor.c
+@@ -4017,6 +4017,15 @@ static const struct flash_info *spi_nor_match_id(const char *name)
+ 	return NULL;
+ }
+ 
++void spi_nor_restore(struct spi_nor *nor)
++{
++	if ((nor->addr_width == 4) &&
++	    (JEDEC_MFR(nor->info) != SNOR_MFR_SPANSION) &&
++	    !(nor->info->flags & SPI_NOR_4B_OPCODES))
++		set_4byte(nor, nor->info, 0);
++}
++EXPORT_SYMBOL_GPL(spi_nor_restore);
++
+ MODULE_LICENSE("GPL");
+ MODULE_AUTHOR("Huang Shijie <shijie8@gmail.com>");
+ MODULE_AUTHOR("Mike Lavender");
+diff --git a/include/linux/mtd/spi-nor.h b/include/linux/mtd/spi-nor.h
+index d67ab84304d8..bdf06e47e03a 100644
+--- a/include/linux/mtd/spi-nor.h
++++ b/include/linux/mtd/spi-nor.h
+@@ -520,4 +520,13 @@ struct spi_nor_hwcaps {
+ int spi_nor_scan(struct spi_nor *nor, const char *name,
+ 		 const struct spi_nor_hwcaps *hwcaps);
+ 
++/**
++ * spi_nor_restore() - restore the SPI NOR settings for romboot
++ * @nor:	the spi_nor structure
++ *
++ * The drivers can use this fuction to prepare SPI NOR to settings
++ * be required for a ROM boot.
++ */
++void spi_nor_restore(struct spi_nor *nor);
++
+ #endif
