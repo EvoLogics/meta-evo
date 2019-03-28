@@ -6,6 +6,7 @@ For more information about the EvoLogics product line see:
 
 Supported SoCs / MACHINE names
     - SAMA5D2 product family / sama5d2-roadrunner-evomini2
+    - i.MX6 product family / tx6s-8035-evobb, tx6u-8033-evobb, tx6q-8037-evobb, tx6q-8137-evobb
 
 Dependencies
 ============
@@ -21,6 +22,14 @@ Branch: rocko
 
 - meta-acme
 URI: https://github.com/ramok/meta-acme
+Branch: rocko
+
+- meta-freescale
+URI: https://git.yoctoproject.org/git/meta-freescale
+Branch: rocko
+
+- meta-freescale-3rdparty
+URI: https://github.com/evologics/meta-freescale-3rdparty
 Branch: rocko
 
 Build procedure
