@@ -9,7 +9,7 @@ SRCREV = "7e44ddb093c3b8d723e16212c9a04cd56c77d165"
 
 SRC_URI += "\
     file://adc-remove-regulator-hack.patch \
-    file://adc-force-set-ncpha.patch \
+    file://adc-force-set-csnaat.patch \
     file://${MACHINE}.dtsi \
     file://${MACHINE}-eth.dts \
     file://${MACHINE}-rs232.dts \

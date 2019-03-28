@@ -1,3 +1,11 @@
+From 1a1cee78d86d4dc0b309c4c3258331fad2a01e91 Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Fri, 2 Feb 2018 10:29:14 +0100
+
+---
+ drivers/spi/spidev.c | 1 +
+ 1 file changed, 1 insertion(+)
+
 diff --git a/drivers/spi/spidev.c b/drivers/spi/spidev.c
 index cda10719d1d1..4f3779d3aa09 100644
 --- a/drivers/spi/spidev.c

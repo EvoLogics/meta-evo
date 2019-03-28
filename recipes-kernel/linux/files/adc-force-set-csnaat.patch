@@ -1,0 +1,35 @@
+From 7152ccc9c485874cda69ffe3ea3f652b974442eb Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Thu, 13 Dec 2018 11:33:28 +0100
+
+---
+ drivers/spi/spi-atmel.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/spi/spi-atmel.c b/drivers/spi/spi-atmel.c
+index 3f890d162934..7f5b429f2f54 100644
+--- a/drivers/spi/spi-atmel.c
++++ b/drivers/spi/spi-atmel.c
+--- a/drivers/spi/spi-atmel.c
++++ b/drivers/spi/spi-atmel.c
+@@ -146,6 +146,8 @@
+ #define SPI_CPOL_SIZE				1
+ #define SPI_NCPHA_OFFSET			1
+ #define SPI_NCPHA_SIZE				1
++#define SPI_CSNAAT_OFFSET			2
++#define SPI_CSNAAT_SIZE				1
+ #define SPI_CSAAT_OFFSET			3
+ #define SPI_CSAAT_SIZE				1
+ #define SPI_BITS_OFFSET				4
+@@ -1206,7 +1206,10 @@ static int atmel_spi_setup(struct spi_device *spi)
+ 	if (!(spi->mode & SPI_CPHA))
+ 		csr |= SPI_BIT(NCPHA);
+ 	if (!as->use_cs_gpios)
+-		csr |= SPI_BIT(CSAAT);
++		;
++
++    csr |= SPI_BIT(CSNAAT);
++
+ 
+ 	/* DLYBS is mostly irrelevant since we manage chipselect using GPIOs.
+ 	 *

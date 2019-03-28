@@ -1,8 +1,16 @@
+From 5027bb842094a2f86cad59714f60586bae853b0c Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Thu, 13 Dec 2018 11:33:28 +0100
+
+---
+ drivers/iio/adc/at91-sama5d2_adc.c | 41 +-------------------------------------
+ 1 file changed, 1 insertion(+), 40 deletions(-)
+
 diff --git a/drivers/iio/adc/at91-sama5d2_adc.c b/drivers/iio/adc/at91-sama5d2_adc.c
-index 57e1eb23c45d..020fd35d0784 100644
+index d5ea84cf6460..8bb439ed087b 100644
 --- a/drivers/iio/adc/at91-sama5d2_adc.c
 +++ b/drivers/iio/adc/at91-sama5d2_adc.c
-@@ -682,32 +682,12 @@ static int at91_adc_probe(struct platform_device *pdev)
+@@ -1746,32 +1746,12 @@ static int at91_adc_probe(struct platform_device *pdev)
  	if (IS_ERR(st->per_clk))
  		return PTR_ERR(st->per_clk);
  
@@ -36,7 +44,7 @@ index 57e1eb23c45d..020fd35d0784 100644
  
  	at91_adc_hw_init(st);
  
-@@ -744,9 +724,6 @@ static int at91_adc_probe(struct platform_device *pdev)
+@@ -1824,9 +1804,6 @@ static int at91_adc_probe(struct platform_device *pdev)
  per_clk_disable_unprepare:
  	clk_disable_unprepare(st->per_clk);
  vref_disable:
@@ -46,7 +54,7 @@ index 57e1eb23c45d..020fd35d0784 100644
  	return ret;
  }
  
-@@ -759,9 +736,6 @@ static int at91_adc_remove(struct platform_device *pdev)
+@@ -1841,9 +1818,6 @@ static int at91_adc_remove(struct platform_device *pdev)
  
  	clk_disable_unprepare(st->per_clk);
  
@@ -56,7 +64,7 @@ index 57e1eb23c45d..020fd35d0784 100644
  	return 0;
  }
  
-@@ -780,8 +754,6 @@ static __maybe_unused int at91_adc_suspend(struct device *dev)
+@@ -1862,8 +1836,6 @@ static __maybe_unused int at91_adc_suspend(struct device *dev)
  	at91_adc_writel(st, AT91_SAMA5D2_CR, AT91_SAMA5D2_CR_SWRST);
  
  	clk_disable_unprepare(st->per_clk);
@@ -65,7 +73,7 @@ index 57e1eb23c45d..020fd35d0784 100644
  
  	return pinctrl_pm_select_sleep_state(dev);
  }
-@@ -797,14 +769,6 @@ static __maybe_unused int at91_adc_resume(struct device *dev)
+@@ -1879,14 +1851,6 @@ static __maybe_unused int at91_adc_resume(struct device *dev)
  	if (ret)
  		goto resume_failed;
  
@@ -80,7 +88,7 @@ index 57e1eb23c45d..020fd35d0784 100644
  	ret = clk_prepare_enable(st->per_clk);
  	if (ret)
  		goto vref_disable_resume;
-@@ -818,9 +782,6 @@ static __maybe_unused int at91_adc_resume(struct device *dev)
+@@ -1911,9 +1875,6 @@ static __maybe_unused int at91_adc_resume(struct device *dev)
  	return 0;
  
  vref_disable_resume:
