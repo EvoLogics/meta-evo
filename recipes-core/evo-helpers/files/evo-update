@@ -1,7 +1,7 @@
 #!/bin/sh -ex
 NEW_ROOT=/update
 PROG=$(realpath $0)
-ROOT_TGZ=/home/root/core-image-minimal-sama5d2-roadrunner-evomini2.tar.xz
+ROOT_TGZ=/home/root/core-image-minimal-sama5d2-roadrunner-evo.tar.xz
 
 mk_ram_root_tgz() {
 	tar -C $NEW_ROOT -xf $ROOT_TGZ

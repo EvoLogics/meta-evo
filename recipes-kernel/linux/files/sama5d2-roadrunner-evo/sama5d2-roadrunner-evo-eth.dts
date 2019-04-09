@@ -1,8 +1,8 @@
 /dts-v1/;
-#include "sama5d2-roadrunner-evomini2.dtsi"
+#include "sama5d2-roadrunner-evo.dtsi"
 
 / {
-    model = "Acme Systems RoadRunner on EvoLogics Baseboard RS232";
+    model = "Acme Systems RoadRunner on EvoLogics Baseboard ETH";
 
 	ahb {
 		apb {
@@ -18,7 +18,7 @@
 			macb0: ethernet@f8008000 {
 				pinctrl-names = "default";
 				pinctrl-0 = <&pinctrl_macb0_default>;
-				status = "disabled";
+				status = "okay";
 				mac-address = [de ad 00 00 00 01];
 			};
 
@@ -46,6 +46,13 @@
                     pinmux  = <PIN_PC16__GPIO>;
                     bias-pull-up;
                 };
+
+				/*
+				pinctrl_macb0_phy_irq: macb0_phy_irq {
+					pinmux = <PIN_PC9__GPIO>;
+					bias-disable;
+				};
+				*/
 			};
 		};
 	};

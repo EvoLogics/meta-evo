@@ -5,7 +5,7 @@ For more information about the EvoLogics product line see:
     https://evologics.de/en/products/index.html
 
 Supported SoCs / MACHINE names
-    - SAMA5D2 product family / sama5d2-roadrunner-evomini2
+    - SAMA5D2 product family / sama5d2-roadrunner-evo
     - i.MX6 product family / tx6s-8035-evobb, tx6u-8033-evobb, tx6q-8037-evobb, tx6q-8137-evobb
 
 Dependencies
@@ -92,7 +92,7 @@ and edit the "local.conf" file. Here is an example:
 
 vim conf/local.conf
 [...]
-MACHINE ??= "sama5d2-roadrunner-evomini2"
+MACHINE ??= "sama5d2-roadrunner-evo"
 [...]
 DL_DIR ?= "your_download_directory_path"
 [...]

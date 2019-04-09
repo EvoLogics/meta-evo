@@ -17,24 +17,24 @@ software =
         },
         {
            name = "dtb";
-           filename = "sama5d2-roadrunner-evomini2-eth.dtb";
+           filename = "sama5d2-roadrunner-evo-eth.dtb";
            device = "/dev/mtd1";
            type = "flash";
-           sha256 = "@zImage-sama5d2-roadrunner-evomini2-eth.dtb";
+           sha256 = "@zImage-sama5d2-roadrunner-evo-eth.dtb";
         },
         {
            name = "kernel";
-           filename = "zImage-sama5d2-roadrunner-evomini2.bin";
+           filename = "zImage-sama5d2-roadrunner-evo.bin";
            device = "/dev/mtd2";
            type = "flash";
-           sha256 = "@zImage-sama5d2-roadrunner-evomini2.bin";
+           sha256 = "@zImage-sama5d2-roadrunner-evo.bin";
         },
         {
             name = "rootfs";
-            filename = "evologics-base-image-sama5d2-roadrunner-evomini2.ubi";
+            filename = "evologics-base-image-sama5d2-roadrunner-evo.ubi";
             device = "/dev/mtd3";
             type = "flash";
-            sha256 = "@evologics-base-image-sama5d2-roadrunner-evomini2.ubi";
+            sha256 = "@evologics-base-image-sama5d2-roadrunner-evo.ubi";
         }
    );
 }

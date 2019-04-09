@@ -11,7 +11,7 @@ SRC_URI += "\
 # https://github.com/linux4sam/at91bootstrap/commit/afbe83496893c100a245d1f414eb4008ab36fd0a
 SRCREV = "afbe83496893c100a245d1f414eb4008ab36fd0a"
 
-AT91BOOTSTRAP_LOAD_sama5d2-roadrunner-evomini2 = "dataflashboot-linux"
+AT91BOOTSTRAP_LOAD_sama5d2-roadrunner-evo = "dataflashboot-linux"
 # TODO: find how to set it from config
 #CONFIG_OF_OFFSET="0x00010000"
 
