@@ -4,7 +4,7 @@ PR .= ".2"
 SRC_URI += "file://issue*        \
            "
 
-do_install_append() {
+do_install_append_sama5d2-roadrunner-evo() {
 	install -d ${D}${sysconfdir}
 	install -m 0644 ${WORKDIR}/issue.base ${D}${sysconfdir}
 	install -m 0644 ${WORKDIR}/issue.wise ${D}${sysconfdir}
