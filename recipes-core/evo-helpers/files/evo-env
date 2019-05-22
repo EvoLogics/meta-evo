@@ -126,7 +126,9 @@ proc get_env {var} {
     }
 
     spawn fdtget -t $type $::opt(config_file) $param(path) $param(name)
-    expect eof
+    expect -re {Error|FDT_ERR} {
+        return {}
+    }
     set rc $expect_out(buffer)
     set rc [regsub {\r?\n$} $rc {}]
 
