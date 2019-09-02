@@ -9,7 +9,7 @@ HOMEPAGE = "http://mmonit.com/monit/"
 LICENSE = "AGPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ea116a7defaf0e93b3bb73b2a34a3f51"
 
-DEPENDS = "openssl zlib"
+DEPENDS = "openssl zlib virtual/crypt"
 
 SRC_URI = "\
 	http://mmonit.com/monit/dist/${BP}.tar.gz \
@@ -17,8 +17,8 @@ SRC_URI = "\
 	file://init \
 	"
 
-SRC_URI[md5sum] = "890df599d6c1e9cfbbdd3edbacb7db81"
-SRC_URI[sha256sum] = "aa0ce6361d1155e43e30a86dcff00b2003d434f221c360981ced830275abc64a"
+SRC_URI[md5sum] = "9f7dc65e902c103e4c5891354994c3df"
+SRC_URI[sha256sum] = "87fc4568a3af9a2be89040efb169e3a2e47b262f99e78d5ddde99dd89f02f3c2"
 
 INITSCRIPT_NAME = "monit"
 INITSCRIPT_PARAMS = "defaults 99"
