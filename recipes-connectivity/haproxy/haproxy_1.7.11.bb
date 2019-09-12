@@ -5,7 +5,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2d862e836f92129cdc0ecccc54eed5e0"
 
 DEPENDS = "libpcre openssl zlib"
-RDEPENDS_${PN} = "openssl"
+RDEPENDS_${PN} = "openssl openssl-bin"
 
 SRC_URI = "http://www.haproxy.org/download/1.7/src/haproxy-1.7.11.tar.gz \
            file://haproxy.cfg \
