@@ -9,7 +9,7 @@ HOMEPAGE = "http://mmonit.com/monit/"
 LICENSE = "AGPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ea116a7defaf0e93b3bb73b2a34a3f51"
 
-DEPENDS = "openssl zlib libxcrypt"
+DEPENDS = "openssl zlib"
 
 SRC_URI = "\
 	http://mmonit.com/monit/dist/${BP}.tar.gz \
