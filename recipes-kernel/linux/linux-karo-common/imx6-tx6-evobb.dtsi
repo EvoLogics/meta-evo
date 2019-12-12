@@ -55,6 +55,16 @@
 		reset-delay-us = <10000>;
 		#reset-cells = <0>;
 	};
+
+    pps_gpio: pps-gpio {
+        compatible = "pps-gpio";
+        label = "pps-gpio";
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_pps>;
+
+        gpios = <&gpio1 4 GPIO_ACTIVE_HIGH>;
+        //assert-falling-edge;
+    };
 };
 
 &i2c2 {
@@ -144,6 +154,11 @@
 	pinctrl_icplus: icplusgrp {
 		fsl,pins = <
 			MX6QDL_PAD_EIM_OE__GPIO2_IO25		0x17059
+		>;
+	};
+	pinctrl_pps: ppsgrp {
+		fsl,pins = <
+			MX6QDL_PAD_GPIO_4__GPIO1_IO04       0x1b0b0 /* GPS_PPS */
 		>;
 	};
 
