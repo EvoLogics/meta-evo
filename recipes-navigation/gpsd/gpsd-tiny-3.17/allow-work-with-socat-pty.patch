@@ -1,0 +1,13 @@
+--- a/timehint.c	2019-11-06 10:41:24.087469930 +0100
++++ b/timehint.c	2019-11-06 10:41:17.191499098 +0100
+@@ -416,10 +416,6 @@
+ void ntpshm_link_activate(struct gps_device_t *session)
+ /* set up ntpshm storage for a session */
+ {
+-    /* don't talk to NTP when we're running inside the test harness */
+-    if (session->sourcetype == source_pty)
+-	return;
+-
+     if (session->sourcetype != source_pps ) {
+ 	/* allocate a shared-memory segment for "NMEA" time data */
+ 	session->shm_clock = ntpshm_alloc(session->context);
