@@ -4,9 +4,14 @@ SUMMARY = "Linux Kernel for Ka-Ro electronics TX6 Computer-On-Modules on EvoLogi
 
 PR .= ".0"
 
+PV = "4.20+git"
+
 SRCREV_sdma-imx6q = "55edf5202154de59ee1c6a5b6b6ba6fa54571515"
 SRC_URI[sdma-imx6q.md5sum] = "03405e6d82f1fe8ae1517d0a294027dd"
 SRC_URI[sdma-imx6q.sha256sum] = "7790c161b7e013a9dbcbffb17cc5d4cb63d952949a505647e4679f02d04c4784"
+
+SRC_URI += "file://defconfig \
+"
 
 SRC_URI += "\
     file://imx6-tx6-evobb.cfg \
