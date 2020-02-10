@@ -2,6 +2,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += " \
+    file://coreutils.cfg \
     file://brctl.cfg \
     file://compress.cfg \
     file://cron.cfg \
@@ -27,4 +28,7 @@ SRC_URI += " \
     file://tun.cfg \
     file://ubi.cfg \
     file://vi.cfg \
+    file://modules.cfg \
+    file://console.cfg \
+    file://new0.cfg \
 "
