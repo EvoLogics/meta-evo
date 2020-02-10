@@ -4,6 +4,24 @@ export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 
 mkdir -p /dev/pts /dev/shm
 
+getty_loop() {
+    while :; do
+         if [ ! -e /var/lock/nogetty.$1 -a -e /dev/$1 ]; then
+            GETTY_SPEED=115200
+            # for temporary change speed
+            if [ -f /tmp/getty-speed.$1.cfg ]; then
+                read GETTY_SPEED /tmp/getty-speed.$1.cfg
+            fi
+
+            stty -F /dev/$1 erase '^?'
+            # to make possible init script catch signals
+            /sbin/getty $GETTY_SPEED $1&
+            wait $!
+        fi
+        sleep 0.5
+    done
+}
+
 case "$1" in
     6)
         [ -e /opt/lxc/sandbox/enable ] && /etc/init.d/lxc stop
@@ -124,13 +142,4 @@ if $WISE; then
 	/etc/init.d/lxc start
 fi
 
-while :; do
-     if [ ! -e /var/lock/nogetty ]; then
-        # to make possible init script catch signals
-        stty -F /dev/ttyS0 erase '^?'
-        /sbin/getty 115200 ttyS0&
-        wait $!
-    fi
-    sleep 0.5
-done
-
+getty_loop ttyS0
