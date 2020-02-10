@@ -1,8 +1,24 @@
 #!/bin/sh
 
+HW_REV_FILE=/etc/hwrevision
+
 die() {
-    echo "$*" >&2
+    if [ -t 0 ]; then
+        printf "ERROR: $*\n" >&2
+    else
+        printf "\e[1;31mERROR: $*\e[m\n" >&2
+    fi
     exit 1
+}
+
+warn() {
+    if ! $QUIET; then
+        if [ -t 0 ]; then
+            printf "WARNING: $*\n" >&2
+        else
+            printf "\e[1;31mWARNING: $*\e[m\n" >&2
+        fi
+    fi
 }
 
 pin_set_env() {
@@ -39,39 +55,59 @@ parse_val() {
     case "$1" in
         off|0) echo -n 0;;
         on|1)  echo -n 1;;
-        *) die "need parameters 'on'/'off' or empty" ;;
+        *) die "Need parameters 'on'/'off' or empty" ;;
     esac
 }
 
 get_straps() {
-    echo "$(pin_get PC9)$(pin_get PC15)$(pin_get PC14)$(pin_get PC13)$(pin_get PC12)"
+    echo "$(pin_get PC21)$(pin_get PC9)$(pin_get PC15)$(pin_get PC14)$(pin_get PC13)$(pin_get PC12)"
+}
+
+have_eth() {
+    ETH_STATUS_FILE=$(ls /sys/firmware/devicetree/base/ahb/apb/ethernet@*/status|head -n 1)
+    if [ -f "$ETH_STATUS_FILE" ]; then
+        read STATUS < "$ETH_STATUS_FILE"
+        case "$STATUS" in
+            ok|okay|enabled) return 0;;
+        esac
+    fi
+    return 1
 }
 
 get_hwtype() {
     STRAPS="$(get_straps)"
     case "$STRAPS" in
-        11111) echo eth   ;;
-        11110) echo can   ;;
-        11101) echo rs422 ;;
-        11100) echo rs485 ;;
-        *) die "unsupported straps: $STRAPS" ;;
+        111111) have_eth && HWTYPE=eth || HWTYPE=rs232 ;;
+        111110) HWTYPE=can   ;;
+        111101) HWTYPE=rs422 ;;
+        111100) HWTYPE=rs485 ;;
+        111011) have_eth && HWTYPE=eth || HWTYPE=rs232 ;;
+        *) die "Unsupported straps: $STRAPS" ;;
     esac
+    if [ -f "$HW_REV_FILE" ]; then
+        read_etc_hwtype CFG_HWTYPE
+        if [ "$HWTYPE" != "$CFG_HWTYPE" -a "$CFG_HWTYPE" != "rs232" ]; then
+            warn "Hardware type in $HW_REV_FILE is $CFG_HWTYPE, and not equal to straps $HWTYPE"
+        fi
+    else
+       warn "File $HW_REV_FILE not exist."
+    fi
+    echo $HWTYPE
 }
 
 
 get_dt_status() {
     case "$1" in
         eth)
-            ETH_STATUS=/sys/firmware/devicetree/base/ahb/apb/ethernet@f8008000/status
-            if [ -f $ETH_STATUS ] && grep -qw okay $ETH_STATUS; then
+            if have_eth; then
                 return 0
             else
-                echo WARNING: ethernet disabled it dt. Force switch off >&2
+                warn "Ethernet disabled it dt. Force switch off"
                 return 1
             fi
         ;;
         can)
-            echo TODO: check CAN dt status >&2
+            warn "TODO: check CAN dt status"
             return 0
         ;;
     esac
@@ -90,13 +126,23 @@ set_dev_power() {
         can)
                     get_dt_status "$1" && pin_set PD21 $((!$VAL)) || pin_set PD21 1;
                     get_dt_status "$1" && pin_set PD22 $((!$VAL)) || pin_set PD22 1;;
-        *) die "unknown hardware type: $1"  ;;
+        *) die "Unknown hardware type: $1"  ;;
+    esac
+
+    STATUS=$(get_dev_status $1)
+    case $STATUS in
+        [01])
+            if [ "$VAL" -ne "$STATUS" ]; then
+                warn "Device $1 not change power status"
+            fi
+            ;;
+        *);;
     esac
 }
 
 get_dev_status() {
     case "$1" in
-        rs232)      echo $(pin_get PC22) ;;
+        rs232)      echo $(pin_get PC26) ;; # in hw revision 1.0 is PC22
         eth)        echo $(pin_get PC16) ;;
         rs485)      echo $(pin_get PC16) ;;
         rs422)      echo $(pin_get PC16) ;;
@@ -104,7 +150,79 @@ get_dev_status() {
         can0)       echo unknown ;;
         can1)       echo unknown ;;
         can)        echo unknown ;;
-        *)          die "unknown device: $1";;
+        *)          die "Unknown device: $1";;
+    esac
+}
+
+volume_mode() {
+    awk '$2 == "'$1'" {split($4,a,/,/);for(i in a) if(a[i] == "rw" || a[i] == "ro") print a[i]}' /proc/mounts
+}
+
+temporary_remount() {
+    if [ -z "$VOL_MODE" ]; then
+        VOL_MODE=$(volume_mode $1)
+        [ "$VOL_MODE" == "ro" ] && mount -o remount,rw $1
+    else
+        [ "$VOL_MODE" == "ro" ] && mount -o remount,ro $1
+        unset VOL_MODE
+    fi
+}
+
+read_etc_hwtype() {
+    read $1 VER_ < $HW_REV_FILE
+    eval $1=\${$1##*-}
+}
+
+write_etc_hwtype() {
+    read $1 VER_ < $HW_REV_FILE
+    read_etc_hwtype HWTYPE_
+
+    temporary_remount /
+    echo ${HWTYPE_%-*}-$1 $VER_ > $HW_REV_FILE
+    temporary_remount /
+}
+
+update_hostname() {
+    temporary_remount /
+
+    read HOSTNAME < /etc/hostname
+    echo ${HOSTNAME%-*}-$1 > /etc/hostname
+    sed -i s/$HOSTNAME/${HOSTNAME%-*}-$1/ /etc/hosts
+
+    temporary_remount /
+}
+
+dt_set() {
+    case "$1" in
+        eth)
+            case "$2" in
+                enable)  HWTYPE=eth   STATUS=okay; ;;
+                disable) HWTYPE=rs232 STATUS=disabled; ;;
+            esac
+            if [ -f "$HW_REV_FILE" ]; then
+                read_etc_hwtype CFG_HWTYPE
+                case "$CFG_HWTYPE" in
+                    eth|rs232) ;;
+                    *) die "Hardware type in $HW_REV_FILE is $CFG_HWTYPE, and not eth or rs232"
+                esac
+            else
+                write_etc_hwtype $HWTYPE || exit 1
+            fi
+
+            if [ "$CFG_HWTYPE" != "$HWTYPE" ]; then
+                if [ ! -w $HW_REV_FILE ]; then
+                    die "File $HW_REV_FILE has no permission to write"
+                fi
+
+                fw_setenv -q ethstatus $STATUS
+                write_etc_hwtype $HWTYPE
+                update_hostname  $HWTYPE
+
+                warn "You need reboot to apply changes"
+            fi
+
+            ;;
+        *) die "Enabling/disabling device $1 not supported";;
     esac
 }
 
@@ -117,16 +235,21 @@ show_status() {
 
 usage() {
     cat << END
-Usage: $(basename $0) [on|off]|[[P<ABCDE><0-9>|eth|rs485|rs422|rs485-term|can|can0|can1] [on|off|type]]
+Usage: $(basename $0) [-q] [on|off]|[[P<ABCDE><0-9>|eth|rs485|rs422|rs485-term|can|can0|can1] [on|off|type|enable|disable]]
 END
 }
 
+QUIET=false
+case "$1" in
+    -q) QUIET=true; shift ;;
+esac
+
 case "$1" in
     -h) usage ;;
-    "")   show_status ;;
-    on)   set_dev_power $(get_hwtype) 1 ;;
-    off)  set_dev_power $(get_hwtype) 0 ;;
-    type) get_hwtype ;;
+    "")     show_status ;;
+    on)     set_dev_power $(get_hwtype) 1 ;;
+    off)    set_dev_power $(get_hwtype) 0 ;;
+    type)   get_hwtype ;;
     P[ABCDE][0-9]*)
         if [ -z "$2" ]; then
             pin_get "$1"
@@ -135,11 +258,11 @@ case "$1" in
         fi
     ;;
     *)
-        if [ -z "$2" ]; then
-            echo "$1 status: $(get_dev_status "$1")"
-        else
-            set_dev_power "$1" "$2"
-        fi
+        case "$2" in
+            enable|disable) dt_set "$1" "$2" ;;
+            "") echo "$1 status: $(get_dev_status "$1")" ;;
+            *)  set_dev_power "$1" "$2";;
+        esac
     ;;
 esac
 

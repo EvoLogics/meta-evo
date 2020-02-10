@@ -1,7 +1,35 @@
-#!/bin/sh -ex
+#!/bin/sh -e
 NEW_ROOT=/update
-PROG=$(realpath $0)
-ROOT_TGZ=/home/root/core-image-minimal-sama5d2-roadrunner-evo.tar.xz
+PROG=$(basename $0)
+PROG_ABS=$(realpath $0)
+UPDATER_PUB=/etc/ssl/private/evo-updater.pub.pem
+
+ROOTFS_OLD=rootfs-old
+VAR_DATA_BAK=/tmp/var-data.bak.tar.xz
+VAR_DT_PARAM_BAK=/tmp/dt-param-bak.txt
+PARAMS_FILE=$PROG.params.txt
+
+# TODO: add rootfs for updating to swu?
+ROOT_TGZ=rootfs-update.tar.xz
+
+CONSPY_TTY_NUM=42
+CONSPY_TTY=/dev/tty$CONSPY_TTY_NUM
+
+trap 'sed $LINENO"s/.*/Error line $LINENO: + &/p" $PROG_ABS' ERR
+
+######### utils ###########
+msg() {
+    printf "$*"
+}
+
+warn() {
+    printf "\e[35;1m%s\e[0m\n" "$*"
+}
+
+die() {
+    [ -n "$*" ] && printf "\e[31;1m%s\e[0m\n" "$*"
+    exit 1
+}
 
 mk_ram_root_tgz() {
 	tar -C $NEW_ROOT -xf $ROOT_TGZ
@@ -9,38 +37,551 @@ mk_ram_root_tgz() {
 }
 
 mk_ram_root() {
-#    tar --one-file-system -C / -c . | \
+    msg "Create update system... "
+    [ -d /opt/arsp ] && ADD=/opt/arsp
     tar -C / -c \
-         bin etc lib sbin var usr/bin usr/lib usr/sbin usr/share |
+         bin etc lib sbin var usr/bin usr/lib usr/sbin usr/share home/root/.ssh $ADD |
               tar -C $NEW_ROOT -x
-    mkdir -p $NEW_ROOT/tmp $NEW_ROOT/dev $NEW_ROOT/home/root $NEW_ROOT/proc $NEW_ROOT/sys
-    (cd $NEW_ROOT && ln -s /var/volatile/tmp tmp)
+    #(cd $NEW_ROOT && ln -s /var/volatile/tmp tmp)
+    msg "done\n"
 }
 
 mount_ramfs() {
+    mount -o remount,rw /
     mkdir -p $NEW_ROOT
     mount -t tmpfs tmp $NEW_ROOT
+    mount -o remount,ro /
 }
 
-if [ ! -e $NEW_ROOT/bin/sh ]; then
+prepare_swu() {
+    case "$1" in
+        *.gz)
+            gunzip "$1"
+            echo "${1%.gz}"
+            ;;
+        *.bz2)
+            bunzip2 "$1"
+            echo "${1%.bz2}"
+            ;;
+        *.xz)
+            unxz "$1"
+            echo "${1%.xz}"
+            ;;
+        *)
+            echo "$1"
+            ;;
+    esac
+}
+
+check_swu() {
+    msg "Check update .swu file... "
+    if ! swupdate -c -k $UPDATER_PUB -i "$1" > /dev/null; then
+        die ""
+    fi
+    msg "done\n"
+}
+
+is_update_rootfs() {
+    awk '$2 == "/" && $3 == "tmpfs" {rc=1} END{exit !rc}' /proc/mounts
+}
+
+check_system_update_stage() {
+    if $OPT_CLEAN_VAR_DATA && $OPT_BACKUP; then
+        die "For system update -b and -c cannot use toogether"
+    fi
+
+    case "$STAGE" in
+        1)
+            if is_update_rootfs; then
+                msg "System ready for second stage of system update\n"
+                STAGE=2
+            fi
+            ;;
+        2)
+            if ! is_update_rootfs; then
+                msg "System NOT ready for second stage of system update. Stage will be prepared\n"
+                STAGE=1
+            fi
+            ;;
+        *) die "Unknow stage '$STAGE'" ;;
+    esac
+}
+
+var_data_backup() {
+    fw_printenv > $VAR_DT_PARAM_BAK
+
+    BAK_ADD_DIR=
+    if ! $OPT_CLEAN_VAR_DATA; then
+        for DIR in usr/local opt/arsp opt/evins data; do
+            if [ -e /$1/$DIR ]; then
+                msg "Will backup $DIR\n"
+                BAK_ADD_DIR="$DIR $BAK_ADD_DIR"
+            fi
+        done
+    fi
+    msg "Backup data from old system... "
+    tar -C "$1" $TAR_VERBOSE -cjf $VAR_DATA_BAK \
+        home/root/.ssh \
+        etc/ssl/private \
+        etc/dropbear/dropbear_rsa_host_key \
+        $BAK_ADD_DIR
+
+#            etc/shadow \
+#            etc/shells \
+#            etc/passwd \
+#            etc/group \
+#            sbin/init
+    msg "done\n"
+}
+
+remount_all() {
+    for PART in / /usr/local/etc/vol1 /usr/local/etc/vol2 /data; do
+        mount -o remount,$2 /$1$PART
+    done
+}
+
+var_data_restore() {
+    fw_setenv -q -f -s $VAR_DT_PARAM_BAK
+
+    # mount /rootfs/tmp to be able create /tmp/init-setup.lock
+    # from initial /usr/local/etc/rc.local
+    mount -t tmpfs tmpfs /$ROOTFS_OLD/var/volatile
+    mkdir -p /$ROOTFS_OLD/var/volatile/tmp \
+             /$ROOTFS_OLD/var/volatile/run \
+             /$ROOTFS_OLD/var/volatile/lock \
+             /$ROOTFS_OLD/var/volatile/log
+
+    chroot /$ROOTFS_OLD sh /usr/local/etc/rc.local
+    msg "Waiting initial setup ends... "
+    while chroot /$ROOTFS_OLD test -f /tmp/init-setup.lock; do
+        echo -n .
+        sleep 1
+    done
+
+    remount_all /$ROOTFS_OLD rw
+
+    grep '^\(root\|toor\):' /etc/passwd > /tmp/pwd.txt
+    sed -i '/\(root\|toor\):/d' /$ROOTFS_OLD/etc/passwd
+    # cat /tmp/pwd.txt >> /$ROOTFS_OLD/etc/passwd
+
+    # Add /tmp/pwd.txt in the beginning of /$ROOTFS_OLD/etc/passwd
+    sed -i -ne '1{h;s/.*//;r /tmp/pwd.txt' \
+        -e '};2{H;g;s/\(.*\)\n\(.*\)/\2\n\1/}' \
+        -e '/\(root\|toor\):/d;/^$/!p' /$ROOTFS_OLD/etc/passwd
+
+    if [ -f $VAR_DATA_BAK ]; then
+        tar -C "$1" $TAR_VERBOSE -xf $VAR_DATA_BAK
+    else
+        warn "There is no data from old system"
+    fi
+    remount_all /$ROOTFS_OLD ro
+}
+
+get_rootfs_mtd() {
+    awk '$4 ~ /rootfs/ && sub(/:/,""){print $1; exit}' /proc/mtd
+}
+
+get_ubi_names() {
+    eval $(sed 's/.*root=/UBIDEV=/;s/ .*//;s/:/ ROOTFS_NAME=/' /proc/cmdline)
+}
+
+flash_detach() {
+    ROOTFS_MTD="$(get_rootfs_mtd)"
+    if [ -z "$ROOTFS_MTD" -o ! -c /dev/$ROOTFS_MTD ]; then
+        die "Cannot find rootfs mtd device"
+    fi
+
+    mount | grep -wo "/$ROOTFS_OLD[^ ]*" | sort -r | xargs umount
+    ubidetach -p /dev/$ROOTFS_MTD
+}
+
+flash_attach() {
+    ROOTFS_MTD="$(get_rootfs_mtd)"
+    if [ -z "$ROOTFS_MTD" -o ! -c /dev/$ROOTFS_MTD ]; then
+        die "Cannot find rootfs mtd device"
+    fi
+    ubiattach -p /dev/$ROOTFS_MTD
+    get_ubi_names
+
+    mount -t ubifs $UBIDEV:$ROOTFS_NAME /$ROOTFS_OLD
+    chroot /$ROOTFS_OLD mount -t devtmpfs none dev
+    chroot /$ROOTFS_OLD mount -a
+}
+
+chroot_mount_all() {
+    mkdir -p $1/tmp $1/dev $1/proc $1/sys
+    chroot "$1" sh << END
+        mount -t proc proc proc
+        mount -t devtmpfs dev dev
+        mount -t sysfs sysfs sys
+        mount -t devpts devpts dev/pts
+END
+}
+
+store_params() {
+    P="$1/$PARAMS_FILE"
+    cat > $P << END
+OPT_CLEAN_VAR_DATA=$OPT_CLEAN_VAR_DATA
+OPT_BACKUP=$OPT_BACKUP
+OPT_FORCE=$OPT_FORCE
+OPT_VERBOSE=$OPT_VERBOSE
+LOG_TTY=$(tty)
+END
+}
+
+load_params() {
+    P="$1/$PARAMS_FILE"
+    if [ ! -f "$P" ]; then
+        warn "No parameters file \"$P\""
+        return
+    fi
+    . "$P"
+}
+
+log_consoles_init() {
+    if [ ! -c $CONSPY_TTY ]; then
+        # create tty for conspy
+        conspy -nds $CONSPY_TTY_NUM > /dev/null
+    fi
+
+    LOG_CONS_REDIRECTS="$CONSPY_TTY"
+
+    case "$LOG_TTY" in
+        /dev/ttyGS0)
+            # serial console on gadget usb
+            LOG_CONS_REDIRECTS="$LOG_CONS_REDIRECTS $LOG_TTY"
+            ;;
+        /dev/ttyS0)                             ;; # we don't need log redirect for console
+        /dev/pts/[0-9]*)                        ;; # ssh terminal (something else?)
+        /dev/tty[0-9]*)                         ;; # already run in tty
+    esac
+
+    LOG_FIFO=/tmp/$PROG.fifo
+    rm -f $LOG_FIFO
+    mkfifo $LOG_FIFO
+    tee $LOG_CONS_REDIRECTS < $LOG_FIFO&
+    exec > $LOG_FIFO 2>&1
+}
+
+######################################
+update_system_update_stage_1() {
+    SWU="$1"
+
+    if [ -z "$SWU" ]; then
+        usage
+    fi
+
+    SWU="$(realpath $SWU)"
+
+    msg "Prepare .swu... "
+    SWU="$(prepare_swu $SWU)"
+    msg "done\n"
+
+    check_swu "$SWU"
+
+    if $OPT_NO_ACTION; then
+        msg "No action\n"
+        exit
+    fi
+
     mount_ramfs
     mk_ram_root
+
+    cd $NEW_ROOT
+    mkdir $NEW_ROOT/update
+    mv "$SWU" $NEW_ROOT/update
+    store_params $NEW_ROOT/update
+
+    mount --bind . .
+    mkdir -p $ROOTFS_OLD
+    pivot_root . $ROOTFS_OLD || exec $PROG $@
+
+    #keep_run -m
+
+    #chroot . sh mount -a
+    chroot_mount_all .
+
+    case "$(tty)" in
+        /dev/pts/*)
+            if [ -n "$SSH_CONNECTION" ]; then
+                msg "You will be disconnect in order to make upgrade\n"
+                msg "You can connect back to see update process:\n"
+                msg "$ ssh -t $USER@$(echo $SSH_CONNECTION | awk '{print $3}') conspy 42\n"
+            elif [ "$SHELL" = "/sbin/eush" ]; then
+                msg "You will be logout in order to make upgrade\n"
+                # give time send message via arsp (rs485)
+                sleep 5
+            else
+                msg "You will be logout in order to make upgrade\n"
+                msg "You can login back to see update process:\n"
+                msg "$ conspy 42\n"
+            fi
+            ;;
+    esac
+
+    kill -HUP 1
+    sleep 1
+
+    exit 0
+}
+
+update_system_update_stage_2() {
+    SWU="$1"
+
+    if [ -z "$SWU" ]; then
+        die "TODO: search for swu in second stage"
+        usage
+    fi
+
+    if $OPT_NO_ACTION; then
+        msg "No action\n"
+        exit
+    fi
+
+    SWU="$(realpath $SWU)"
+    load_params $(dirname $SWU)
+    log_consoles_init
+
+    var_data_backup /$ROOTFS_OLD
+    flash_detach
+
+    msg "Flashing new images..."
+    if $OPT_VERBOSE; then
+        msg "\n"
+        swupdate -k $UPDATER_PUB -i "$SWU" -v
+    else
+        expect -c "log_user 0; spawn swupdate -k $UPDATER_PUB -i $SWU;\
+            expect -re .+ exp_continue -timeout 5 timeout {send_user .;exp_continue}"
+        msg " done\n"
+    fi
+
+    flash_attach
+    var_data_restore /$ROOTFS_OLD
+    flash_detach
+
+    msg "System update done\n"
+    $OPT_REBOOT && reboot
+}
+
+mtd_name_by_name() {
+    MTD_NAME=$(awk '$4 == "\"'"$1"'\"" && sub(/:/,"") {print "/dev/"$1}' /proc/mtd)
+    [ -z "$MTD_NAME" ] && die "Cannot find mtd for $1"
+    echo "$MTD_NAME"
+    unset MTD_NAME
+}
+
+volume_mode() {
+    awk '$2 == "'$1'" {split($4,a,/,/);for(i in a) if(a[i] == "rw" || a[i] == "ro") print a[i]}' /proc/mounts
+}
+
+temporary_remount() {
+    if [ -z "$VOL_MODE" ]; then
+        VOL_MODE=$(volume_mode $1)
+        [ "$VOL_MODE" == "ro" ] && mount -o remount,rw $1
+    else
+        [ "$VOL_MODE" == "ro" ] && mount -o remount,ro $1
+        unset VOL_MODE
+    fi
+}
+
+gen_bak_name () {
+    NUM=$(fw_printenv 'serial#' | sed 's/.*=//;s,/,-,')
+    printf "$1" $NUM
+}
+
+install_to_mtd() {
+    [ ! -f "$2" ] && die "Cannot find $1 '$2'"
+
+    MTD_DEV=$(mtd_name_by_name $1)
+
+    if $OPT_BACKUP; then
+        BAK=$(gen_bak_name /tmp/$(basename $2).%s.gz)
+        if ! $OPT_FORCE && [ -f "$BAK" ]; then
+            die "Backup file $BAK exist. Use -f to force it"
+        fi
+
+        msg "Backup $1 to $BAK ... "
+        dd status=none if=$MTD_DEV | gzip -c > $BAK
+        msg "done\n"
+    fi
+
+    CAT=cat
+    case "$1" in
+        *.gz)  CAT=zcat;;
+        *.bz2) CAT=bzcat;;
+        *.xz)  CAT=xzcat;;
+    esac
+
+    $OPT_NO_ACTION || flash_erase $MTD_DEV 0 0
+    msg "Update $1... "
+    $OPT_NO_ACTION || $CAT "$2" | dd status=none of=$MTD_DEV
+    msg "done\n"
+
+    if [ -n "$3" ]; then
+        printf "$3\n"
+    fi
+}
+
+install_at91bootstrap() {
+    install_to_mtd at91bootstrap "$1"
+}
+
+install_kernel() {
+    install_to_mtd kernel "$1" "Do not forget update kernel modules"
+}
+
+check_dtb () {
+    CFG_TMP=/tmp/1.dtb
+    MTD_DEV=$(mtd_name_by_name dtb)
+    if ! dtc -qI dtb -O dtb -o /dev/null -qq -f $1; then
+        die "There is no valid dtb in $1"
+    fi
+
+    CUR_MODEL=$(fdtget $MTD_DEV / model | sed 's/.*Baseboard //' | tr A-Z a-z)
+
+    if [ -z "$CUR_MODEL" ]; then
+        warn "Can't determinate model type from current dtb: $MTD_DEV"
+        $OPT_FORCE && exit 1
+    fi
+
+    NEW_MODEL=$(fdtget $1 / model | sed 's/.*Baseboard //' | tr A-Z a-z)
+    if [ -z "$NEW_MODEL" ]; then
+        warn "Can't determinate model type from new dtb: $1"
+        $OPT_FORCE && exit 1
+    fi
+
+    if [ "$CUR_MODEL" != "$NEW_MODEL" ]; then
+        warn "Current model from dtb do not match new model: $CUR_MODEL != $NEW_MODEL"
+        $OPT_FORCE && exit 1
+    fi
+
+    return 0
+}
+
+install_dtb () {
+    set -e
+    fw_printenv > $VAR_DT_PARAM_BAK
+    install_to_mtd dtb "$1"
+    fw_setenv -q -f -s $VAR_DT_PARAM_BAK
+    set +e
+
+    rm -f $VAR_DT_PARAM_BAK
+    return 0
+}
+
+check_modules_tgz () {
+    if ! tar tf "$1" | grep -q '^\(\./\)\?lib/modules/\?$'; then
+        die "$1 is not tarball with kernel modules"
+    fi
+}
+
+install_modules () {
+    if $OPT_BACKUP; then
+        BAK=$(gen_bak_name /tmp/modules.%s.tar.gz)
+        if ! $OPT_FORCE && [ -f "$BAK" ]; then
+            die "Backup file $BAK exist. Use -f to force it"
+        fi
+        msg "Backup kernel modules to $BAK ... "
+        tar -C / $TAR_VERBOSE -czf "$BAK" lib/modules
+        msg "done\n"
+    fi
+
+    temporary_remount /
+    if $OPT_FORCE; then
+        msg "Clean old modules..."
+        $OPT_NO_ACTION || rm -r /lib/modules/*
+        msg "done\n"
+    fi
+
+    msg "Update kernel modules... "
+    $OPT_NO_ACTION || tar -C / $TAR_VERBOSE -xf "$1"
+    temporary_remount /
+    msg "done\n"
+    printf "Do not forget update kernel\n"
+}
+
+######################################
+usage() {
+    cat << END
+Usage: $PROG [<image.swu>|<zImage>|<modules.tgz>|<dtb>|<at91bootstrap>] ...
+    -b - Backup before update
+    -f - Force override old backup. Or clean /lib/modules before update
+    -c - Clean var data. Do not safe data (configs and /data) after update.
+    -n - no action
+    -z - Stage (for internal usage)
+    -h - Help
+END
+    exit 1
+}
+
+STAGE=1
+
+# NOTE: if you add new option, fix store_params()/load_params() also
+OPT_CLEAN_VAR_DATA=false
+OPT_BACKUP=false
+OPT_FORCE=false
+OPT_REBOOT=false
+OPT_VERBOSE=false
+OPT_NO_ACTION=false
+
+while getopts bfcnz:rh:v FLAG; do
+    case "$FLAG" in
+        c) OPT_CLEAN_VAR_DATA=true ;;
+        b) OPT_BACKUP=true         ;;
+        f) OPT_FORCE=true          ;;
+        f) OPT_NO_ACTION=true      ;;
+        z) STAGE="$OPTARG"         ;;
+        r) OPT_REBOOT=true         ;;
+        v) OPT_VERBOSE=true        ;;
+        h) usage ;;
+        *) usage ;;
+    esac
+done
+
+shift $(expr $OPTIND - 1)
+
+if [ -z "$1" ]; then
+    usage
 fi
 
-cd $NEW_ROOT
-mount --bind . .
-mkdir -p rootfs-old
-pivot_root . rootfs-old || exec $PROG $@
+if $OPT_VERBOSE; then
+    TAR_VERBOSE=-v
+fi
 
-#keep_run -m
+while [ -n "$1" ]; do
+    case "$(basename $1)" in
+        at91bootstrap*.bin)
+            install_at91bootstrap "$1"
+            shift
+            ;;
+        zImage|zImage*.bin|zImage*.gz|zImage*.bz2|zImage*.xz)
+            install_kernel "$1"
+            shift
+            ;;
+        *.dtb)
+            check_dtb "$1"
+            install_dtb "$1"
+            shift
+            ;;
+        modules*.tgz)
+            check_modules_tgz "$1"
+            install_modules "$1"
+            shift
+            ;;
+        *.swu|*.swu.*)
+            check_system_update_stage
 
-#chroot . sh mount -a
-chroot . sh << END
-	mount -t proc proc proc
-	mount -t mount -t devtmpfs dev dev
-	mount -t sysfs sysfs sys
-END
+            case "$STAGE" in
+                1) update_system_update_stage_1 $@;;
+                2) update_system_update_stage_2 $@;;
+                *) die "Unknow stage '$STAGE'" ;;
+            esac
+            exit
+            ;;
+        *)
+            die "Unknown parameter \"$1\""
+            ;;
+    esac
+done
 
-kill -HUP 1
-sleep 1
-
+$OPT_REBOOT && reboot

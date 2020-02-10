@@ -4,7 +4,7 @@
     LC_TYPE=C exec expect -f "$0" -- "$@"
 
 array set ::opt {
-    loglevel {fail warn note info norm pass stage}
+    loglevel {err warn note info norm pass stage}
     force 0
     noheader 0
 
@@ -29,7 +29,7 @@ array set ::c {
 }
 
 proc die {msg} {
-    msg fail "die: $msg\n" stderr
+    msg err "die: $msg\n" stderr
     exit 1
 }
 
@@ -38,8 +38,8 @@ proc msg {type msg {out stdout}} {
         return
     }
 
-    switch $type {
-        fail    {set col $::c(lred)}
+    switch -re $type {
+        err     {set col $::c(lred)}
         warn    {set col $::c(lmag)}
         note    {set col $::c(lyel)}
         info    {set col $::c(white)}
@@ -84,6 +84,12 @@ proc check_for_following {type} {
     }
 }
 
+proc lremove {listVariable value} {
+    upvar 1 $listVariable var
+    set idx [lsearch -exact $var $value]
+    set var [lreplace $var $idx $idx]
+}
+
 ############## end: help function ######################
 array set evo_vars {
     serial# {
@@ -112,9 +118,26 @@ array set evo_vars {
     }
 }
 
+proc run {arg} {
+    msg dbg "$arg\n"
+    spawn /bin/sh -c [concat $arg]
+    expect eof
+
+    set rc $expect_out(buffer)
+    set rc [regsub {\r?\n$} $rc {}]
+
+    foreach {pid spawnid iserror exit_code} [wait] break
+    if {$iserror != 0 && $exit_code != 10} {
+        # exit_code == 10 (ECHILD 10 No child processes)
+        # happend in shell from +++AT#
+        puts stderr "$rc"
+        exit $exit_code
+    }
+}
+
 proc get_env {var} {
     if {![info exist ::evo_vars($var)]} {
-        msg err "ERROR: Can't find variable $var"
+        msg err "ERROR: Can't find variable $var\n"
         return {}
     }
 
@@ -141,42 +164,62 @@ proc get_env {var} {
     }
 
     if {$param(type) == {mac}} {
-        set rc [format %02x:%02x:%02x:%02x:%02x:%02x {*}$rc]
+        if {[catch {set rc [format %02x:%02x:%02x:%02x:%02x:%02x {*}$rc]} err]} {
+            msg warn "MAC address wrong format: $rc\n" stderr
+            return {}
+        }
+
+    }
+
+    if {!$::opt(noheader)} {
+        set rc "$var=$rc"
     }
     return $rc
-
-    # fdtget -t s sama5d2-roadrunner-evomini2-eth.dtb /chosen serial#
-    #Error at 'serial#': FDT_ERR_NOTFOUND
 }
 
-proc set_env {var val} {
-    if {![info exist ::evo_vars($var)]} {
-        msg err "ERROR: Can't find variable $var"
-        return {}
+proc set_envs {args} {
+    foreach {var val} $args {
+        if {![info exist ::evo_vars($var)]} {
+            msg err "ERROR: variable \"$var\" not supported\n"
+            return {}
+        }
+
+        array set param $::evo_vars($var)
+        if {$param(protected) && !$::opt(force)} {
+            die "Error: Variable $var protected. Use flag -f to force set"
+        }
     }
 
-    array set param $::evo_vars($var)
-    if {$param(protected) && !$::opt(force)} {
-        die "Error: Variable $var protected. Use flag -f to force set"
-    }
-
-    if {$param(type) == {mac}} {
-        set type x
-        set val "\[[split val :]]"
-    } else {
-        set type $param(type)
-    }
-    # SERIAL=134/13;
-    # dtc -qI dtb -O dtb -o /tmp/1.dtb /dev/mtd1
-    # && fdtput -t s /tmp/1.dtb /chosen serial# "$SERIAL"
-    # && flash_erase -q /dev/mtd1 0 0
-    # && dtc -qI dtb -O dtb -o /dev/mtd1 /tmp/1.dtb
     if {[file type $::opt(config_file)] == {characterSpecial}} {
-        die "writing to char dev not yet supported"
+        set cfg_tmp /tmp/1.dtb
+        run "dtc -qI dtb -O dtb -o $cfg_tmp $::opt(config_file)"
     }
 
-    #puts "fdtput -t $type $::opt(config_file) $param(path) $param(name) $val"
-    exec fdtput -t $type $::opt(config_file) $param(path) $param(name) $val
+    foreach {var val} $args {
+        array set param $::evo_vars($var)
+        if {$param(type) == {mac}} {
+            set type bx
+            set val "[split $val :]"
+        } elseif {$param(type) == {s}} {
+            set type $param(type)
+            set val "\"$val\""
+        } else {
+            set type $param(type)
+        }
+
+        if {[file type $::opt(config_file)] == {characterSpecial}} {
+            run "fdtput -t $type $cfg_tmp $param(path) $param(name) $val"
+        } else {
+            run "fdtput -t $type $::opt(config_file) $param(path) $param(name) $val"
+        }
+    }
+
+    if {[file type $::opt(config_file)] == {characterSpecial}} {
+            run "flash_erase -q $::opt(config_file) 0 0"
+            run "dtc -qI dtb -O dtb -o $::opt(config_file) $cfg_tmp"
+            #catch {file delete $cfg_tmp}
+            msg warn "To apply changes you need to reboot\n"
+    }
 }
 
 proc do_printenv {argv argc} {
@@ -189,48 +232,69 @@ proc do_printenv {argv argc} {
     }
 
     foreach var $params {
-        if {!$::opt(noheader)} {
-            puts -nonewline "$var="
+        set rc [get_env $var]
+        if {$rc != {}} {
+            puts $rc
         }
-        puts "[get_env $var]"
     }
 }
 
-proc do_setenv {argv argc} {
-    if {[expr $argc % 2] != 0} {
-        die "Error: must have an even number of arguments"
+proc read_script {filename} {
+    if {$filename != {-}} {
+        spawn -open [open $filename r]
     }
 
-    foreach {var val} $argv {
-        set_env $var $val
+    expect -re {([^=]+)=([^\n]*)\n} {
+        lappend out $expect_out(1,string) $expect_out(2,string)
+        exp_continue
+    } -re {.*\n} {
+        die "Error: script file must containe settings in format var=val pro line"
+    } eof
+    return $out
+}
+
+proc do_setenv {argv argc} {
+    if {[info exist ::opt(script)] && $::opt(script) != {}} {
+        if {$argc != 0} {
+            die "Error: option -s must be without free arguments"
+        }
+        set argv [read_script $::opt(script)]
+    } else {
+        if {[expr $argc % 2] != 0} {
+            die "Error: must have an even number of arguments"
+        }
     }
+
+    set_envs {*}$argv
+}
+
+proc usage_common {} {
+    send_error -- " -h, --help     - this help\n\
+    -c, --config   - configuration dtb file/partition, default: $::opt(config_file)\n\
+    -v, --verbose  - be verbose\n"
 }
 
 proc usage_printenv {} {
     global argv0
-    send_error "Usage: [regsub .*/ $argv0 {}] \[OPTIONS]... \[--] \[VARIABLE]\n\
-    -h, --help     - this help\n\
-    -c, --config   - configuration dtb file/partition, default: $::opt(config_file)\n\
-    -v, --verbose  - be verbose\n\
-    -n, --noheader - do not repeat variable name in output\n\
+    send_error -- "Usage: [regsub .*/ $argv0 {}] \[OPTIONS]... \[--] \[VARIABLE]\n"
+    usage_common
+    send_error -- " -n, --noheader - do not repeat variable name in output\n\
     "
     exit 1
 }
 
 proc usage_setenv {} {
     global argv0
-    send_error "Usage: [regsub .*/ $argv0 {}] \[-h|--help] \[-v] \[--] \n\
-    -h, --help     - this help\n\
-    -c, --config   - configuration dtb file/partition, default: $::opt(config_file)\n\
-    -v, --verbose  - be verbose\n\
-    -s, --script   - batch mode to minimize writes\n\
-    -v, --verbose  - be verbose\n\
+    send_error -- "Usage: [regsub .*/ $argv0 {}] \[-h|--help] \[-v] \[-s] \[--] \[VARIABLE] \[VALUE]] ..\n"
+    usage_common
+    send_error -- " -s, --script   - batch mode to minimize writes. Can be '-' for stdin\n\
     -f, --force  - force action\n\
     "
     exit 1
 }
 
 proc parse_common_args {argv_ argc_} {
+   global progname
    upvar $argv_ argv
    upvar $argc_ argc
    while { [llength $argv] > 0 } {
@@ -240,7 +304,8 @@ proc parse_common_args {argv_ argc_} {
        switch -glob -- $flag {
            -c - --config { set ::opt(config_file) [lindex $argv 0]; check_for_following string; set argv [lrange $argv 1 end] }
            -f - --force  { set ::opt(force) 1 }
-           -v - --verbose   { lappend ::opt(loglevel) dbg }
+           -v - --verbose { lappend ::opt(loglevel) dbg  }
+           -q - --quiet   { lremove ::opt(loglevel) warn }
            -h - --help {
                switch $progname {
                    fw_printenv usage_printenv
@@ -282,7 +347,8 @@ proc parse_setenv_args {argv_ argc_} {
     set argc [llength $argv]
 }
 
-switch [file tail $argv0] {
+set progname [file tail $argv0]
+switch $progname {
     fw_printenv {
         parse_common_args   argv argc
         parse_printenv_args argv argc
@@ -294,20 +360,20 @@ switch [file tail $argv0] {
         do_setenv $argv $argc
     }
     evo-env {
-        die "Error: support directly setting dt variables not yet support"
+        switch [lindex $argv 0] {
+            check {
+                # TODO: check hostname vs. SN/HWTYPE
+                #HOSTNAME=evo-$TYPE-$NUM-$SR-$HWTYPE
+                #echo $HOSTNAME > /etc/hostname
+                #echo 127.0.0.1 $HOSTNAME >> /etc/hosts
+                die "Error: checking system parameters and settings integrity not yet implemented"
+            }
+            default {
+                die "Error: support directly setting dt variables not yet support"
+            }
+        }
     }
     default {
         die "Error: Identity crisis - may be called as `fw_printenv' or as `fw_setenv' but not as `$argv0'"
     }
 }
-
-#set argv [string trim $argv \{\}]
-#set argc [llength $argv]
-#
-#puts $argv0
-#exit
-
-#if {$argc != 1} {
-#    usage
-#}
-
