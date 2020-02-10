@@ -1,0 +1,22 @@
+From 48e11ac4a054587f3aa2853493009b2c9d1486b3 Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Thu, 23 May 2019 22:54:54 +0200
+Subject: [PATCH] Bump version to 1.0.11 in configure.in
+
+---
+ configure.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.in b/configure.in
+index 4a89e0d..04488d7 100755
+--- a/configure.in
++++ b/configure.in
+@@ -19,7 +19,7 @@ dnl	to configure the system for the local environment.
+ # so you can encode the package version directly into the source files.
+ #-----------------------------------------------------------------------
+
+-AC_INIT([udp], [1.0.10])
++AC_INIT([udp], [1.0.11])
+
+ #--------------------------------------------------------------------
+ # Call TEA_INIT as the first TEA_ macro to set up initial vars.

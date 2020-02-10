@@ -1,0 +1,22 @@
+From 47d1af8a0214e4e951bf78085720b479071267df Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Thu, 23 May 2019 18:02:50 +0200
+Subject: [PATCH] Fix -L when cross compiling
+
+---
+ tclconfig/tcl.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tclconfig/tcl.m4 b/tclconfig/tcl.m4
+index 4b4bd1e..b254800 100755
+--- a/tclconfig/tcl.m4
++++ b/tclconfig/tcl.m4
+@@ -370,7 +370,7 @@ AC_DEFUN([TEA_LOAD_TCLCONFIG], [
+     # of TCL_BUILD_LIB_SPEC. An extension should make use of TCL_LIB_SPEC
+     # instead of TCL_BUILD_LIB_SPEC since it will work with both an
+     # installed and uninstalled version of Tcl.
+-    if test -f "${TCL_BIN_DIR}/Makefile" ; then
++    if test -f "${TCL_BIN_DIR}/Makefile" || test "$cross_compiling" = yes; then
+         TCL_LIB_SPEC="${TCL_BUILD_LIB_SPEC}"
+         TCL_STUB_LIB_SPEC="${TCL_BUILD_STUB_LIB_SPEC}"
+         TCL_STUB_LIB_PATH="${TCL_BUILD_STUB_LIB_PATH}"
