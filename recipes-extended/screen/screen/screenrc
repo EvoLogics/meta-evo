@@ -1,0 +1,24 @@
+startup_message off
+deflogin off
+vbell off
+vbell_msg "beep!"
+verbose on
+msgwait 2
+defscrollback 5000
+scrollback 5000
+defencoding UTF-8
+defmonitor on
+caption always "%{= wb}%H %L=%-Lw%45>%{+b}%n%f* %t%{-}%+Lw%-0<"
+caption always "%{= gY}%H[%n] %{= BY}[%f]%{= wk} %L=%-Lw%15>%{+br}%n%f* %t%{-}%+Lw%-0<"
+hardstatus off
+# Set the hardstatus prop on gui terms to set the titlebar/icon title
+termcapinfo xterm*|rxvt*|aterm*|kterm*|Eterm*|mlterm* "hs:ts=\E]0;:fs=\007:ds=\E]0;\007"
+# set these terminals up to be 'optimal' instead of vt100
+termcapinfo xterm*|linux*|rxvt*|aterm*|Eterm* OP
+termcapinfo xterm|xterms|xs|rxvt ti@:te@
+bind c screen 1
+bind 0 select 10
+bind = resize =
+bind + resize +1
+bind - resize -1
+bind _ resize max
