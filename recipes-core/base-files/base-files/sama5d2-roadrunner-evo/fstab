@@ -5,6 +5,7 @@ tmpfs                /dev/shm             tmpfs      mode=0777             0  0
 sysfs                /sys                 sysfs      defaults              0  0
 /dev/ubi0_0          /usr/local/etc/vol1  ubifs      ro                    0  0
 /dev/ubi0_1          /usr/local/etc/vol2  ubifs      ro                    0  0
+/dev/ubi0_2          /data                ubifs      rw                    0  0
 
 #/dev/mmcblk0p1      /media/card           auto       errors=continue       0  0
 

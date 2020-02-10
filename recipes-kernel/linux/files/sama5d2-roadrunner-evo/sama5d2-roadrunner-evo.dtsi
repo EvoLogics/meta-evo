@@ -54,6 +54,7 @@
 / {
 	model = "Acme Systems RoadRunner on EvoLogics Baseboard";
 	compatible = "atmel,sama5d2-evo", "atmel,sama5d2", "atmel,sama5";
+	serial# = "000/00";
 
 	aliases {
 		ssc0 = &ssc0;
@@ -80,6 +81,26 @@
 		main_xtal {
 			clock-frequency = <12000000>;
 		};
+	};
+
+	pps0 {
+		 compatible = "pps-gpio";
+		 pinctrl-names = "default";
+		 pinctrl-0 = <&pinctrl_pps0>;
+
+		 gpios = <&pioA PIN_PC24 GPIO_ACTIVE_HIGH>;
+		 //assert-falling-edge;
+		 status = "okay";
+	};
+
+	pps1 {
+		 compatible = "pps-gpio";
+		 pinctrl-names = "default";
+		 pinctrl-0 = <&pinctrl_pps1>;
+
+		 gpios = <&pioA PIN_PC23 GPIO_ACTIVE_HIGH>;
+		 //assert-falling-edge;
+		 status = "disable";
 	};
 
 	ahb {
@@ -132,7 +153,7 @@
 					//compatible = "micron,n25q128a13", "jedec,spi-nor";
 					compatible = "jedec,spi-nor";
 					reg = <0>;
-					spi-max-frequency = <83000000>;
+					spi-max-frequency = <132000000>;
 					m25p,fast-read;
 
 					at91bootstrap@00000000 {
@@ -154,8 +175,8 @@
 						label = "rootfs";
 						//reg = <0x00420000 0x000be0000>; // 16 MiB
 						//reg = <0x00420000 0x001df0000>; // 32 MiB
-						reg = <0x00420000 0x003be0000>; // 64 MiB
-						//reg = <0x00420000 0x007be0000>; // 128 MiB
+						//reg = <0x00420000 0x003be0000>; // 64 MiB
+						reg = <0x00420000 0x007be0000>; // 128 MiB
 						//reg = <0x00420000 0x000000000>;
 					};
 
@@ -174,7 +195,7 @@
 				pinctrl-0 = <&pinctrl_spi1_default>;
 				status = "okay";
 				device@0 {
-					compatible = "spidev";
+					compatible = "irqman";
 					spi-max-frequency = <50000000>;	 // 50 MHz
 					reg = <0>;
 				};
@@ -310,34 +331,68 @@
 				/* pinctrl-names = "default"; */
 				/* pinctrl-0 = <&pinctrl_sscdev>; */
 				compatible = "irqman";
-				ssc = <&ssc0>;
+
+				atmel,ssc-controller = <&ssc0>;
 				io-channels = <&adc 4>;
 				io-channel-names = "bat0";
 
-				/* input */
-				fpga-busy-gpios  = <&pioA PIN_PC6  GPIO_ACTIVE_HIGH>;
-				tbuf-empty-gpios = <&pioA PIN_PC5  GPIO_ACTIVE_HIGH>;
+				fpga-busy-gpios   = <&pioA PIN_PC6  GPIO_ACTIVE_HIGH>;
+				tbuf-empty-gpios  = <&pioA PIN_PC5  GPIO_ACTIVE_HIGH>;
 				boot-jumper-gpios = <&pioA PIN_PB13 GPIO_ACTIVE_HIGH>;
-				/* input_0 ?? */
-				/* input_1 ?? */
+				/* input0-gpios  = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
+				/* input1-gpios  = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
 
 				/* output */
 				fpga-reset-gpios = <&pioA PIN_PB30 GPIO_ACTIVE_HIGH>;
-				tx-done-gpios	= <&pioA PIN_PB28 GPIO_ACTIVE_HIGH>;
-				tx-on-gpios	  = <&pioA PIN_PB29 GPIO_ACTIVE_HIGH>;
+				tx-done-gpios    = <&pioA PIN_PB28 GPIO_ACTIVE_HIGH>;
+				tx-on-gpios      = <&pioA PIN_PB29 GPIO_ACTIVE_HIGH>;
 				keep-alive-gpios = <&pioA PIN_PD7  GPIO_ACTIVE_HIGH>;
-				reset-gpios	  = <&pioA PIN_PB31 GPIO_ACTIVE_HIGH>;
-				power-gpios	  = <&pioA PIN_PD8  GPIO_ACTIVE_HIGH>;
+				reset-gpios      = <&pioA PIN_PB31 GPIO_ACTIVE_HIGH>;
+				power-gpios      = <&pioA PIN_PD8  GPIO_ACTIVE_HIGH>;
+				opto0-gpios      = <&pioA PIN_PD6  GPIO_ACTIVE_HIGH>;
+				/* opto1-gpios      = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
 
-				optocoupler0-gpios = <&pioA PIN_PD6  GPIO_ACTIVE_HIGH>;
+				/* sdm */
+				/* rx-almost-full-gpios  = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
+				/* tx-almost-empty-gpios = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
+				/* rxtx-fifo-inv-gpios   = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
+				/* tx-almost-full-gpios  = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
+				sdm-sync-in-gpios = <&pioA PIN_PC23 GPIO_ACTIVE_HIGH>; /* conflict with pps1 */
 
-				/* irq */
-				dsp-irq-gpios	= <&pioA PIN_PB3  GPIO_ACTIVE_HIGH>;
-				irq1-gpios	   = <&pioA PIN_PB2  GPIO_ACTIVE_HIGH>;
-				fiq-gpios		= <&pioA PIN_PB4  GPIO_ACTIVE_HIGH>;
+				/* eclk */
+				lock-gpios      = <&pioA PIN_PD5  GPIO_ACTIVE_HIGH>; /* LOCK(BITE_N) */
+
+				/* IRQs */
+				dsp-irq-gpios	= <&pioA PIN_PB3  GPIO_ACTIVE_HIGH>; /* EVO_IRQ0 */
+				irq1-gpios	    = <&pioA PIN_PB2  GPIO_ACTIVE_HIGH>; /* EVO_IRQ1 */
+				fiq-gpios		= <&pioA PIN_PB4  GPIO_ACTIVE_HIGH>; /* EVO_FIQ  */
+			};
+
+			rstc@f8048000 {
+				compatible = "atmel,sama5d2-roadrunner-evo-rstc";
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_rstc>;
+				board-reset-gpios   = <&pioA PIN_PC7 GPIO_ACTIVE_LOW>;
 			};
 
 			pinctrl@fc038000 {
+				pinctrl_rstc: pinctrl_rstc_default {
+					pinmux = <PIN_PC7__GPIO>;
+					output-high;
+					bias-pull-up;
+					drive-open-drain;
+				};
+
+				pinctrl_pps0: pps0_default {
+					pinmux = <PIN_PC24__GPIO>;
+					bias-disable;
+				};
+
+				pinctrl_pps1: pps1_default {
+					pinmux = <PIN_PC23__GPIO>;
+					bias-disable;
+				};
+
 				pinctrl_can0_default: can0_default {
 					pinmux = <PIN_PC10__CANTX0>,
 						 <PIN_PC11__CANRX0>;
@@ -404,11 +459,6 @@
 
 				pinctrl_charger_chglev: charger_chglev {
 					pinmux = <PIN_PA12__GPIO>;
-					bias-disable;
-				};
-
-				pinctrl_charger_irq: charger_irq {
-					pinmux = <PIN_PB13__GPIO>;
 					bias-disable;
 				};
 

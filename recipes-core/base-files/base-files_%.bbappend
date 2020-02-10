@@ -17,9 +17,11 @@ do_install_append() {
     ln -sf issue.base issue
 
     cd ${D}${localstatedir}
+    # need for toolchain target opkg
+    mkdir -p volatile/lock volatile/run
     ln -sf volatile/lock
-    ln -sf volatile/log
     ln -sf volatile/run
+    ln -sf volatile/log
 
     cd ${D}
     [ -d tmp ] && rmdir tmp
@@ -27,4 +29,7 @@ do_install_append() {
 
     # create mount points for evologics 'safe etc' setup
     mkdir -p ${D}/usr/local/etc/vol1 ${D}/usr/local/etc/vol2
+
+    # create non-volatile rw partition mount point
+    mkdir -p ${D}/data
 }
