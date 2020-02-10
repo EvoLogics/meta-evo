@@ -6,6 +6,12 @@ LICENSE = "MIT"
 IMAGE_FEATURES += "ssh-server-dropbear package-management"
 
 IMAGE_INSTALL = "\
+    kernel-module-g-cdc \
+    kernel-module-ppp-async \
+    kernel-module-veth \
+    kernel-module-bridge \
+    kernel-module-iptable-nat \
+    \
     swupdate \
     swupdate-www \
     \
@@ -21,6 +27,7 @@ IMAGE_INSTALL = "\
     busybox-hwclock \
     busybox-mdev \
     \
+    ethtool \
     i2c-tools \
     devmem2 \
     mtd-utils-ubifs \
@@ -39,6 +46,7 @@ IMAGE_INSTALL = "\
     \
     strace \
     \
+    vim-xxd \
     pv \
     \
     libcsv \
@@ -52,6 +60,7 @@ IMAGE_INSTALL = "\
     erlang-kernel \
     erlang-erts \
     erlang-crypto \
+    erlang-inets \
     "
 
 DEPENDS += "\
@@ -61,6 +70,7 @@ DEPENDS += "\
     minicom\
     usbutils \
     \
+    procps \
     iperf3 \
     wget \
     dosfstools \
@@ -69,7 +79,14 @@ DEPENDS += "\
     \
     can-utils \
     \
+    tcpdump \
+    ltrace \
+    \
     packagegroup-erlang-embedded \
+    \
+    tcllib \
+    \
+    fftw \
 "
 
 inherit core-image
