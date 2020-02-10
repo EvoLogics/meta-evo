@@ -1,0 +1,417 @@
+#!/bin/sh
+# vim: ft=tcl
+# the next line restarts using tclsh             \
+    case "$(hostname)" in \
+        up*-mode) exec conspy -c 42;; \
+    esac; \
+    exec expect -f "$0" -- "$@"
+
+set prog [file tail $argv0]
+set ::env(PATH) /bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+
+set columns [stty columns]
+if {$columns == {} || $columns == 0} {
+    stty columns 120
+}
+set rows [stty rows]
+if {$rows == {} || $rows == 0} {
+    stty rows 50
+}
+
+array set ::opt {
+    base_dir        /tmp/upgrade
+    history_file    /tmp/.\${prog}_history
+    keywords_file   /tmp/.\${prog}.keywords
+    rlwrap_out_file /tmp/.\${prog}.out.txt
+
+    debug_log       /tmp/\${prog}.debug.log
+    debug 1
+
+    interactive 1
+}
+
+set ::opt(help) "\
+ver     - show versions of components (not implemented)\n\
+rz      - receive file via zmodem\n\
+upgrade - run upgrade\n\
+ls      - show uploaded upgrade files\n\
+remove  - remove uploaded upgrade files\n\
+reboot  - reboot device\n\
+reset   - reset terminal\n\
+exit    - exit from shell\n\
+help    - this command\n"
+
+log_user 0
+
+remove_nulls -d 1
+remove_nulls 1
+fconfigure stdin  -translation binary -buffering none
+fconfigure stdout -translation binary -buffering none
+
+# need to prevent internal encoding conversion
+encoding system iso8859-1
+
+#stty raw -echo
+
+match_max 100000
+set timeout -1
+
+###############################################################
+proc hexdump_ascii {string {shift {}}} {
+    set out {}
+    for {set i 0} {$i < [string length $string]} {incr i 16} {
+        set row [string range $string $i [expr {$i + 15}]]
+        binary scan $row H* hex
+        set hex [regsub -all {(.{2})} [format %-32s $hex] {\1 }]
+        set row [regsub -all {[^[:print:]]} $row .]
+        lappend out [format "$shift%08x: %s %-16s" $i $hex $row]
+    }
+    return [join $out \n]
+}
+
+# NOTE: to debug run $prog 2> /tmp/prog.stderr.log
+# and uncomment this:
+# exp_internal 1
+# strace 10
+proc log_debug {str} {
+    if {!$::opt(debug)} {
+        return
+    }
+    set fd [open $::opt(debug_log) a+]
+
+    # NOTE: according strace 10
+    #       [clock format] or [clock seconds] hangs?
+    #
+    #puts $fd "[clock format [clock seconds]]: $str"
+    #puts $fd "[clock seconds]: $str"
+    puts $fd "$str"
+    ::close $fd
+}
+
+proc show_help {} {
+    send_user -- "EvoLogics Upgrade Shell\n$::opt(help)"
+}
+
+proc get_sn {} {
+    spawn sh -c "fw_printenv serial# | sed 's/.*=//'"
+    expect eof {
+        set out [string trim $expect_out(buffer)]
+    }
+
+    exp_wait
+
+    if {![info exist out]} {
+        set out "000/00"
+    }
+    return $out
+}
+
+proc exec_append {out_ descr arg} {
+    upvar $out_ out
+    spawn /bin/sh -c [concat $arg]
+    expect eof
+    exp_wait
+
+    set s "$descr [string trim $expect_out(buffer)]"
+    lappend out $s
+
+    return $s
+}
+
+proc show_versions {} {
+    lappend out "Serial Numer:    [get_sn]"
+
+    exec_append out "Interface type: " {evo-hw type}
+    exec_append out "Kernel version: " {uname -r}
+    exec_append out "FW version:     " \
+        {test -x /usr/local/bin/ds && /usr/local/bin/ds -l 0 --version 2> /dev/null | grep '^v'}
+    exec_append out "Evins version:  " \
+        {find /opt/evins/releases/ -maxdepth 1 -type d 2> /dev/nulll |  sed -n '$s,.*/,,p'}
+
+    send_user [join $out \n]\n
+}
+
+proc show_uploaded_files {} {
+    set stage1 1
+    set header 0
+    spawn sh -c "cd $::opt(base_dir) && ls -lh --color=never * && echo '====' && md5sum *"
+    expect -re {^====\r\n} {
+        set stage1 0
+        exp_continue
+    } -re {^[^\r\n]*No such file or directory\r\n} {
+        exp_continue
+    } -re {^([^\r\n]*)\r\n} {
+        set input [regexp -all -inline {\S+} $expect_out(1,string)]
+
+        if {$stage1} {
+            set sizes([lindex $input 8]) [lindex $input 4]
+        } else {
+            set name [lindex $input 1]
+            if {!$header} {
+                send_user [format "%-32s %8s %s\n" MD5sum Size Name]
+                incr header
+            }
+            send_user [format "%s %8s %s\n" [lindex $input 0] $sizes($name) $name]
+        }
+        exp_continue
+    }
+    array unset sizes {}
+    catch {exp_close}
+    catch {exp_wait}
+
+    #system "cd $::opt(base_dir); \
+    #    (ls -lh;echo '====';md5sum *)" |\
+    #        awk '/^====\$/{f=1;next}!f{s\[\$9]=\$5}f{if(!t)printf\"%-32s %8s %s\n\",\"md5sum\",\"size\",\"name\";t=1;printf\"%s %8s %s\n\",\$1,s\[\$2],\$2}'"
+
+}
+
+proc gen_keywords_file {} {
+    foreach line [split $::opt(help) \n] {
+        lappend keywords [lindex [split [string trim $line]] 0]
+    }
+    exec echo [join $keywords] > $::opt(keywords_file)
+}
+
+# ZABORT lrzsz-0.12.21/src/canit.c
+proc send_zabort {} {
+    log_debug "ZABORT"
+    send_tty -raw "\x18\x18\x18\x18\x18\x18\x18\x18\x18\x18"
+    send_tty -raw "\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08"
+}
+
+proc handle_command {cmd} {
+    switch -re $cmd {
+        {^rz( -r)?$} {
+        # Run in restrict mode
+        # FIXME: remove -U and --unrestrict
+
+            set rc [catch {system "$cmd -R"} result options]
+            if {$rc} {
+            # sometime programm fall with SIGCHLD?
+            # trap {log_debug "trap SIGCHLD"} SIGCHLD
+
+                send_error "rz error: $result\n"
+                log_debug  "rz error:\n1. $result\n2. $options"
+
+                send_zabort
+
+                # NOTE: command `expect` bug if using pattern matching
+                # expect: does "unable to alloc 4294931291 bytes
+                # so interact used instead
+                set skip_timeout 5
+                send_tty "Skip incoming data with timeout $skip_timeout seconds.\n"
+
+                spawn -open [open /dev/null w]
+                interact -input $tty_spawn_id \
+                    timeout $skip_timeout {
+                        log_debug "skip: interact timeout"
+                        return
+                } -nobuffer -re {.+} {
+                    send_tty  "Skip incoming data with timeout $skip_timeout seconds.\n"
+                    log_debug "skip: catch in interact: [hexdump_ascii $interact_out(0,string)]"
+                    send_zabort
+                }
+                exp_close
+                system reset
+                # trap SIG_DFL SIGCHLD
+            }
+        }
+
+        {^rx$|^rx .*} {
+            set rx [regexp -all -inline {\S+} $cmd]
+            set rc [catch {system "rx -R [lrange $rx 1 end]"} result options]
+
+            if {$rc} {
+                send_error "rx error: $result\n"
+                log_debug  "rx error:\n1. $result\n2. $options"
+            }
+        }
+
+        {^scp -t .*} {
+            set rc [catch {system "scp -t ."} result options]
+            if {$rc} {
+                send_error "scp error: $result\n"
+                log_debug  "scp error:\n1. $result\n2. $options"
+            }
+        }
+
+        {^upgrade$} {
+            set files [glob -nocomplain -type f *.swu.*]
+            if {$files != {}} {
+                spawn evo-update [glob *.swu.*]
+                log_user 1
+                expect eof
+                log_user 0
+            } else {
+                send_user "Before upgrade need to upload files\n"
+            }
+        }
+        {^ls$|^ls .*} { show_uploaded_files }
+        {^remove$}    { system rm -f [glob $::opt(base_dir)/*] }
+        {^ver$}       { show_versions }
+        {^reset$}     { system reset }
+        {^help$}      { show_help }
+        {^exit$}      { exit 0 }
+        {^reboot$}    { exec reboot }
+        .+            { send_user -- "unknown command $cmd\r\n" }
+    }
+}
+
+proc run_interactive_shell {} {
+    gen_keywords_file
+    show_help
+
+    if {![exp_debug]} {
+        trap {log_debug "trap SIGINT"} SIGINT
+    }
+    trap {overlay $argv0} SIGSEGV
+
+    set sn [get_sn]
+
+    while 1 {
+
+        catch {file delete -force $::opt(rlwrap_out_file)}
+        set cmd {}
+
+        log_debug "run rlwrap"
+        spawn rlwrap --one-shot                  \
+            -H $::opt(history_file)          \
+            -f $::opt(keywords_file)         \
+            --no-warnings                    \
+            --extra-char-after-completion {} \
+            --substitute-prompt "$sn:upgrade> "   \
+            sh -c "cat > $::opt(rlwrap_out_file)"
+
+            # \004 - ctrl-d
+        set quit 0
+
+        # command not delivered to cat?
+        #-nobuffer \r return
+
+        interact -u $::user_spawn_id \
+            \004 {
+                set quit 1
+                return
+        } -nobuffer -re {(rz( -r)?)\r} {
+            log_debug "catch in interact: [hexdump_ascii $interact_out(0,string)]"
+            set cmd $interact_out(1,string)
+            return
+        }
+        catch {exp_close}
+        catch {exp_wait}
+
+        # NOTE: if send via kermit, it send rz too fast and rlwrap catch also ZINIT header
+        #       trying to avoid this did't work
+        #     -re {\*\*\u0018B0[^\r]*\r\n} {
+        #         log_debug "catch zinit"
+        #         return
+        #    }
+
+
+        if {$quit} {
+            log_debug "exit by ctrl-d"
+            send_user "\n"
+            exit
+        }
+
+        #    if {[catch {set cmd_size [file size $::opt(rlwrap_out_file)]} err]} {
+        #        log_debug "exit by file size:\n$err"
+        #        send_user -- "\n$err\n"
+        #        exit
+        #    }
+        #
+        #    if {$cmd_size == 0} {
+        #        log_debug "exit by cmd size == 0"
+        #        exit
+        #    }
+
+        # if we did't catch $cmd in interact, read it from file
+        if {$cmd == {}} {
+            if {[catch {set fd [open $::opt(rlwrap_out_file) r]} err]} {
+                log_debug "exit by open $::opt(rlwrap_out_file):\n$err"
+                continue
+            }
+            seek $fd 0
+            if {[gets $fd cmd] == 0} {
+                log_debug "continue by command == 0"
+                continue
+            }
+            ::close $fd
+        }
+
+        if {[regexp {\*\*0000000000*} $cmd]} {
+            log_debug "catch ZINIT in cmd"
+            set cmd "rz -r"
+        }
+        log_debug "run command: [hexdump_ascii $cmd]"
+
+        handle_command $cmd
+    }
+}
+
+proc check_for_following {type} {
+    global argv0
+    if {![llength [uplevel set argv]]} {
+        send_error "$argv0: [uplevel set flag] requires following $type"
+        exit 2
+    }
+}
+
+###############################################################
+
+foreach {key val} [array get ::opt] {
+    set ::opt($key) [subst $val]
+}
+
+file mkdir $::opt(base_dir)
+cd $::opt(base_dir)
+
+
+############## end: help function ######################
+proc usage {{err {}}} {
+    global argv0
+    send_error "Usage: [regsub .*/ $argv0 {}] \[-h|--help] \[-v] \[-c command \[command ..]] \[--] \n\
+    -c  - run command in batch mode\n\
+    -h  - this help\n\
+    -v  - debug log in $::opt(debug_log)\n\
+    "
+    if {$err != {}} {
+        die $err
+    }
+    exit 0
+}
+
+while {[llength $argv] > 0} {
+    set flag [lindex $argv 0]
+    if {0 == [regexp "^-" $flag]} break
+    set argv [lrange $argv 1 end]
+    switch -- $flag {
+        -c    {
+            set command [lmap cmd [split [lindex $argv 0] {;}] {string trim $cmd}]
+            check_for_following string
+            set argv [lrange $argv 1 end]
+            set ::opt(interactive) 0
+        }
+        -v    { set ::opt(debug) 1 }
+        -h -
+        --help { usage }
+        --    { break }
+        ^-    { die "unknown option: \"$flag\"" }
+    }
+}
+
+set argv [string trim $argv \{\}]
+set argc [llength $argv]
+
+if {$argc != 0} {
+    usage
+}
+
+if {$::opt(interactive)} {
+    run_interactive_shell
+} else {
+    foreach cmd $command {
+        handle_command $cmd
+    }
+}
+

@@ -4,6 +4,17 @@ export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 
 mkdir -p /dev/pts /dev/shm
 
+restart_sig() {
+    exec /sbin/init u
+}
+
+trap 'reboot -f' SIGTERM
+#trap 'exec /sbin/init u' SIGHUP
+trap 'restart_sig' SIGHUP
+
+# start-stop-daemon
+/sbin/initctl.exp > /dev/null 2>&1&
+
 getty_loop() {
     while :; do
          if [ ! -e /var/lock/nogetty.$1 -a -e /dev/$1 ]; then
@@ -32,28 +43,32 @@ case "$1" in
     u)
         kill -9 -1
         sleep 2
-        dropbear -r /etc/dropbear/dropbear_rsa_host_key
 
-        mount | grep -wo '/rootfs-old[^ ]*' | sort -r | xargs umount
-        ubidetach -p /dev/mtd3
+        /sbin/initctl.exp > /dev/null 2>&1&
 
-        export PS1='\u@updating:\w\$ '
-        /bin/sh
-            #while :; do
-            #    if [ ! -e /var/lock/nogetty ]; then
-            #       # to make possible init script catch signals
-            #        /sbin/getty 115200 ttyS0&
-            #        wait $!
-            #    fi
-            #    sleep 0.5
-            # done
+        dropbear -B -r /etc/dropbear/dropbear_rsa_host_key
+
+        export PS1='\u@\h:\w\$ '
+        export TERM=xterm
+        hostname upgrade-mode
+
+        [ -e /opt/arsp/etc/rc.local ] && sh /opt/arsp/etc/rc.local&
+
+        SWU="$(ls /update/*.swu* | head -n 1)"
+        if [ -f "$SWU" ]; then
+            echo 'There is upgrade files available. Run it...' >&2
+            hostname system-upgrade-running
+            evo-update -z 2 -r $SWU # upgrade in second stage and force reboot
+        fi
+
+        getty_loop ttyGS0&
+        getty_loop ttyS0
        ;;
 esac
 
 if [ -e /opt/lxc/sandbox/enable ]; then
 	WISE=true
 	REAL_ROOT=toor
-                                                                               
 else
 	REAL_ROOT=root
 	WISE=false
@@ -64,45 +79,69 @@ mount -a
 echo 2 > /proc/cpu/alignment
 echo 0 > /proc/sys/net/ipv4/icmp_echo_ignore_broadcasts
 
-hostname -F /etc/hostname
-
-[ -x /sbin/evo-hw ] && /sbin/evo-hw on
-
-ifconfig lo up
-
-IPADDRDEF=192.168.0.124
-NETMASKDEF=255.255.255.0
-IPADDR=$IPADDRDEF
-if [ -f /usr/local/etc/config/ipaddr ]; then
-        IPADDR=$(cat /usr/local/etc/config/ipaddr)
-fi
-if [ -f /usr/local/etc/config/netmask ]; then
-        NETMASK=$(cat /usr/local/etc/config/netmask)
-fi
-
-ifconfig eth0 $IPADDR netmask $NETMASK 2> /dev/null
-if [ $? -ne 0 ]; then
-        ifconfig eth0 $IPADDRDEF netmask $NETMASKDEF
-fi
-
-#ifconfig eth0:0 10.0.2.1
-#insmod /usr/local/bin/tun.ko
-#mkdir /dev/net
-#mknod /dev/net/tun c 10 200
-#tunctl -t tun0
-#
-#echo 1 > /proc/sys/net/ipv4/ip_forward
-
 mkdir -p /var/volatile/cache \
          /var/volatile/lock  \
          /var/volatile/log   \
          /var/volatile/run   \
          /var/volatile/tmp
 
-export LD_LIBRARY_PATH=/usr/local/lib
-[ -e /usr/local/etc/rc.local ] && sh /usr/local/etc/rc.local&
+hostname -F /etc/hostname
 
-sleep 2
+[ -x /sbin/evo-hw ] && /sbin/evo-hw on
+
+ifconfig lo up
+
+if [ -f "/sys/firmware/devicetree/base/serial#" ]; then
+    IFS=/ read NUM SR < '/sys/firmware/devicetree/base/serial#'
+    SN="$NUM/$SR"
+fi
+
+HW_TYPE=$(evo-hw type)
+
+if ifconfig eth0 > /dev/null 2>&1; then
+    IPADDRDEF=192.168.0.126
+    NETMASKDEF=255.255.255.0
+    GATEWAYDEF=192.168.0.1
+    IPADDR=$IPADDRDEF
+
+    if [ -n "$NUM" -a "$NUM" -ge 126 -a "$NUM" -le 254 ]; then
+        IPADDR=192.168.0.$NUM
+        NETMASK=255.255.255.0
+    fi
+
+    if [ -f /usr/local/etc/config/ipaddr ]; then
+        IPADDR=$(cat /usr/local/etc/config/ipaddr)
+        if [ -f /usr/local/etc/config/netmask ]; then
+            NETMASK=$(cat /usr/local/etc/config/netmask)
+        fi
+    fi
+
+    if [ -f /usr/local/etc/config/gateway ]; then
+        GATEWAY=$(cat /usr/local/etc/config/gateway)
+    else
+        GATEWAY="$GATEWAYDEF"
+    fi
+
+    if ! ifconfig eth0 "$IPADDR" netmask "$NETMASK" 2> /dev/null; then
+        ifconfig eth0 $IPADDRDEF netmask $NETMASKDEF
+    fi
+
+    if ! route -n add default gw "$GATEWAY"; then
+        route -n add default gw "$GATEWAYDEF"
+    fi
+fi
+
+case $HW_TYPE in
+    can)
+        ip link set can0 type can bitrate 500000
+        ifconfig can0 up
+        ip link set can1 type can bitrate 500000
+        ifconfig can1 up
+        ;;
+    *)
+        ;;
+esac
+
 
 ln -fs /dev/null /var/run/lastlog
 ln -fs /dev/null /var/run/utmp
@@ -111,35 +150,53 @@ ln -fs /dev/null /var/log/wtmp
 syslogd -S -D -C64
 klogd
 
-restart_sig() {
-    exec /sbin/init u
-}
-
-trap 'reboot -f' SIGTERM
-#trap 'exec /sbin/init u' SIGHUP
-trap 'restart_sig' SIGHUP
-
-# start-stop-daemon
-/sbin/initctl.exp > /dev/null 2>&1&
-
 httpd -h /usr/local/www
 inetd
-dropbear -r /etc/dropbear/dropbear_rsa_host_key
+dropbear -B -r /etc/dropbear/dropbear_rsa_host_key
 
 modprobe ppp_async
 
-if $WISE; then
+if [ -n "$SN" ]; then
+    SR_HEX="$(printf "%02x" $SR)"
+    NUM_HEX="$(printf "%02x" $NUM)"
 
-	ubiattach -p /dev/mtd8
-	ubiattach -p /dev/mtd10
-	
+    IPADDRDEF_USB=10."$SR.$NUM".1
+    MAC_USB_DEV=ba:be:00:00:"$SR_HEX:$NUM_HEX"
+    MAC_USB_HOST=ba:be:01:00:"$SR_HEX:$NUM_HEX"
+else
+    IPADDRDEF_USB=10.254.254.1
+    MAC_USB_DEV=ba:dd:ca:fe:00:01
+    MAC_USB_HOST=ba:dd:ca:fe:00:02
+fi
+
+modprobe g_cdc iManufacturer="EvoLogics GmbH" \
+               iProduct="s2c tiny $HW_TYPE" \
+               iSerialNumber="$SN" \
+               dev_addr=$MAC_USB_DEV \
+               host_addr=$MAC_USB_HOST
+
+ifconfig usb0 $IPADDRDEF_USB
+
+test -f /etc/udhcpd.conf && udhcpd
+
+export LD_LIBRARY_PATH=/usr/local/lib
+[ -e /opt/arsp/etc/rc.local ]  && sh /opt/arsp/etc/rc.local&
+[ -e /usr/local/etc/rc.local ] && sh /usr/local/etc/rc.local&
+
+sleep 1
+
+if $WISE; then
+	#ubiattach -p /dev/mtd8
+	#ubiattach -p /dev/mtd10
+
 	mount -t cgroup cgroup /sys/fs/cgroup
-	mount -t ubifs -o sync /dev/ubi4_0 /opt/lxc/sandbox/rootfs
-	
+	#mount -t ubifs -o sync /dev/ubi4_0 /opt/lxc/sandbox/rootfs
+
 	modprobe ext4
-	#test -b /dev/mmcblk0p1 && mount -t ext4 -o errors=continue /dev/mmcblk0p1 /media/card 
-	
+	##test -b /dev/mmcblk0p1 && mount -t ext4 -o errors=continue /dev/mmcblk0p1 /media/card
+
 	/etc/init.d/lxc start
 fi
 
+getty_loop ttyGS0&
 getty_loop ttyS0

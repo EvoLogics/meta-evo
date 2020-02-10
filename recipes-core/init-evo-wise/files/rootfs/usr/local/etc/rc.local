@@ -1,23 +1,80 @@
 #!/bin/sh
 # init script called once at first boot from /sbin/init
-echo '=== First boot initial setup ==='
+echo '=== First boot initial setup start ==='
+touch /tmp/init-setup.lock
 
 mount -o remount,rw /
 
 [ -d /run ] && rmdir /run
 ln -sf /var/volatile/run /run
 
+# make bash history permanent
+ln -sf /data/.bash_history /home/root/.bash_history
+
 DROPBEAR_RSAKEY=/etc/dropbear/dropbear_rsa_host_key
-dropbearkey -t rsa -f $DROPBEAR_RSAKEY
+if [ ! -f $DROPBEAR_RSAKEY ]; then
+    dropbearkey -t rsa -f $DROPBEAR_RSAKEY
+fi
 dropbear -r $DROPBEAR_RSAKEY
 cd /
 
-echo config::0:0:0:/tmp:/usr/local/bin/sersh >> /etc/passwd
-echo 'config:!:0:0:99999:7:::' >> /etc/shadow
+HWTYPE=$(evo-hw -q type)
+IMAGE_VERSION=XXXXX
+echo roadrunner-evo-$HWTYPE $IMAGE_VERSION > /etc/hwrevision
+
+echo config::0:0:FW Config Shell,,,:/tmp:/usr/local/bin/sersh >> /etc/passwd
+echo config::0:0:99999:7::: >> /etc/shadow
 echo /usr/local/bin/sersh >> /etc/shells
+
+echo upgrade::0:0:Upgrade System Shell,,,:/tmp:/sbin/eush >> /etc/passwd
+echo upgrade::0:0:99999:7::: >> /etc/shadow
+echo /sbin/eush >> /etc/shells
+
+SN="$(fw_printenv serial\# | sed 's,.*=,,')"
+NUM="${SN%/*}"
+NUM_HEX="$(printf "%02x" $NUM)"
+SR="${SN#*/}"
+SR_HEX="$(printf "%02x" $SR)"
+
+echo Serial Number: $SN
+case "$NUM" in
+    [0-9]*)
+        ifconfig eth0 192.168.0.$NUM
+        if [ "$NUM" -gt 1 -a "$NUM" -lt 254 ]; then
+            #sed -i -e 's/\(IPADDRDEF=\).*/\1192.168.0.'$NUM'/' \
+            #       -e 's/\(IPADDRDEF_USB=\).*/\110.'"$SR.$NUM"'.1/' \
+            #       -e 's/\(MAC_USB_DEV=\).*/\1ba:be:00:00:'$SR_HEX:$NUM_HEX'/' \
+            #       -e 's/\(MAC_USB_HOST=\).*/\1ba:be:01:00:'$SR_HEX:$NUM_HEX'/' \
+            #           /sbin/init
+
+            sed -i -e 's/\(^start\).*/\1 10.'"$SR.$NUM"'.2/' \
+                   -e 's/\(^end\).*/\1 10.'"$SR.$NUM"'.20/' \
+                       /etc/udhcpd.conf
+        else
+            echo "Warning: SN is not a number not in range: $NUM"
+        fi
+        ;;
+    *)
+        echo "Warning: SN is not a number: $NUM"
+        ;;
+esac
+
+TYPE=base
+if [ -f /opt/lxc/sandbox/enable ]; then
+    TYPE=wise
+fi
+HOSTNAME=evo-$TYPE-$NUM-$SR-$HWTYPE
+echo $HOSTNAME > /etc/hostname
+echo 127.0.0.1 $HOSTNAME >> /etc/hosts
 
 # needed for sersh 'ip' command
 ln -s /sbin/ip /bin/ip
 
+# FIXME: sometimes mount to ro fails. 'busy'. why?
 # remove self
-sleep 2 && rm -f /usr/local/etc/rc.local && mount -o remount,ro / &
+( sleep 2 && \
+    rm -f /usr/local/etc/rc.local && \
+        mount -o remount,ro /; \
+            printf '\n=== First boot initial setup ends ===\n' && \
+                rm /tmp/init-setup.lock ) &
+

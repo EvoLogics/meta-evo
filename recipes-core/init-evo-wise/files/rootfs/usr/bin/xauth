@@ -1,0 +1,3 @@
+#!/bin/sh
+# Fake xauth, to prevent ssh client show "sh: xauth: command not found"
+true

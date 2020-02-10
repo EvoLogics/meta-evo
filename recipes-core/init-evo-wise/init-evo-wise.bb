@@ -25,8 +25,11 @@ RDEPENDS_${PN} = "busybox expect"
 
 SRC_URI = "file://rootfs/sbin/init \
            file://rootfs/sbin/initctl.exp \
+           file://rootfs/sbin/eush \
+           file://rootfs/usr/bin/xauth \
            file://rootfs/etc/init.d/lxc \
            file://rootfs/usr/local/etc/rc.local \
+           file://rootfs/etc/udhcpd.conf \
     "
 
 FILES_${PN} += "/usr/local/www /usr/local/etc/rc.local"
@@ -52,9 +55,18 @@ do_install() {
     install -m 0755 ${WORKDIR}/rootfs/sbin/init ${D}${base_sbindir}
     install -m 0755 ${WORKDIR}/rootfs/sbin/initctl.exp ${D}${base_sbindir}
 
+	install -d ${D}${sysconfdir}
+    install -m 0644 ${WORKDIR}/rootfs/etc/udhcpd.conf ${D}${sysconfdir}
+
+	install -d ${D}/usr/bin
+    install -m 0755 ${WORKDIR}/rootfs/usr/bin/xauth ${D}/usr/bin
+
+    install -m 0755 ${WORKDIR}/rootfs/sbin/eush ${D}${base_sbindir}
+
     mkdir -p ${D}/usr/local/etc
     # install init script runned at start and delete her self
     install -m 0755 ${WORKDIR}/rootfs/usr/local/etc/rc.local ${D}/usr/local/etc
+    sed -i "s/\(IMAGE_VERSION=\).*/\1${DISTRO_VERSION}-${IMAGE_VERSION}/" ${D}/usr/local/etc/rc.local
     mkdir -p ${D}/usr/local/www
            
 	cd ${D}${base_sbindir}
