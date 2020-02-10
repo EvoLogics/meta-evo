@@ -1,10 +1,11 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend_tx6 := "${THISDIR}/${PN}/tx6:"
 #PRINC := "${@int(PRINC) + 1}"
 PR .= ".2"
 SRC_URI += "file://issue*        \
            "
 
-do_install_append() {
+do_install_append_sama5d2-roadrunner-evo() {
 	install -d ${D}${sysconfdir}
 	install -m 0644 ${WORKDIR}/issue.base ${D}${sysconfdir}
 	install -m 0644 ${WORKDIR}/issue.wise ${D}${sysconfdir}
@@ -32,4 +33,13 @@ do_install_append() {
 
     # create non-volatile rw partition mount point
     mkdir -p ${D}/data
+}
+
+do_install_append_tx6() {
+	install -d ${D}${sysconfdir}
+	install -m 0644 ${WORKDIR}/issue.tx6 ${D}${sysconfdir}
+
+	cd ${D}${sysconfdir}
+    cat issue.tx6 issue | tee issue
+    rm -f issue.net issue.tx6
 }

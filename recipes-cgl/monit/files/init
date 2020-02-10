@@ -13,13 +13,13 @@ test -x "$monit" || exit 0
 case "$1" in
   start)
     echo -n "Starting Monit"
-    start-stop-daemon --start --quiet --exec $monit -- $monit_args
+    $monit $monit_args &
     RETVAL=$?
     echo "."
     ;;
   stop)
     echo -n "Stopping Monit"
-    start-stop-daemon --stop --quiet --pidfile $pidfile
+    $monit quit
     RETVAL=$?
     echo "."
     ;;

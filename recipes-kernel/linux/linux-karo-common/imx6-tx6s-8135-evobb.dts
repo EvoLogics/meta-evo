@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 Lothar Waßmann <LW@KARO-electronics.de>
+ * Copyright 2015-2016 Lothar Waßmann <LW@KARO-electronics.de>
  *
  * This file is dual-licensed: you can use it either under the terms
  * of the GPL or the X11 license, at your option. Note that this dual
@@ -40,21 +40,20 @@
  */
 
 /dts-v1/;
-#include "imx6q.dtsi"
+#include "imx6dl.dtsi"
 #include "imx6qdl-tx6.dtsi"
 #include "imx6-tx6-common.dtsi"
 #include "imx6-tx6-evobb.dtsi"
 
-
 / {
-	model = "Ka-Ro electronics TX6Q-8137 Module";
-	compatible = "karo,imx6q-tx6q", "fsl,imx6q";
-};
+	model = "Ka-Ro electronics TX6S-8135 Module";
+	compatible = "karo,imx6dl-tx6dl", "fsl,imx6dl";
 
-&ipu2 {
-	status = "disabled";
-};
+	aliases {
+		ipu1 = &ipu1;
+	};
 
-&sata {
-	status = "okay";
+	cpus {
+		/delete-node/ cpu@1;
+	};
 };

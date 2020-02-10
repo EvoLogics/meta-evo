@@ -227,13 +227,13 @@
 	status = "disabled";
 
 	spidev0: spi@0 {
-		compatible = "spidev";
+		compatible = "lineartechnology,ltc2488";
 		reg = <0>;
 		spi-max-frequency = <54000000>;
 	};
 
 	spidev1: spi@1 {
-		compatible = "spidev";
+		compatible = "lineartechnology,ltc2488";
 		reg = <1>;
 		spi-max-frequency = <54000000>;
 	};
@@ -689,12 +689,14 @@
 &uart2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart2 &pinctrl_uart2_rtscts>;
+	fsl,uart-has-rtscts;
 	status = "okay";
 };
 
 &uart3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart3 &pinctrl_uart3_rtscts>;
+	fsl,uart-has-rtscts;
 	status = "okay";
 };
 
