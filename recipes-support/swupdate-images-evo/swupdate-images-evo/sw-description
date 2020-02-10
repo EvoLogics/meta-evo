@@ -1,33 +1,31 @@
 software =
 {
     version = "@@DISTRO_VERSION@@";
-    description = "Firmware system update for EvoLogics S2C EvoMini2 Modem";
+    description = "Firmware system update for EvoLogics S2C Modem";
 
-    /*
-    hardware-compatibility: [ "1.0", "1.2", "1.3"];
-    */
+    hardware-compatibility = ["@@DISTRO_VERSION@@-@@IMAGE_VERSION@@"];
+    scripts: (
+        {
+            filename = "evo-swu-emb.sh";
+            type = "shellscript";
+            sha256 = "@evo-swu-emb.sh";
+        }
+    );
 
     images: (
         {
-           name = "at91bootstrap";
-           filename = "at91bootstrap-sama5d2_roadrunner.bin";
-           device = "/dev/mtd0";
-           type = "flash";
-           sha256 = "@at91bootstrap-sama5d2_roadrunner.bin";
+            name = "at91bootstrap";
+            filename = "at91bootstrap-sama5d2_roadrunner.bin";
+            device = "/dev/mtd0";
+            type = "flash";
+            sha256 = "@at91bootstrap-sama5d2_roadrunner.bin";
         },
         {
-           name = "dtb";
-           filename = "sama5d2-roadrunner-evo-eth.dtb";
-           device = "/dev/mtd1";
-           type = "flash";
-           sha256 = "@zImage-sama5d2-roadrunner-evo-eth.dtb";
-        },
-        {
-           name = "kernel";
-           filename = "zImage-sama5d2-roadrunner-evo.bin";
-           device = "/dev/mtd2";
-           type = "flash";
-           sha256 = "@zImage-sama5d2-roadrunner-evo.bin";
+            name = "kernel";
+            filename = "zImage-sama5d2-roadrunner-evo.bin";
+            device = "/dev/mtd2";
+            type = "flash";
+            sha256 = "@zImage-sama5d2-roadrunner-evo.bin";
         },
         {
             name = "rootfs";
@@ -36,5 +34,96 @@ software =
             type = "flash";
             sha256 = "@evologics-base-image-sama5d2-roadrunner-evo.ubi";
         }
-   );
+     );
+
+     roadrunner-evo-eth = {
+         /* ref = "#./../scripts"; */
+         images: (
+             {
+                 name = "dtb";
+                 filename = "sama5d2-roadrunner-evo-eth.dtb";
+                 device = "/dev/mtd1";
+                 type = "flash";
+                 sha256 = "@sama5d2-roadrunner-evo-eth.dtb";
+             },
+             /*
+             {
+                 ref = "#./../images";
+             }
+             */
+             {
+                 name = "at91bootstrap";
+                 filename = "at91bootstrap-sama5d2_roadrunner.bin";
+                 device = "/dev/mtd0";
+                 type = "flash";
+                 sha256 = "@at91bootstrap-sama5d2_roadrunner.bin";
+             },
+             {
+                 name = "kernel";
+                 filename = "zImage-sama5d2-roadrunner-evo.bin";
+                 device = "/dev/mtd2";
+                 type = "flash";
+                 sha256 = "@zImage-sama5d2-roadrunner-evo.bin";
+             },
+             {
+                 name = "rootfs";
+                 filename = "evologics-base-image-sama5d2-roadrunner-evo.ubi";
+                 device = "/dev/mtd3";
+                 type = "flash";
+                 sha256 = "@evologics-base-image-sama5d2-roadrunner-evo.ubi";
+             }
+             );
+     };
+
+     roadrunner-evo-rs232 = {
+         ref = "#./eth";
+     };
+
+     roadrunner-evo-rs422 = {
+         ref = "#./../scripts";
+         images: (
+             {
+                 name = "dtb";
+                 filename = "sama5d2-roadrunner-evo-rs422.dtb";
+                 device = "/dev/mtd1";
+                 type = "flash";
+                 sha256 = "@sama5d2-roadrunner-evo-rs422.dtb";
+             },
+             {
+                 ref = "#./../images";
+             }
+             );
+     };
+
+     roadrunner-evo-rs485 = {
+         ref = "#./../scripts";
+         images: (
+             {
+                 name = "dtb";
+                 filename = "sama5d2-roadrunner-evo-rs485.dtb";
+                 device = "/dev/mtd1";
+                 type = "flash";
+                 sha256 = "@sama5d2-roadrunner-evo-rs485.dtb";
+             },
+             {
+                 ref = "#./../images";
+             }
+             );
+     };
+
+     roadrunner-evo-can = {
+         ref = "#./../scripts";
+         images: (
+             {
+                 name = "dtb";
+                 filename = "sama5d2-roadrunner-evo-can.dtb";
+                 device = "/dev/mtd1";
+                 type = "flash";
+                 sha256 = "@sama5d2-roadrunner-evo-can.dtb";
+             },
+             {
+                 ref = "#./../images";
+             }
+             );
+     };
 }
