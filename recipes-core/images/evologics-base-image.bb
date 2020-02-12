@@ -5,6 +5,18 @@ LICENSE = "MIT"
 
 IMAGE_FEATURES += "ssh-server-dropbear package-management"
 
+# kernel-dev ?
+TOOLCHAIN_TARGET_TASK_append = " kernel-dev zlib libcsv"
+# for sdmsh
+TOOLCHAIN_TARGET_TASK_append = " readline bsd-headers-dev"
+
+# for needed tcl-staticdev for libplconv for lbl-node
+TOOLCHAIN_TARGET_TASK_append = " tcl-staticdev"
+
+TOOLCHAIN_HOST_TASK_append = " nativesdk-erlang nativesdk-rebar nativesdk-erlang-modules-dev \
+                               nativesdk-tcl-staticdev"
+
+
 IMAGE_INSTALL = "\
     kernel-module-g-cdc \
     kernel-module-ppp-async \
