@@ -6,7 +6,7 @@ LICENSE = "MIT"
 IMAGE_FEATURES += "ssh-server-dropbear package-management"
 
 # kernel-dev ?
-TOOLCHAIN_TARGET_TASK_append = " kernel-dev zlib libcsv"
+TOOLCHAIN_TARGET_TASK_append = " kernel-devsrc zlib libcsv"
 # for sdmsh
 TOOLCHAIN_TARGET_TASK_append = " readline bsd-headers-dev"
 
