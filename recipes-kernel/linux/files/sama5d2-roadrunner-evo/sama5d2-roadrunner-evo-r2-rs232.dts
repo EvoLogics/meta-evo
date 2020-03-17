@@ -1,0 +1,7 @@
+/dts-v1/;
+#include "sama5d2-roadrunner-evo-r2.dtsi"
+#include "sama5d2-roadrunner-evo-rs232.dtsi"
+
+/ {
+    model = "Acme Systems RoadRunner on EvoLogics Baseboard R2 RS232";
+};

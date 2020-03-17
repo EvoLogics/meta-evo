@@ -77,11 +77,12 @@ have_eth() {
 get_hwtype() {
     STRAPS="$(get_straps)"
     case "$STRAPS" in
-        111111) have_eth && HWTYPE=eth || HWTYPE=rs232 ;;
-        111110) HWTYPE=can   ;;
-        111101) HWTYPE=rs422 ;;
-        111100) HWTYPE=rs485 ;;
-        111011) have_eth && HWTYPE=eth || HWTYPE=rs232 ;;
+        111111) HWMODEL=tiny; have_eth && HWTYPE=eth || HWTYPE=rs232 ;;
+        111110) HWMODEL=tiny; HWTYPE=can   ;;
+        111101) HWMODEL=tiny; HWTYPE=rs422 ;;
+        111100) HWMODEL=tiny; HWTYPE=rs485 ;;
+        111011) HWMODEL=tiny; have_eth && HWTYPE=eth || HWTYPE=rs232 ;;
+        011111) HWMODEL=r2;   have_eth && HWTYPE=eth || HWTYPE=rs232 ;;
         *) die "Unsupported straps: $STRAPS" ;;
     esac
     if [ -f "$HW_REV_FILE" ]; then

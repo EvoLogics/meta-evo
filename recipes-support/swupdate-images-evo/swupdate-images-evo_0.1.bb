@@ -34,6 +34,8 @@ SWUPDATE_IMAGES = "at91bootstrap-sama5d2_roadrunner \
                    sama5d2-roadrunner-evo-rs422 \
                    sama5d2-roadrunner-evo-rs485 \
                    sama5d2-roadrunner-evo-can \
+                   sama5d2-roadrunner-evo-r2-eth \
+                   sama5d2-roadrunner-evo-r2-rs232 \
                    \
                    evologics-base-image \
                    "
@@ -60,6 +62,12 @@ SWUPDATE_IMAGES_NOAPPEND_MACHINE[sama5d2-roadrunner-evo-rs485] = "1"
 
 SWUPDATE_IMAGES_FSTYPES[sama5d2-roadrunner-evo-can]   = ".dtb"
 SWUPDATE_IMAGES_NOAPPEND_MACHINE[sama5d2-roadrunner-evo-can]   = "1"
+
+SWUPDATE_IMAGES_FSTYPES[sama5d2-roadrunner-evo-r2-eth]   = ".dtb"
+SWUPDATE_IMAGES_NOAPPEND_MACHINE[sama5d2-roadrunner-evo-r2-eth]   = "1"
+
+SWUPDATE_IMAGES_FSTYPES[sama5d2-roadrunner-evo-r2-rs232]   = ".dtb"
+SWUPDATE_IMAGES_NOAPPEND_MACHINE[sama5d2-roadrunner-evo-r2-rs232]   = "1"
 
 SWUPDATE_IMAGES_FSTYPES[evologics-base-image] = ".ubi"
 

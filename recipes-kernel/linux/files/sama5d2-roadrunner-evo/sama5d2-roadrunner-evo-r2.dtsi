@@ -1,0 +1,40 @@
+/dts-v1/;
+#include "sama5d2-roadrunner-evo.dtsi"
+
+/ {
+    ahb {
+		apb {
+            irqman: irqman {
+				reset-gpios     = <&pioA PIN_PB31 GPIO_ACTIVE_LOW>;  /* Reset on R2 is ACTIVE_LOW */
+				dsp-irq-gpios	= <&pioA PIN_PD31 GPIO_ACTIVE_HIGH>; /* EVO_IRQ0 */
+				fiq-gpios		= <&pioA PIN_PC8  GPIO_ACTIVE_HIGH>; /* EVO_FIQ  */
+            };
+
+			uart2: serial@f8024000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_uart2_default>;
+				status = "okay";
+			};
+
+			uart4: serial@fc00c000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_uart4_default>;
+				status = "okay";
+			};
+
+			pinctrl@fc038000 {
+				pinctrl_uart2_default: uart2_default {
+					pinmux = <PIN_PD4__URXD2>,
+						 <PIN_PD5__UTXD2>;
+					bias-disable;
+				};
+
+				pinctrl_uart4_default: uart4_default {
+					pinmux = <PIN_PB3__URXD4>,
+						 <PIN_PB4__UTXD4>;
+					bias-disable;
+				};
+            };
+        };
+   };
+};

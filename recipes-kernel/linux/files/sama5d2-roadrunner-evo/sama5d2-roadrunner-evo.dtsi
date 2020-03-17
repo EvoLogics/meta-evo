@@ -58,10 +58,12 @@
 
 	aliases {
 		ssc0 = &ssc0;
-		serial0 = &uart1;
-		serial1 = &uart0;
-		serial2 = &uart3;
-		serial5 = &uart5;
+		serial0 = &uart1; /* console */
+		serial1 = &uart0; /* data */
+		serial2 = &uart3; /* sensor */
+		serial3 = &uart2; /* sensor2 */
+		serial4 = &uart4; /* sensor3 */
+		serial5 = &uart5; /* rs485 for tiny */
 	};
 
 	chosen {
