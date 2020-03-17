@@ -360,7 +360,7 @@
 				sdm-sync-in-gpios = <&pioA PIN_PC23 GPIO_ACTIVE_HIGH>; /* conflict with pps1 */
 
 				/* eclk */
-				lock-gpios      = <&pioA PIN_PD5  GPIO_ACTIVE_HIGH>; /* LOCK(BITE_N) */
+				lock-gpios      = <&pioA PIN_PB5  GPIO_ACTIVE_HIGH>; /* LOCK(BITE_N) */
 
 				/* IRQs */
 				dsp-irq-gpios	= <&pioA PIN_PB3  GPIO_ACTIVE_HIGH>; /* EVO_IRQ0 */
