@@ -11,6 +11,7 @@ else
   echo "not found."
 fi
 
+echo -n "Checking if dropbear defaults exists... "
 if [ -e /etc/default/dropbear ]; then
   sed -i 's|/var/lib/dropbear|/etc/dropbear|' /etc/default/dropbear && echo "fixed!"
 else
