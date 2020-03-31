@@ -21,6 +21,8 @@ case "$1" in
     for script in ${ENVINIT_PATH}/*-*.sh; do
       ${script}
     done
+
+    sync && mount -o remount,ro /
     ;;
   stop)
     echo "."
