@@ -1,5 +1,7 @@
 #!/bin/bash
 
+[ "$HOME" = "/" ] && { echo "Copying from skel should be run as user, exiting." && exit 0; }
+
 echo -n "Checking if .profile exists... "
 if [ -e $HOME/.profile ]; then
   echo "found!"
