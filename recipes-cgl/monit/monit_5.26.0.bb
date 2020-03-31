@@ -51,6 +51,12 @@ do_install_append() {
 	sed -i -e 's:#*\s*include /etc/monit.d/:include ${sysconfdir}/monit.d/:' \
 	       ${D}${sysconfdir}/monitrc
 
+  install -m 600 ${D}${sysconfdir}/monitrc ${D}${sysconfdir}/monitrc-ro-rootfs
+	sed -i -e 's:#*\s*set idfile.*:set idfile /etc/monitid:' \
+         -e 's:#*\s*set pidfile.*:set pidfile /var/run/monit.pid:' \
+         -e 's:#*\s*set statefile.*:set statefile /var/tmp/monit.state:' \
+	       ${D}${sysconfdir}/monitrc-ro-rootfs
+
 	install -D -m 0644 ${S}/system/startup/monit.service ${D}${systemd_system_unitdir}/monit.service
 }
 
