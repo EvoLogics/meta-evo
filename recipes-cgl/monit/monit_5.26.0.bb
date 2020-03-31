@@ -13,7 +13,6 @@ DEPENDS = "openssl zlib virtual/crypt"
 
 SRC_URI = "\
 	http://mmonit.com/monit/dist/${BP}.tar.gz \
-	file://enable-etc-monit.d-include.patch \
 	file://init \
 	"
 
@@ -49,8 +48,7 @@ do_install_append() {
 
 	install -m 600 ${S}/monitrc ${D}${sysconfdir}/monitrc
 	install -m 700 -d ${D}${sysconfdir}/monit.d/
-	sed -i -e 's:# set daemon  120:set daemon  120:' \
-	       -e 's:include /etc/monit.d/:include /${sysconfdir}/monit.d/:' \
+	sed -i -e 's:#*\s*include /etc/monit.d/:include ${sysconfdir}/monit.d/:' \
 	       ${D}${sysconfdir}/monitrc
 
 	install -D -m 0644 ${S}/system/startup/monit.service ${D}${systemd_system_unitdir}/monit.service
