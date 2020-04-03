@@ -6,6 +6,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d217a23f408e91c94359447735bc1800"
 DEPENDS = "ncurses libusb1 chrpath-replacement-native pps-tools"
 PROVIDES = "virtual/gpsd"
 
+
+FILESEXTRAPATHS_prepend := "${THISDIR}/gpsd-tiny-3.17:"
+FILESEXTRAPATHS_prepend_mx6ul-comm-module := "${THISDIR}/phytec-commod:"
+
+
 CONFLICT = "gpsd"
 RCONFLICT = "gpsd"
 RCONFLICTS_virtual/gpsd = "gpsd"
@@ -14,12 +19,20 @@ EXTRANATIVEPATH += "chrpath-native"
 
 ON="${@'${BP}'.replace('-tiny','')}"
 S = "${WORKDIR}/${ON}"
+
+
 SRC_URI = "${SAVANNAH_GNU_MIRROR}/${@'${BPN}'.replace('-tiny','')}/${ON}.tar.gz \
     file://0001-SConstruct-prefix-includepy-with-sysroot-and-drop-sy.patch \
     file://0004-SConstruct-disable-html-and-man-docs-building-becaus.patch \
     file://0001-include-sys-ttydefaults.h.patch \
     file://allow-work-with-socat-pty.patch \
 "
+
+SRC_URI_mx6ul-comm-module += "  \
+    file://gpsd.default         \ 
+    file://gpsd.service         \
+"
+
 SRC_URI[md5sum] = "e0cfadcf4a65dfbdd2afb11c58f4e4a1"
 SRC_URI[sha256sum] = "68e0dbecfb5831997f8b3d6ba48aed812eb465d8c0089420ab68f9ce4d85e77a"
 
@@ -117,6 +130,7 @@ do_install_append() {
     install -m 0644 ${S}/systemd/gpsd.socket ${D}${systemd_unitdir}/system/${BPN}.socket
 }
 
+
 PACKAGES =+ "libgps lib${BPN} ${BPN}-udev ${BPN}-conf ${BPN}-gpsctl"
 
 FILES_${PN}-dev += "${libdir}/pkgconfdir/libgpsd.pc ${libdir}/pkgconfdir/libgps.pc \
@@ -145,7 +159,7 @@ FILES_${BPN}-gpsctl = "${bindir}/gpsctl"
 RPROVIDES_${PN} += "${PN}-systemd"
 RREPLACES_${PN} += "${PN}-systemd"
 RCONFLICTS_${PN} += "${PN}-systemd"
-SYSTEMD_SERVICE_${PN} = "${BPN}.socket ${BPN}ctl@.service"
+SYSTEMD_SERVICE_${PN} = "${BPN}.socket ${BPN}ctl@.service ${BPN}.service"
 
 
 ALTERNATIVE_${PN} = "gpsd-defaults"
