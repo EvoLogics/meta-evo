@@ -1,0 +1,11 @@
+[Match]
+Name=br0
+
+[Network]
+Address=10.0.0.2/24
+Gateway=10.0.0.1
+
+[Address]
+Address=192.168.1.250/24
+Label=br0:wfr
+

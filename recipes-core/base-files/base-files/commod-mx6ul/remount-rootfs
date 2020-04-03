@@ -1,0 +1,10 @@
+mount -o remount,rw /
+
+echo
+echo
+echo "**************************************************************"
+echo "Please perform a manual sync after you have made your changes"
+echo "**************************************************************"
+echo
+echo
+
