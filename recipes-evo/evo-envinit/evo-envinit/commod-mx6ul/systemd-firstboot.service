@@ -1,0 +1,9 @@
+[Unit]
+Description=Systemd Service to fix and generate ssh keys.
+
+[Service]
+Type=simple
+ExecStart=/bin/bash  /sbin/systemd-firstboot.sh
+
+[Install]
+WantedBy=multi-user.target

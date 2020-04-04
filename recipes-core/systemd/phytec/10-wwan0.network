@@ -1,5 +1,0 @@
-[Match]
-Name=wwan0
-
-[Network]
-Bridge=br0

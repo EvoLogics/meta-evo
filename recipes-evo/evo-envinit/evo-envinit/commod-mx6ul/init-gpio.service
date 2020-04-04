@@ -3,7 +3,7 @@ Description=Systemd Service to Initialize gpios needed by Communication Module.
 
 [Service]
 Type=simple
-ExecStart=/bin/bash /usr/bin/InitGPIO.sh
+ExecStart=/bin/bash  /sbin/initgpio.sh
 
 [Install]
 WantedBy=multi-user.target
