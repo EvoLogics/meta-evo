@@ -28,9 +28,9 @@ SRC_URI = "${SAVANNAH_GNU_MIRROR}/${@'${BPN}'.replace('-tiny','')}/${ON}.tar.gz 
     file://allow-work-with-socat-pty.patch \
 "
 
-SRC_URI_mx6ul-comm-module += "  \
-    file://gpsd.default         \ 
-    file://gpsd.service         \
+SRC_URI_append_mx6ul-comm-module = "    \
+    file://gpsd.default                 \ 
+    file://gpsd.service                 \
 "
 
 SRC_URI[md5sum] = "e0cfadcf4a65dfbdd2afb11c58f4e4a1"
@@ -128,6 +128,11 @@ do_install_append() {
     install -m 0644 ${S}/systemd/gpsd.service ${D}${systemd_unitdir}/system/${BPN}.service
     install -m 0644 ${S}/systemd/gpsdctl@.service ${D}${systemd_unitdir}/system/${BPN}ctl@.service
     install -m 0644 ${S}/systemd/gpsd.socket ${D}${systemd_unitdir}/system/${BPN}.socket
+}
+
+do_install_append_mx6ul-comm-module() {
+    install -m 0644 ${WORKDIR}/gpsd.service ${D}${systemd_unitdir}/system/${BPN}.service
+    install -m 0644 ${WORKDIR}/gpsd.default ${D}/${sysconfdir}/default/gpsd.default
 }
 
 
