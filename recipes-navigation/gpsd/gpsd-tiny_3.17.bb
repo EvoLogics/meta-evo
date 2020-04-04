@@ -13,7 +13,7 @@ RCONFLICTS_virtual/gpsd = "gpsd"
 EXTRANATIVEPATH += "chrpath-native"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/gpsd-tiny-3.17:"
-FILESEXTRAPATHS_prepend_mx6ul-comm-module := "${THISDIR}/phytec-commod:"
+FILESEXTRAPATHS_prepend_mx6ul-comm-module := "${THISDIR}/commod-mx6ul:"
 
 ON="${@'${BP}'.replace('-tiny','')}"
 S = "${WORKDIR}/${ON}"
