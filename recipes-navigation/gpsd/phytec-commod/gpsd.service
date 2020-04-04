@@ -6,8 +6,7 @@ Requires=gpsd.socket
 
 [Service]
 Type=forking
-EnvironmentFile=-/etc/default/gpsd
-EnvironmentFile=-/etc/sysconfig/gpsd
+EnvironmentFile=-/etc/default/gpsd.commod
 ExecStartPre=/bin/stty -F /dev/ttymxc2 115200 raw
 ExecStart=/usr/sbin/gpsd $GPSD_OPTIONS $OPTIONS $DEVICES
 
