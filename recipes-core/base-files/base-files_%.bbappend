@@ -7,7 +7,7 @@ PR .= ".2"
 SRC_URI += "file://issue*        \
            "
 
-SRC_URI_mx6ul-comm-module += "  \
+SRC_URI_append_mx6ul-comm-module = "  \
     file://print_issue.sh       \
 "
 
