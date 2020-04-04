@@ -10,6 +10,16 @@
 / {
 	model = "PHYTEC phyBOARD-Segin i.MX 6ULL";
 	compatible = "phytec,imx6ull-pbacd-10", "phytec,imx6ull-pcl063","fsl,imx6ull";
+
+
+
+	pps0: pps0 {
+		compatible = "pps-gpio";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pps0>;
+		gpios = <&gpio1 18 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
 };
 
 &iomuxc {
@@ -25,15 +35,6 @@
 	/delete-node/ uart8grp;
 	/delete-node/ ethphy2;
 	/delete-node/ fec2;
-
-
-	pps0: pps0 {
-		compatible = "pps-gpio";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_pps0>;
-		gpios = <&gpio1 18 GPIO_ACTIVE_HIGH>;
-		status = "disabled";
-	};
 };
 
 
