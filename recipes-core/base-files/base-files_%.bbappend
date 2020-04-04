@@ -9,8 +9,6 @@ SRC_URI += "file://issue*        \
 
 SRC_URI_mx6ul-comm-module += "  \
     file://print_issue.sh       \
-    file://InitGPIO.sh          \
-    file://init-gsm             \
 "
 
 do_install_append_sama5d2-roadrunner-evo() {
@@ -56,9 +54,6 @@ do_install_append_tx6() {
 do_install_append_mx6ul-comm-module() {
     install -m 0755 ${WORKDIR}/print_issue.sh ${D}${sysconfdir}/profile.d/print_issue.sh
     install -d ${D}/mnt/storage
-    install -m 0777 ${WORKDIR}/remount-rootfs ${D}/bin/remount-rootfs
-    install -m 0777 ${WORKDIR}/InitGPIO.sh ${D}/usr/bin/InitGPIO.sh
-    install -m 0777 ${WORKDIR}/init-gsm ${D}/bin/init-gsm
 }
 
 do_install_basefilesissue_append_mx6ul-comm-module() {
