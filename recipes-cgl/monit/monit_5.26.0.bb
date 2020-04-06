@@ -63,8 +63,6 @@ do_install_append() {
          -e 's:#*\s*set pidfile.*:set pidfile /var/run/monit.pid:' \
          -e 's:#*\s*set statefile.*:set statefile /var/tmp/monit.state:' \
 	       ${D}${sysconfdir}/monitrc-ro-rootfs
-
-	install -D -m 0644 ${WORKDIR}/monit.service ${D}${systemd_system_unitdir}/monit.service
 }
 
 do_install_append_mx6ul-comm-module(){
