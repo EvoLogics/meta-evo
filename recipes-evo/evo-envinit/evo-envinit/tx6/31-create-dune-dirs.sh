@@ -8,7 +8,7 @@ if [ -e ${DUNE_BASE}/bin/dune ]; then
   echo "found!"
 else
   echo "not found, exiting!"
-  exit 1
+  exit 0
 fi
 
 echo -n "Creating dirs... "
