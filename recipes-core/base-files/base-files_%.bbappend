@@ -1,5 +1,4 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-FILESEXTRAPATHS_prepend_tx6 := "${THISDIR}/${PN}/tx6:"
 #PRINC := "${@int(PRINC) + 1}"
 PR .= ".2"
 SRC_URI += "file://issue*        \
@@ -35,7 +34,13 @@ do_install_append_sama5d2-roadrunner-evo() {
     mkdir -p ${D}/data
 }
 
-do_install_append_tx6() {
+##########################
+### MX6-EVOBB Specific ###
+##########################
+
+FILESEXTRAPATHS_prepend_mx6-evobb := "${THISDIR}/${PN}/tx6:"
+
+do_install_append_mx6-evobb() {
 	install -d ${D}${sysconfdir}
 	install -m 0644 ${WORKDIR}/issue.tx6 ${D}${sysconfdir}
 
