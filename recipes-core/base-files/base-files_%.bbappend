@@ -7,8 +7,10 @@ PR .= ".2"
 SRC_URI += "file://issue*        \
            "
 
-SRC_URI_append_mx6ul-comm-module = "  \
-    file://print_issue.sh       \
+SRC_URI_append_mx6ul-comm-module = "    \
+    file://print_issue.sh               \
+    file://share/dot.bashrc             \
+    file://share/dot.profile            \
 "
 
 do_install_append_sama5d2-roadrunner-evo() {
@@ -50,16 +52,11 @@ do_install_append_tx6() {
     rm -f issue.net issue.tx6
 }
 
+SYSROOT_DIRS_append_mx6ul-comm-module = "${sysconfdir}/skel"
 
 do_install_append_mx6ul-comm-module() {
     install -m 0755 ${WORKDIR}/print_issue.sh ${D}${sysconfdir}/profile.d/print_issue.sh
+    install -m 0755 ${WORKDIR}/share/dot.profile ${D}${sysconfdir}/skel/.profile
+    install -m 0755 ${WORKDIR}/share/dot.bashrc ${D}${sysconfdir}/skel/.bashrc
     install -d ${D}/mnt/storage
 }
-
-do_install_basefilesissue_append_mx6ul-comm-module() {
-   if [ -n "${DISTRO_NAME}" ]; then
-       sed -i 's/%h//g' ${D}${sysconfdir}/issue.net
-   fi
-}
-
-
