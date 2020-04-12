@@ -7,6 +7,22 @@
 
 #include "imx6ull-phytec-segin.dtsi"
 
+&iomuxc {
+	/delete-node/ flexcan1engrp;
+	/delete-node/ rtcintgrp;
+	/delete-node/ stmpegrp;
+	/delete-node/ uart2grp;
+	/delete-node/ uart3grp;
+	/delete-node/ uart4grp;
+	/delete-node/ uart5grp;
+	/delete-node/ uart6grp;
+	/delete-node/ uart7grp;
+	/delete-node/ uart8grp;
+	/delete-node/ ethphy2;
+	/delete-node/ fec2;
+};
+
+
 / {
 	model = "PHYTEC phyBOARD-Segin i.MX 6ULL";
 	compatible = "phytec,imx6ull-pbacd-10", "phytec,imx6ull-pcl063","fsl,imx6ull";
@@ -22,19 +38,12 @@
 	};
 };
 
-&iomuxc {
-	/delete-node/ flexcan1engrp;
-	/delete-node/ rtcintgrp;
-	/delete-node/ stmpegrp;
-	/delete-node/ uart2grp;
-	/delete-node/ uart3grp;
-	/delete-node/ uart4grp;
-	/delete-node/ uart5grp;
-	/delete-node/ uart6grp;
-	/delete-node/ uart7grp;
-	/delete-node/ uart8grp;
-	/delete-node/ ethphy2;
-	/delete-node/ fec2;
+
+&usbotg1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usb_otg1_id>;
+	dr_mode = "host";
+	status = "disabled";
 };
 
 
@@ -151,6 +160,12 @@
 		fsl,pins = <
 			MX6UL_PAD_UART1_CTS_B__GPIO1_IO18          		0x000010B0
 	    >;
+	};
+
+	pinctrl_usb_otg1_id: usbotg1idgrp {
+		fsl,pins = <
+			MX6UL_PAD_GPIO1_IO00__ANATOP_OTG1_ID	0x17059
+		>;
 	};
 
 	pinctrl_enet2: enet2grp {
