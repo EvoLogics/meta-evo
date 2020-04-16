@@ -1,9 +1,3 @@
-#Initialising Reset Line for XBEE
-echo 1 > /sys/class/gpio/export
-echo "out" > /sys/class/gpio/gpio1/direction
-echo 1 > /sys/class/gpio/gpio1/value
-
-
 #Initialising OE Line for TXB0108
 echo 68 > /sys/class/gpio/export             
 echo "out" > /sys/class/gpio/gpio68/direction
@@ -48,14 +42,6 @@ echo 0 > /sys/class/gpio/gpio130/value
 
 stty -F /dev/ttymxc6 115200 raw
 sleep 0.5
-#turn on GPS
-echo "G" > /dev/ttymxc6 
-#turn on Wifi
+#turn on only wifi by default
 sleep 0.2
 echo "W" > /dev/ttymxc6 
-#turn on Xbee
-sleep 0.2
-echo "X" > /dev/ttymxc6
-#turn on Atomic Clock
-sleep 0.2
-echo "C" > /dev/ttymxc6
