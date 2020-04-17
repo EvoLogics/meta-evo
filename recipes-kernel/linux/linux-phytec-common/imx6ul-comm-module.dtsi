@@ -91,13 +91,10 @@
 };
 
 &i2c1 {
-	i2c_light: light@48 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	i2c_light: light@10 {
 		compatible = "vishay,veml6030";
-		reg = <0x48>;
-		status = "disabled";
-	};
-	i2c_dac: dac@10 {
-		compatible = "maxim,max5821";
 		reg = <0x10>;
 		status = "disabled";
 	};
