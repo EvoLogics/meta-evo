@@ -1,0 +1,32 @@
+From dffad01361a7b8756e969d2ecaab9b4aa0fe7c8f Mon Sep 17 00:00:00 2001
+From: Victor Voronin <viktor.voronin@evologics.de>
+Date: Fri, 17 Apr 2020 10:39:18 +0200
+Subject: [PATCH] Define SD_1_8
+
+---
+ arch/arm/boot/dts/imx6dl-colibri-eval-v3-sd18.dts | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm/boot/dts/imx6dl-colibri-eval-v3-sd18.dts b/arch/arm/boot/dts/imx6dl-colibri-eval-v3-sd18.dts
+index 46ad772..a337d0a 100644
+--- a/arch/arm/boot/dts/imx6dl-colibri-eval-v3-sd18.dts
++++ b/arch/arm/boot/dts/imx6dl-colibri-eval-v3-sd18.dts
+@@ -43,6 +43,7 @@
+ 
+ /dts-v1/;
+ 
++#define SD_1_8
+ #include <dt-bindings/input/input.h>
+ #include <dt-bindings/interrupt-controller/irq.h>
+ #include <dt-bindings/pwm/pwm.h>
+@@ -312,6 +313,7 @@
+ 
+ /* Colibri MMC */
+ &usdhc1 {
++  voltage-ranges = <1800 1800 3300 3300>;
+ 	status = "okay";
+ };
+ 
+-- 
+2.17.1
+

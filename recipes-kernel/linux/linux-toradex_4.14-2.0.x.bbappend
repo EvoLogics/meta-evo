@@ -14,6 +14,22 @@ do_configure_append() {
     return 0
 }
 
+########################
+### Colibri Specific ###
+########################
+
+SRC_URI_append_colibri-imx6-iris-evo = "\
+  file://0001-Define-SD_1_8.patch \
+  "
+
+do_patch_prepend_colibri-imx6-iris-evo() {
+    s = d.getVar("S")
+    src = oe.path.join(s, "arch/arm/boot/dts/imx6dl-colibri-eval-v3.dts")
+    dest = oe.path.join(s, "arch/arm/boot/dts/imx6dl-colibri-eval-v3-sd18.dts")
+
+    bb.utils.copyfile(src, dest)
+}
+
 ####################
 ### TX6 Specific ###
 ####################
