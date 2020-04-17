@@ -106,6 +106,12 @@
 	status = "disabled";
 };
 
+&pwm4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm4>;
+	status = "disabled";
+};
+
 &fec2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_enet2>;
@@ -231,6 +237,12 @@
 	pinctrl_pwm3: pwm3grp {
 		fsl,pins = <
 			MX6UL_PAD_GPIO1_IO04__PWM3_OUT				0x0b0b0
+		>;
+	};
+	
+	pinctrl_pwm4: pwm4grp {
+		fsl,pins = <
+			MX6UL_PAD_LCD_DATA03__PWM4_OUT	0x0b0b0
 		>;
 	};
 
