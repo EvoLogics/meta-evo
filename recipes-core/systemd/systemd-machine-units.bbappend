@@ -35,6 +35,16 @@ do_install_mx6ul-comm-module(){
     install -m 0644 ${WORKDIR}/Bridge.netdev ${D}${systemd_unitdir}/network/
     install -m 0644 ${WORKDIR}/10-wwan0.network ${D}${systemd_unitdir}/network/
 
+    if [ -n "${BRIDGE_ADDRESS}" ]
+    then
+        sed -i -e 's!Address=10.0.0.2/24!Address=${BRIDGE_ADDRESS}!g' ${D}${systemd_unitdir}/network/Bridge.network
+    fi
+
+    if [ -n "${BRIDGE_GATEWAY}" ]
+    then
+        sed -i -e 's!Gateway=10.0.0.1!Gateway=${BRIDGE_GATEWAY}!g' ${D}${systemd_unitdir}/network/Bridge.network
+    fi
+
     install -d ${D}${systemd_system_unitdir}/
     install -m 0644 ${WORKDIR}/can0.service ${D}${systemd_system_unitdir}/
 }
