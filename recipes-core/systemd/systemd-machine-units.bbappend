@@ -19,13 +19,10 @@ SRC_URI_mx6ul-comm-module += "  \
     file://Bridge.network       \
     file://Bridge.netdev        \
     file://10-wwan0.network     \
-    file://can0.service         \
+    ${@bb.utils.contains("IMAGE_CONFIGS", "can", "file://can0.service", "", d)} \
 "
 
-
-SYSTEMD_SERVICE_${PN}_mx6ul-comm-module += "    \
-    can0.service                                \
-"
+SYSTEMD_SERVICE_${PN}_mx6ul-comm-module = "${@bb.utils.contains("IMAGE_CONFIGS", "can", "can0.service", "", d)}"
 
 do_install_mx6ul-comm-module(){
     install -d ${D}${systemd_unitdir}/network/
@@ -46,5 +43,7 @@ do_install_mx6ul-comm-module(){
     fi
 
     install -d ${D}${systemd_system_unitdir}/
-    install -m 0644 ${WORKDIR}/can0.service ${D}${systemd_system_unitdir}/
+    for file in $(find ${WORKDIR} -maxdepth 1 -type f -name *.service); do
+        install -m 0644 "$file" ${D}${systemd_system_unitdir}/
+    done
 }
