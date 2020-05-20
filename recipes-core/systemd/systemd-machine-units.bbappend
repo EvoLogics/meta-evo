@@ -34,7 +34,7 @@ do_install_mx6ul-comm-module(){
 
     if [ -n "${BRIDGE_ADDRESS}" ]
     then
-        sed -i -e 's!Address=10.0.0.2/24!Address=${BRIDGE_ADDRESS}!g' ${D}${systemd_unitdir}/network/Bridge.network
+        sed -i -e 's!Address=10.0.0.2/24!Address=${BRIDGE_ADDRESS}\/24!g' ${D}${systemd_unitdir}/network/Bridge.network
     fi
 
     if [ -n "${BRIDGE_GATEWAY}" ]
