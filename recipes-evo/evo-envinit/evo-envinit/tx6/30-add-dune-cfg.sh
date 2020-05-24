@@ -7,7 +7,7 @@ if [ -d ${DUNE_BASE}/etc/ ]; then
   echo "found!"
 else
   echo "not found, exiting!"
-  exit 1
+  exit 0
 fi
 
 echo -n "Checking if hostname matches with dune configuration... "
