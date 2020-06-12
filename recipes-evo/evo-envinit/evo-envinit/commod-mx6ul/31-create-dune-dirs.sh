@@ -22,10 +22,12 @@ mount | grep -qi '/mnt/storage'
 if [ $? -eq 0 ]; then
   echo "found!"
   mkdir -p /mnt/storage/dune-log
+  mkdir -p /mnt/storage/dune-db
   grep -iq '/mnt/storage/dune-log' /etc/fstab || cat >> /etc/fstab << EOF
 
 # uncomment this for dune-log bind
 /mnt/storage/dune-log   /opt/dune/log   none   defaults,bind   0   0
+/mnt/storage/dune-db    /opt/dune/db    none   defaults,bind   0   0
 EOF
   mount -a
 fi
