@@ -30,11 +30,6 @@ do_install_mx6ul-comm-module(){
     install -m 0644 ${WORKDIR}/10-eth1.network  ${D}${systemd_unitdir}/network/
     install -m 0644 ${WORKDIR}/Bridge.network ${D}${systemd_unitdir}/network/
     install -m 0644 ${WORKDIR}/Bridge.netdev ${D}${systemd_unitdir}/network/
-
-    #Create a random MAC Address for Bridge Interface
-    MAC=$(hexdump -n3 -e'1/3 "52:54:00" 3/1 ":%02X"' /dev/random; echo "")
-    echo "MACAddress=${MAC}" >> ${D}${systemd_unitdir}/network/Bridge.netdev
-
     install -m 0644 ${WORKDIR}/10-wwan0.network ${D}${systemd_unitdir}/network/
 
     if [ -n "${BRIDGE_ADDRESS}" ]
@@ -52,5 +47,3 @@ do_install_mx6ul-comm-module(){
         install -m 0644 "$file" ${D}${systemd_system_unitdir}/
     done
 }
-
-do_install[nostamp] = "1"

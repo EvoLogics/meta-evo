@@ -20,6 +20,7 @@ SRC_URI_mx6ul-comm-module = "  						\
 				file://09-monit-id.sh				\
 				file://10-resize-home.sh 			\
 				file://20-cp-from-skel.sh 			\
+        file://21-generate-mac.sh       \
 				file://30-add-dune-cfg.sh 			\
 				file://31-create-dune-dirs.sh 		\
 				file://systemd-firstboot.sh 		\
