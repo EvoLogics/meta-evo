@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # If IMAGE_FEATURES has read-only-rootfs and no pregenerated keys found,
 # sshd and dropbear will generate keys to /var instead of /etc

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 [ "$HOME" = "/" ] && { echo "Copying from skel should be run as user, exiting." && exit 0; }
 

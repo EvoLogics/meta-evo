@@ -17,8 +17,6 @@ INITSCRIPT_PARAMS = "defaults 07"
 
 inherit update-rc.d
 
-RDEPENDS_${PN} = "bash"
-
 S = "${WORKDIR}"
 
 do_configure() {

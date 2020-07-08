@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 DROPBEAR_RSAKEY_DIR="/etc/dropbear"
 DROPBEAR_RSAKEY="${DROPBEAR_RSAKEY_DIR}/dropbear_rsa_host_key"

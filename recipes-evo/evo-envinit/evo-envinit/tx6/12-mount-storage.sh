@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 echo -n "Checking if ssd exists... "
 if [ -b /dev/sda1 ]; then

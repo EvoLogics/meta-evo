@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 IPHEX=$(cat /sys/class/net/eth0/address | cut -d':' -f6)
 IPDEC=$(printf "%d" 0x$IPHEX)

@@ -1,6 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 
 DUNE_BASE="/opt/dune"
+SYSNAME=$(cat /etc/hostname)
 
 echo -n "Checking if dune configuration folder exists... "
 if [ -d ${DUNE_BASE}/etc/ ]; then
@@ -11,7 +12,7 @@ else
 fi
 
 echo -n "Checking if hostname matches with dune configuration... "
-if [ -e ${DUNE_BASE}/etc/${HOSTNAME}.ini ]; then
+if [ -e ${DUNE_BASE}/etc/${SYSNAME}.ini ]; then
   echo "found!"
 else
   echo "not found!"
@@ -38,7 +39,7 @@ else
 # Automatically generated file, do not edit it. If you need some local
 # configuration tuning, use local.ini for this purpose.
 
-[Require ${HOSTNAME}.ini]
+[Require ${SYSNAME}.ini]
 [Include local.ini]
 EOF
 fi

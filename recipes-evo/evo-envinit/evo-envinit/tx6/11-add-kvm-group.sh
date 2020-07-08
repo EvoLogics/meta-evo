@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 echo -n "Checking if kvm group exists... "
 grep -q kvm /etc/group
