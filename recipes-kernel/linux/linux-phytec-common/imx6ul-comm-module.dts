@@ -1,0 +1,94 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright (C) 2018 PHYTEC Messtechnik GmbH
+ * Author:  Riedmueller <s.riedmueller@phytec.de>
+ */
+
+/dts-v1/;
+#include <dt-bindings/input/input.h>
+#include "imx6ull.dtsi"
+#include "imx6ull-phytec-phycore-som.dtsi"
+#include "imx6ul-comm-module.dtsi"
+
+/ {
+	model = "PHYTEC phyBOARD-Segin i.MX 6ULL Full Featured with eMMC";
+	compatible = "phytec,imx6ull-pbacd10-emmc", "phytec,imx6ull-pbacd10",
+		     "phytec,imx6ull-pcl063","fsl,imx6ull";
+};
+
+
+&can1 {
+	status = "okay";
+};
+
+&ethphy1 {
+	status = "okay";
+};
+
+&ethphy2 {
+	status = "okay";
+};
+
+&fec1 {
+	status = "okay";
+};
+
+&fec2 {
+	status = "okay";
+};
+
+&uart2 {
+	status = "okay";
+};
+
+&uart3 {
+	status = "okay";
+};
+
+&uart4 {
+	status = "okay";
+};
+
+&uart5 {
+	status = "okay";
+};
+
+&uart6 {
+	status = "okay";
+};
+
+&uart7 {
+	status = "okay";
+};
+
+&uart8 {
+	status = "okay";
+};
+
+&usdhc1 {
+	status = "okay";
+};
+
+&usdhc2 {
+	status = "okay";
+};
+
+&pwm3 {
+	status = "okay";
+};
+
+&pwm4 {
+	status = "okay";
+};
+
+&pps0{
+	status = "okay";	
+};
+
+&usbotg1{
+	status = "okay";
+};
+
+&i2c_light {
+	status = "okay";
+};

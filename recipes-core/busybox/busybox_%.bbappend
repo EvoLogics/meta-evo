@@ -1,5 +1,6 @@
 # http://www.yoctoproject.org/docs/current/kernel-dev/kernel-dev.html#changing-the-configuration
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend_mx6ul-comm-module := "${THISDIR}/commod-mx6ul:"
 
 SRC_URI_sama5d2-roadrunner-evo += " \
     file://coreutils.cfg \
@@ -32,3 +33,7 @@ SRC_URI_sama5d2-roadrunner-evo += " \
     file://console.cfg \
     file://new0.cfg \
 "
+
+SRC_URI_append_mx6ul-comm-module = "    \
+    file://defconfig                    \
+" 

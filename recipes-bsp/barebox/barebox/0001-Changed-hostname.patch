@@ -1,0 +1,22 @@
+From 1fecfc9136ec572c7b20d3ff86e1b5a42a3bebfd Mon Sep 17 00:00:00 2001
+From: llewellyn-evo <llewellyn.fernandes@evologics.de>
+Date: Fri, 6 Mar 2020 13:07:21 +0100
+Subject: [PATCH] Changed hostname
+
+---
+ arch/arm/dts/imx6ull-phytec-phycore-som-emmc.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/dts/imx6ull-phytec-phycore-som-emmc.dts b/arch/arm/dts/imx6ull-phytec-phycore-som-emmc.dts
+index f2e631b19..3059b0d51 100644
+--- a/arch/arm/dts/imx6ull-phytec-phycore-som-emmc.dts
++++ b/arch/arm/dts/imx6ull-phytec-phycore-som-emmc.dts
+@@ -10,7 +10,7 @@
+ #include "imx6ul-phytec-phycore-som.dtsi"
+ 
+ / {
+-	model = "Phytec phyCORE-i.MX6 ULL SOM with eMMC";
++	model = "Comm-Module-Barebox";
+ 	compatible = "phytec,imx6ul-pcl063-emmc", "fsl,imx6ull";
+ };
+ 
