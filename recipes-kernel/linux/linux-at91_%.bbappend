@@ -2,7 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 PR .= ".0"
 COMPATIBLE_MACHINE := "(sama5d2-roadrunner-.*)"
 
-DEPENDS += "ncurses-native"
+DEPENDS += "ncurses-native lz4-native"
 
 # to fix nor flash
 SRCREV = "7e44ddb093c3b8d723e16212c9a04cd56c77d165"
