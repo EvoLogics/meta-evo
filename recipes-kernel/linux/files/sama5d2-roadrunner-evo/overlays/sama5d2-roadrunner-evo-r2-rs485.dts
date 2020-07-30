@@ -1,0 +1,51 @@
+/dts-v1/;
+/plugin/;
+
+#include "../sama5d2-pinfunc.h"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/mfd/atmel-flexcom.h>
+
+/ {
+    fragment@011100 {
+        target-path = "/";
+        __overlay__ {
+            compatible = "atmel,sama5", "atmel,sama5d2", "atmel,sama5d2-evo-r2-rs485";
+            ahb {
+                apb {
+                    flx4: flexcom@fc018000 {
+                        atmel,flexcom-mode = <ATMEL_FLEXCOM_MODE_USART>;
+                        status = "okay";
+
+                        uart5: serial@200 {
+                            pinctrl-names = "default";
+                            pinctrl-0 = <&pinctrl_flx4_default>;
+                            linux,rs485-enabled-at-boot-time;
+                            rs485-rts-delay = <0 20>;
+                            status = "okay";
+                        };
+                    };
+
+                    pinctrl@fc038000 {
+                        pinctrl_flx4_default: flx4_default {
+                            pinmux = <PIN_PC28__FLEXCOM4_IO0>,
+                                     <PIN_PC29__FLEXCOM4_IO1>,
+                                     <PIN_PD0__FLEXCOM4_IO4>;
+                            bias-disable;
+                        };
+
+                        pinctrl_rs4xx_power_default: rs4xx_power_default {
+                            pinmux  = <PIN_PC17__GPIO>;
+                            bias-pull-up;
+                        };
+
+                        pinctrl_rs4xx_status_default: rs4xx_status_default {
+                            pinmux  = <PIN_PC16__GPIO>;
+                            bias-pull-down;
+                        };
+                    };
+                };
+            };
+        };
+    };
+};
+

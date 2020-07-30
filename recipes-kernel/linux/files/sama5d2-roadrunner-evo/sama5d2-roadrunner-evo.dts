@@ -1,5 +1,5 @@
 /*
- * acme-roadrunner-evo.dtsi - DTS include for the roadrunner-evo board
+ * acme-roadrunner-evo-tiny.dts - DTS include for the roadrunner-evo tiny board
  *
  *  Copyright (C) 2015 Atmel,
  *                2015 Nicolas Ferre <nicolas.ferre@atmel.com>
@@ -43,6 +43,8 @@
  *     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  *     OTHER DEALINGS IN THE SOFTWARE.
  */
+/dts-v1/;
+
 #include "sama5d2.dtsi"
 #include "sama5d2-pinfunc.h"
 #include <dt-bindings/dma/at91.h>
@@ -92,7 +94,7 @@
 
 		 gpios = <&pioA PIN_PC24 GPIO_ACTIVE_HIGH>;
 		 //assert-falling-edge;
-		 status = "okay";
+		 status = "disabled";
 	};
 
 	pps1 {
@@ -328,7 +330,7 @@
 				};
 			};
 
-			/* sscdev: sscdev { */
+			/* sscdev: sscdev */
 			irqman: irqman {
 				/* pinctrl-names = "default"; */
 				/* pinctrl-0 = <&pinctrl_sscdev>; */
@@ -359,7 +361,7 @@
 				/* tx-almost-empty-gpios = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
 				/* rxtx-fifo-inv-gpios   = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
 				/* tx-almost-full-gpios  = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
-				sdm-sync-in-gpios = <&pioA PIN_PC23 GPIO_ACTIVE_HIGH>; /* conflict with pps1 */
+				sdm-sync-in-gpios = <&pioA PIN_PC24 GPIO_ACTIVE_HIGH>; /* SYNCIN0, conflict with pps0 */
 
 				/* eclk */
 				lock-gpios      = <&pioA PIN_PB5  GPIO_ACTIVE_HIGH>; /* LOCK(BITE_N) */
@@ -434,15 +436,6 @@
 							 <PIN_PD16__GPIO>, /* eth gtx1 */
 							 <PIN_PD17__GPIO>; /* eth gmdc */
 
-					/* ENA_FUSE2V5 - PB0 "def low"
-					 BOOT_MODE   - PB13  "low that jumper is installed"
-					 CFG.STRAP0 PC12
-					 CFG.STRAP1 PC13
-					 CFG.STRAP2 PC14
-					 CFG.STRAP3 PC15
-					 CFG.STRAP4 PC 9
-					 power-fuses-gpios = <&pioA PIN_PB10 GPIO_ACTIVE_HIGH>;
-					*/
 					bias-pull-up;
 				};
 				/*

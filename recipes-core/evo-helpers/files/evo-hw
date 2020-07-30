@@ -1,6 +1,10 @@
 #!/bin/sh
 
 HW_REV_FILE=/etc/hwrevision
+DT_PREFIX=sama5d2-roadrunner-evo
+DT_MODEL="Acme Systems RoadRunner on EvoLogics Baseboard"
+DT_COMP_BASE="atmel,sama5d2"
+DT_COMPATIBLE="atmel,sama5 $DT_COMP_BASE"
 
 die() {
     if [ -t 0 ]; then
@@ -12,7 +16,7 @@ die() {
 }
 
 warn() {
-    if ! $QUIET; then
+    if ! $OPT_QUIET; then
         if [ -t 0 ]; then
             printf "WARNING: $*\n" >&2
         else
@@ -21,34 +25,12 @@ warn() {
     fi
 }
 
-pin_set_env() {
-    PIN=$1
-    P=${PIN#P*}
-    PIN_NUM=${P:1}
-    PIN_CHAR=${P%%[0-9]*}
-    PIN_DIR=/sys/class/gpio/$PIN
-
-    # AT91_PIOC*32 + number.
-    # PA == 0, PB == 1, PC == 2, PD == 3
-    PIN_NUM=$((32 * ($(printf '%d' "'$PIN_CHAR") - 65) + $PIN_NUM))
-}
-
-pin_export() {
-    pin_set_env $1
-    if [ ! -e $PIN_DIR/direction ]; then
-        echo -n $PIN_NUM > /sys/class/gpio/export
-        echo -n $2 > $PIN_DIR/direction
-    fi
-}
-
 pin_set() {
-    pin_export $1 out
-    echo -n $2 > $PIN_DIR/value
+    gpioset $(gpiofind $1)=$2
 }
 
 pin_get() {
-    pin_export $1 in
-    cat $PIN_DIR/value
+    gpioget $(gpiofind $1)
 }
 
 parse_val() {
@@ -60,7 +42,9 @@ parse_val() {
 }
 
 get_straps() {
-    echo "$(pin_get PC21)$(pin_get PC9)$(pin_get PC15)$(pin_get PC14)$(pin_get PC13)$(pin_get PC12)"
+    # optimisation, cut ~280ms of starting time
+    #echo "$(pin_get PC21)$(pin_get PC9)$(pin_get PC15)$(pin_get PC14)$(pin_get PC13)$(pin_get PC12)"
+    gpioget 0 85 73 79 78 77 76 | tr -d ' '
 }
 
 have_eth() {
@@ -74,7 +58,32 @@ have_eth() {
     return 1
 }
 
-get_hwtype() {
+mtd_name_by_name() {
+    MTD_NAME=$(awk '$4 == "\"'"$1"'\"" && sub(/:/,"") {print "/dev/"$1}' /proc/mtd)
+    [ -z "$MTD_NAME" ] && die "Cannot find mtd for $1"
+    echo "$MTD_NAME"
+    unset MTD_NAME
+}
+
+get_hwtypes() {
+    if [ -z "$HWMODEL" -o -z "$HWTYPE" ]; then
+        hw_detect
+    fi
+    echo ${HWTYPE//-/ }
+}
+
+read_dt_hwtype() {
+    MTD_DEV=$(mtd_name_by_name dtb)
+    HW_=$(fdtget $MTD_DEV / model | sed 's/.*Baseboard //;s/ /-/g' | tr A-Z a-z)
+    eval $1=\${HW_%%-*} $2=\${HW_#*-}
+}
+
+read_sysfs_dt_hwtype() {
+    HW_=$(sed 's/.*Baseboard //;s/ /-/g' /sys/firmware/devicetree/base/model | tr '\0' '\n' | tr A-Z a-z)
+    eval $1=\${HW_%%-*} $2=\${HW_#*-}
+}
+
+hw_detect() {
     STRAPS="$(get_straps)"
     case "$STRAPS" in
         111111) HWMODEL=tiny; have_eth && HWTYPE=eth || HWTYPE=rs232 ;;
@@ -83,17 +92,24 @@ get_hwtype() {
         111100) HWMODEL=tiny; HWTYPE=rs485 ;;
         111011) HWMODEL=tiny; have_eth && HWTYPE=eth || HWTYPE=rs232 ;;
         011111) HWMODEL=r2;   have_eth && HWTYPE=eth || HWTYPE=rs232 ;;
+        011101) HWMODEL=r2;   have_eth && HWTYPE=eth-rs422 || HWTYPE=rs232-rs422 ;;
+        011100) HWMODEL=r2;   have_eth && HWTYPE=eth-rs485 || HWTYPE=rs232-rs485 ;;
+        011011) HWMODEL=r2;   have_eth && HWTYPE=eth-can   || HWTYPE=rs232-can ;;
         *) die "Unsupported straps: $STRAPS" ;;
     esac
     if [ -f "$HW_REV_FILE" ]; then
-        read_etc_hwtype CFG_HWTYPE
-        if [ "$HWTYPE" != "$CFG_HWTYPE" -a "$CFG_HWTYPE" != "rs232" ]; then
-            warn "Hardware type in $HW_REV_FILE is $CFG_HWTYPE, and not equal to straps $HWTYPE"
+        read_etc_hwtype CFG_HWMODEL CFG_HWTYPE CFG_VER
+        if [ "$HWTYPE" != "$CFG_HWTYPE" ]; then
+            case "$CFG_HWTYPE" in
+                *rs232*) ;;
+                *) warn "Hardware type in \"$HW_REV_FILE\" is \"$CFG_HWTYPE\", and not equal to straps and dt \"$HWTYPE\"" ;;
+            esac
         fi
+        export CFG_HWMODEL CFG_HWTYPE CFG_VER
     else
        warn "File $HW_REV_FILE not exist."
     fi
-    echo $HWTYPE
+    export HWMODEL HWTYPE
 }
 
 
@@ -114,19 +130,28 @@ get_dt_status() {
     esac
 }
 
+set_devs_power() {
+    for DEV in $(get_hwtypes); do
+        set_dev_power $DEV "$1"
+    done
+}
+
 set_dev_power() {
     VAL=$(parse_val "$2")
     case "$1" in
-        eth)        get_dt_status "$1" && pin_set PC17 $((!$VAL)) || pin_set PC17 1;;
-        rs232)      pin_set PC25 $VAL ;;
-        rs485)      pin_set PC17 $VAL ;;
-        rs422)      pin_set PC17 $VAL ;;
-        rs485-term) pin_set PC31 $VAL ;; # ?? enable 0 or 1?
-        can0)       get_dt_status "$1" && pin_set PD21 $((!$VAL)) || pin_set PD21 1;;
-        can1)       get_dt_status "$1" && pin_set PD22 $((!$VAL)) || pin_set PD22 1;;
-        can)
-                    get_dt_status "$1" && pin_set PD21 $((!$VAL)) || pin_set PD21 1;
-                    get_dt_status "$1" && pin_set PD22 $((!$VAL)) || pin_set PD22 1;;
+        eth)        VAL=$((!$VAL)); get_dt_status "$1" && pin_set PC17 $VAL || pin_set PC17 1;;
+        rs232)      pin_set PC25 $VAL;;
+        rs485|rs422)
+            case "$HWMODEL" in
+                tiny) pin_set PC17 $VAL;;
+                r2)   pin_set PC20 $VAL;;
+            esac;;
+        rs4xx-term) pin_set PC31 $VAL ;; # ?? enable 0 or 1?
+        can0)       VAL=$((!$VAL)); get_dt_status "$1" && pin_set PD21 $VAL || pin_set PD21 1;;
+        can1)       VAL=$((!$VAL)); get_dt_status "$1" && pin_set PD22 $VAL || pin_set PD22 1;;
+        can)        VAL=$((!$VAL));
+                    get_dt_status "$1" && pin_set PD21 $VAL || pin_set PD21 1;
+                    get_dt_status "$1" && pin_set PD22 $VAL || pin_set PD22 1;;
         *) die "Unknown hardware type: $1"  ;;
     esac
 
@@ -145,9 +170,12 @@ get_dev_status() {
     case "$1" in
         rs232)      echo $(pin_get PC26) ;; # in hw revision 1.0 is PC22
         eth)        echo $(pin_get PC16) ;;
-        rs485)      echo $(pin_get PC16) ;;
-        rs422)      echo $(pin_get PC16) ;;
-        rs485-term) echo unknown ;;
+        rs485|rs422)
+            case "$HWMODEL" in
+                tiny) echo $(pin_get PC16);;
+                r2)   echo $(pin_get PC19);;
+            esac;;
+        rs4xx-term) echo unknown ;;
         can0)       echo unknown ;;
         can1)       echo unknown ;;
         can)        echo unknown ;;
@@ -170,16 +198,16 @@ temporary_remount() {
 }
 
 read_etc_hwtype() {
-    read $1 VER_ < $HW_REV_FILE
-    eval $1=\${$1##*-}
+    read HW_ VER_ < $HW_REV_FILE
+    HW_=${HW_#*evo-}
+    eval $1=\${HW_%%-*} $2=\${HW_#*-} $3=$VER_
 }
 
 write_etc_hwtype() {
-    read $1 VER_ < $HW_REV_FILE
-    read_etc_hwtype HWTYPE_
+    read_etc_hwtype HWMODEL_ HWTYPE_ VER_
 
     temporary_remount /
-    echo ${HWTYPE_%-*}-$1 $VER_ > $HW_REV_FILE
+    echo roadrunner-evo-$1 $VER_ > $HW_REV_FILE
     temporary_remount /
 }
 
@@ -187,70 +215,170 @@ update_hostname() {
     temporary_remount /
 
     read HOSTNAME < /etc/hostname
-    echo ${HOSTNAME%-*}-$1 > /etc/hostname
-    sed -i s/$HOSTNAME/${HOSTNAME%-*}-$1/ /etc/hosts
+    HN="$(echo "$HOSTNAME" | sed 's/\(evo-[^-]*-[0-9]*-[0-9]*-\).*/\1'$1'/')"
+
+    echo "$HN" > /etc/hostname
+    sed -i s/$HOSTNAME/$HN/ /etc/hosts
 
     temporary_remount /
 }
 
-dt_set() {
-    case "$1" in
-        eth)
-            case "$2" in
-                enable)  HWTYPE=eth   STATUS=okay; ;;
-                disable) HWTYPE=rs232 STATUS=disabled; ;;
-            esac
-            if [ -f "$HW_REV_FILE" ]; then
-                read_etc_hwtype CFG_HWTYPE
-                case "$CFG_HWTYPE" in
-                    eth|rs232) ;;
-                    *) die "Hardware type in $HW_REV_FILE is $CFG_HWTYPE, and not eth or rs232"
-                esac
-            else
-                write_etc_hwtype $HWTYPE || exit 1
-            fi
-
-            if [ "$CFG_HWTYPE" != "$HWTYPE" ]; then
-                if [ ! -w $HW_REV_FILE ]; then
-                    die "File $HW_REV_FILE has no permission to write"
-                fi
-
-                fw_setenv -q ethstatus $STATUS
-                write_etc_hwtype $HWTYPE
-                update_hostname  $HWTYPE
-
-                warn "You need reboot to apply changes"
-            fi
-
+switch_eth_and_rs232() {
+    case "$2" in
+        eth|rs232)
+            HW="$(eval echo \$$1 | sed 's/\(.*\)\(eth\|rs232\)\(.*\)/\1'$2'\3/')"
+            eval $1=$HW
             ;;
-        *) die "Enabling/disabling device $1 not supported";;
     esac
 }
 
-show_status() {
-    DEV="$(get_hwtype)"
+update_hwtype() {
+    case "$1" in
+        eth)
+            hw_detect
+            case "$2" in
+                enable)  STATUS=okay;     switch_eth_and_rs232 HWTYPE eth;;
+                disable) STATUS=disabled; switch_eth_and_rs232 HWTYPE rs232;;
+            esac
+            ;;
+        auto)
+            case "$HWTYPE" in
+                *eth*)   STATUS=okay     ;;
+                *rs232*) STATUS=disabled ;;
+            esac
+            ;;
+        *) die "Enabling/disabling device $1 not supported";;
+    esac
 
-    echo $DEV $(get_dev_status $DEV)
-    #echo RS232 has signal: $(get_dev_status rs232)
+    if [ -f "$HW_REV_FILE" ]; then
+        read_etc_hwtype CFG_HWMODEL CFG_HWTYPE VER
+        case "$CFG_HWTYPE" in
+            *eth*|*rs232*) ;;
+            *) die "Hardware type in \"$HW_REV_FILE\" is \"$CFG_HWTYPE\", and not eth or rs232"
+        esac
+    else
+        write_etc_hwtype $HWTYPE || exit 1
+    fi
+
+    if [ "$CFG_HWTYPE" != "$HWTYPE" ]; then
+        if [ ! -e $HW_REV_FILE ]; then
+            die "File $HW_REV_FILE has no permission to write"
+        fi
+
+        [ -n "$STATUS" ] && fw_setenv -q ethstatus $STATUS
+        write_etc_hwtype $HWMODEL-$HWTYPE
+        update_hostname  $HWMODEL-$HWTYPE
+    fi
+}
+
+set_hwtype() {
+    if [ -n "$1" -a "$1" != "auto" ]; then
+        HWTYPE="$1"
+    fi
+
+    if [ "$HWTYPE" = "$CFG_HWTYPE" ]; then
+        warn "Hardware type \"$HWTYPE\" no need to change" 
+        exit 1
+    fi
+    echo "Changing hardware type to $HWMODEL-$HWTYPE"
+
+    DT_FILES_ARCH="/boot/$DT_PREFIX.dtb.xz /boot/$DT_PREFIX-$HWMODEL.dtbo.xz"
+
+    DT_MODEL="$DT_MODEL ${HWMODEL^^}"
+    for HW in ${HWTYPE//-/ }; do 
+        DTBO=/boot/$DT_PREFIX-$HWMODEL-$HW.dtbo.xz 
+        DT_FILES_ARCH="$DT_FILES_ARCH $DTBO"
+        DT_MODEL="$DT_MODEL ${HW^^}"
+        DT_COMPATIBLE="$DT_COMPATIBLE $DT_COMP_BASE-${HWMODEL}-${HW}"
+    done
+
+    for DTB_ARCH in $DT_FILES_ARCH; do
+        [ ! -e $DTB_ARCH ] && die "Cannot find $DTB_ARCH"
+    done
+
+    TMP=$(mktemp -d -p /tmp fdtoverlay.XXXXXXX)
+
+    for DTB_ARCH in $DT_FILES_ARCH; do
+        DTB_FILE=$(basename $DTB_ARCH .xz)
+        xzcat $DTB_ARCH > $TMP/$DTB_FILE
+        DT_FILES="$DT_FILES $TMP/$DTB_FILE"
+    done
+    fdtoverlay -o $TMP/out.dtb -i $DT_FILES
+
+    fdtput -t s $TMP/out.dtb / model     "$DT_MODEL"
+    fdtput -t s $TMP/out.dtb / compatible $DT_COMPATIBLE
+    evo-update -q -f $TMP/out.dtb
+    update_hwtype auto
+    rm -rf $TMP
+    warn "You need reboot to apply changes"
+}
+
+show_status() {
+    if [ -z "$HWMODEL" -o -z "$HWTYPE" ]; then
+        OPT_QUIET=true hw_detect
+    fi
+
+    if $OPT_VERBOSE; then
+        # HWTYPE and CFG_HWTYPE aready set in hw_detect
+        read_dt_hwtype       DT_HWMODEL       DT_HWTYPE
+        read_sysfs_dt_hwtype SYSFS_DT_HWMODEL SYSFS_DT_HWTYPE
+        echo "Hardware model and type by sources:"
+        echo "Straps:          $HWMODEL $HWTYPE"
+        echo "/etc/hwrevision: $CFG_HWMODEL $CFG_HWTYPE"
+        echo "DT in $MTD_DEV: $DT_HWMODEL $DT_HWTYPE"
+        echo "DT in /sys:      $SYSFS_DT_HWMODEL $SYSFS_DT_HWTYPE"
+        echo
+        echo "Status:"
+    fi
+
+    for DEV in $(get_hwtypes); do
+        echo $DEV $(get_dev_status $DEV)
+    done
 }
 
 usage() {
     cat << END
-Usage: $(basename $0) [-q] [on|off]|[[P<ABCDE><0-9>|eth|rs485|rs422|rs485-term|can|can0|can1] [on|off|type|enable|disable]]
+Usage: $(basename $0) [-q] [set-hw [auto|hwtype]]|[on|off]|[[P<ABCDE><0-9>|eth|rs485|rs422|rs4xx-term|can|can0|can1] [on|off|type|enable|disable]]
+    on      - power on devices depend from hardware type
+    off     - power off devices depend from hardware type
+    type    - show hardware type. -v show more information. -q supress warnings
+    set-hw  - set hardware type. 'auto' will set hardware type according straps
+    P<pin>  - set on/off pin number. For example: PA02, PE23
+    <hw>    - set on/off/enable/disable hardware. eth, rs422, rs485, rs4xx-term, can, can0, can1
+              or show hardware status
 END
+    exit $1
 }
 
-QUIET=false
-case "$1" in
-    -q) QUIET=true; shift ;;
-esac
+OPT_VERBOSE=false
+OPT_QUIET=false
+OPT_FORCE=false
+
+while getopts fvqh FLAG; do
+    case "$FLAG" in
+        f) OPT_FORCE=true          ;;
+        v) OPT_VERBOSE=true        ;;
+        q) OPT_QUIET=true          ;;
+        h) usage ;;
+        *) usage ;;
+    esac
+done
+
+shift $(expr $OPTIND - 1)
 
 case "$1" in
-    -h) usage ;;
     "")     show_status ;;
-    on)     set_dev_power $(get_hwtype) 1 ;;
-    off)    set_dev_power $(get_hwtype) 0 ;;
-    type)   get_hwtype ;;
+    on)     set_devs_power 1 ;;
+    off)    set_devs_power 0 ;;
+    type)   hw_detect; echo $HWMODEL-$HWTYPE ;;
+    hwrev)
+        read_sysfs_dt_hwtype HWMODEL HWTYPE
+        echo $HWMODEL-$HWTYPE ;;
+    set-hw)
+        [ -z "$2" ] && usage 1
+        hw_detect
+        set_hwtype "$2"
+        ;;
     P[ABCDE][0-9]*)
         if [ -z "$2" ]; then
             pin_get "$1"
@@ -260,8 +388,11 @@ case "$1" in
     ;;
     *)
         case "$2" in
-            enable|disable) dt_set "$1" "$2" ;;
-            "") echo "$1 status: $(get_dev_status "$1")" ;;
+            enable|disable) update_hwtype "$1" "$2" ;;
+            "")
+                STATUS="$(get_dev_status "$1")"
+                [ -n "$STATUS" ] && echo "$1 status: $STATUS"
+                ;;
             *)  set_dev_power "$1" "$2";;
         esac
     ;;

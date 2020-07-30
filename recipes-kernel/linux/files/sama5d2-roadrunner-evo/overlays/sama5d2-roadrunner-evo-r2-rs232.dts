@@ -1,0 +1,18 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+    fragment@111111_rs232 {
+        target-path = "/";
+        __overlay__ {
+            compatible = "atmel,sama5", "atmel,sama5d2", "atmel,sama5d2-evo-r2-rs232";
+            ahb {
+                apb {
+                    macb0: ethernet@f8008000 {
+                        status = "disabled";
+                    };
+                };
+            };
+        };
+    };
+};

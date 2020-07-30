@@ -18,6 +18,8 @@ TOOLCHAIN_HOST_TASK_append = " nativesdk-erlang nativesdk-rebar nativesdk-erlang
 
 
 IMAGE_INSTALL = "\
+    kernel-devicetree-compressed \
+    \
     kernel-module-g-cdc \
     kernel-module-ppp-async \
     kernel-module-veth \

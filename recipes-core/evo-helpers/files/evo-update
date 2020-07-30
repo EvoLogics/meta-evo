@@ -438,21 +438,22 @@ check_dtb () {
     fi
 
     CUR_MODEL=$(fdtget $MTD_DEV / model | sed 's/.*Baseboard //' | tr A-Z a-z)
+    rm -f $CFG_TMP
 
     if [ -z "$CUR_MODEL" ]; then
         warn "Can't determinate model type from current dtb: $MTD_DEV"
-        $OPT_FORCE && exit 1
+        $OPT_FORCE || exit 1
     fi
 
     NEW_MODEL=$(fdtget $1 / model | sed 's/.*Baseboard //' | tr A-Z a-z)
     if [ -z "$NEW_MODEL" ]; then
         warn "Can't determinate model type from new dtb: $1"
-        $OPT_FORCE && exit 1
+        $OPT_FORCE || exit 1
     fi
 
     if [ "$CUR_MODEL" != "$NEW_MODEL" ]; then
-        warn "Current model from dtb do not match new model: $CUR_MODEL != $NEW_MODEL"
-        $OPT_FORCE && exit 1
+        $OPT_QUIET || warn "Current model from dtb do not match new model: $CUR_MODEL != $NEW_MODEL"
+        $OPT_FORCE || exit 1
     fi
 
     return 0
@@ -523,8 +524,9 @@ OPT_FORCE=false
 OPT_REBOOT=false
 OPT_VERBOSE=false
 OPT_NO_ACTION=false
+OPT_QUIET=false
 
-while getopts bfcnz:rh:v FLAG; do
+while getopts bfcnz:rh:vq FLAG; do
     case "$FLAG" in
         c) OPT_CLEAN_VAR_DATA=true ;;
         b) OPT_BACKUP=true         ;;
@@ -533,6 +535,7 @@ while getopts bfcnz:rh:v FLAG; do
         z) STAGE="$OPTARG"         ;;
         r) OPT_REBOOT=true         ;;
         v) OPT_VERBOSE=true        ;;
+        q) OPT_QUIET=true          ;;
         h) usage ;;
         *) usage ;;
     esac

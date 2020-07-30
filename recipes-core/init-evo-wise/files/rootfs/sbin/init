@@ -132,7 +132,7 @@ if ifconfig eth0 > /dev/null 2>&1; then
 fi
 
 case $HW_TYPE in
-    can)
+    *can*)
         ip link set can0 type can bitrate 500000
         ifconfig can0 up
         ip link set can1 type can bitrate 500000
@@ -142,7 +142,6 @@ case $HW_TYPE in
         ;;
 esac
 
-
 ln -fs /dev/null /var/run/lastlog
 ln -fs /dev/null /var/run/utmp
 ln -fs /dev/null /var/log/wtmp
@@ -150,11 +149,8 @@ ln -fs /dev/null /var/log/wtmp
 syslogd -S -D -C64
 klogd
 
-httpd -h /usr/local/www
 inetd
 dropbear -B -r /etc/dropbear/dropbear_rsa_host_key
-
-modprobe ppp_async
 
 if [ -n "$SN" ]; then
     SR_HEX="$(printf "%02x" $SR)"
@@ -170,18 +166,31 @@ else
 fi
 
 modprobe g_cdc iManufacturer="EvoLogics GmbH" \
-               iProduct="s2c tiny $HW_TYPE" \
+               iProduct="s2c $HW_TYPE" \
                iSerialNumber="$SN" \
                dev_addr=$MAC_USB_DEV \
                host_addr=$MAC_USB_HOST
 
 ifconfig usb0 $IPADDRDEF_USB
 
-test -f /etc/udhcpd.conf && udhcpd
-
 export LD_LIBRARY_PATH=/usr/local/lib
 [ -e /opt/arsp/etc/rc.local ]  && sh /opt/arsp/etc/rc.local&
 [ -e /usr/local/etc/rc.local ] && sh /usr/local/etc/rc.local&
+
+httpd -h /usr/local/www
+test -f /etc/udhcpd.conf && udhcpd
+modprobe ppp_async
+
+read AUTOCONF < /sys/firmware/devicetree/base/hwtype_autoconfig
+
+if [ "$AUTOCONF" -eq 1 ]; then
+    case "$(evo-hw hwrev)" in
+        r2-eth)
+            keep_alive
+            evo-hw set-hw auto | logger -st init && fw_setenv hwtype_autoconfig 0
+            ;;
+    esac
+fi
 
 sleep 1
 

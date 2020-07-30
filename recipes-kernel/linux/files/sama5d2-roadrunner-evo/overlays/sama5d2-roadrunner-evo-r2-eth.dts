@@ -1,0 +1,18 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+    fragment@011111_eth {
+        target-path = "/";
+        __overlay__ {
+            compatible = "atmel,sama5", "atmel,sama5d2", "atmel,sama5d2-evo-r2-eth";
+            ahb {
+                apb {
+                    macb0: ethernet@f8008000 {
+                        status = "okay";
+                    };
+                };
+            };
+        };
+    };
+};

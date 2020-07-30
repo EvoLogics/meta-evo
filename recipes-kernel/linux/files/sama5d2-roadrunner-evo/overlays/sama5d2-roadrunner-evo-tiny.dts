@@ -1,0 +1,32 @@
+/dts-v1/;
+/plugin/;
+
+#include "../sama5d2-pinfunc.h"
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+    fragment@111111 {
+        target-path = "/";
+        __overlay__ {
+            compatible = "atmel,sama5", "atmel,sama5d2", "atmel,sama5d2-evo-tiny";
+            hwtype_autoconfig = "0";
+            ahb {
+                apb {
+                    irqman: irqman {
+                        reset-gpios     = <&pioA PIN_PB31 GPIO_ACTIVE_HIGH>;
+                        dsp-irq-gpios	= <&pioA PIN_PB3  GPIO_ACTIVE_HIGH>; /* EVO_IRQ0 */
+                        fiq-gpios		= <&pioA PIN_PB4  GPIO_ACTIVE_HIGH>; /* EVO_FIQ  */
+                    };
+
+                    uart2: serial@f8024000 {
+                        status = "disabled";
+                    };
+
+                    uart4: serial@fc00c000 {
+                        status = "disabled";
+                    };
+                };
+           };
+       };
+   };
+};
