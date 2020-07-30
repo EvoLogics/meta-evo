@@ -21,7 +21,7 @@ getty_loop() {
             GETTY_SPEED=115200
             # for temporary change speed
             if [ -f /tmp/getty-speed.$1.cfg ]; then
-                read GETTY_SPEED /tmp/getty-speed.$1.cfg
+                read GETTY_SPEED < /tmp/getty-speed.$1.cfg
             fi
 
             stty -F /dev/$1 erase '^?'
