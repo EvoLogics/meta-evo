@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 PR .= ".0"
 COMPATIBLE_MACHINE := "(sama5d2-roadrunner-.*)"
 
