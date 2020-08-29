@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 FILE=/lib/systemd/network/Bridge.netdev
 if test -f "$FILE"; then

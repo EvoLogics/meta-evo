@@ -14,18 +14,19 @@ SRC_URI_mx6-evobb = "file://init \
   "
 
 SRC_URI_mx6ul-comm-module = "  						\
-				file://initgpio.sh 					\
+				file://initgpio.sh 					      \
 				file://07-sshd-dropbear-fix.sh		\
-				file://08-sshd-dropbear-keys.sh     \
-				file://09-monit-id.sh				\
-				file://10-resize-home.sh 			\
-				file://20-cp-from-skel.sh 			\
-        file://21-generate-mac.sh       \
-				file://30-add-dune-cfg.sh 			\
+				file://08-sshd-dropbear-keys.sh   \
+				file://09-monit-id.sh				      \
+				file://10-resize-home.sh 			    \
+        file://12-mount-storage.sh        \
+				file://20-cp-from-skel.sh 			  \
+        file://21-generate-mac.sh         \
+				file://30-add-dune-cfg.sh 			  \
 				file://31-create-dune-dirs.sh 		\
-				file://systemd-firstboot.sh 		\
-				file://se 							\
-        file://init-gpio.service			\
+				file://systemd-firstboot.sh 		  \
+				file://se 							          \
+        file://init-gpio.service			    \
         file://systemd-firstboot.service	\
 "
 
