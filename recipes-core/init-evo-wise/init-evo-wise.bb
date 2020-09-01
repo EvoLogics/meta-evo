@@ -29,10 +29,13 @@ SRC_URI = "file://rootfs/sbin/init \
            file://rootfs/usr/bin/xauth \
            file://rootfs/etc/init.d/lxc \
            file://rootfs/usr/local/etc/rc.local \
+           file://rootfs/usr/local/etc/rc-post.d/99-hwtype_autoconfig.sh \
            file://rootfs/etc/udhcpd.conf \
     "
 
-FILES_${PN} += "/usr/local/www /usr/local/etc/rc.local"
+FILES_${PN} += "/usr/local/www \
+                /usr/local/etc/rc.local \
+                /usr/local/etc/rc-post.d/99-hwtype_autoconfig.sh"
 
 PR = "r1"
 
@@ -63,8 +66,9 @@ do_install() {
 
     install -m 0755 ${WORKDIR}/rootfs/sbin/eush ${D}${base_sbindir}
 
-    mkdir -p ${D}/usr/local/etc
+    mkdir -p ${D}/usr/local/etc/rc-post.d
     # install init script runned at start and delete her self
+    install -m 0755 ${WORKDIR}/rootfs/usr/local/etc/rc-post.d/99-hwtype_autoconfig.sh ${D}/usr/local/etc/rc-post.d/
     install -m 0755 ${WORKDIR}/rootfs/usr/local/etc/rc.local ${D}/usr/local/etc
     sed -i "s/\(IMAGE_VERSION=\).*/\1${DISTRO_VERSION}-${IMAGE_VERSION}/" ${D}/usr/local/etc/rc.local
     mkdir -p ${D}/usr/local/www

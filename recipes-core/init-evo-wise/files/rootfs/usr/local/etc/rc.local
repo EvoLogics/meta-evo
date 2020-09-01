@@ -71,6 +71,11 @@ echo 127.0.0.1 $HOSTNAME >> /etc/hosts
 # needed for sersh 'ip' command
 ln -s /sbin/ip /bin/ip
 
+case "$(evo-hw hwrev)" in
+    r2-eth) ;;
+    *) chmod -x /usr/local/etc/rc-post.d/99-hwtype_autoconfig.sh;;
+esac
+
 # FIXME: sometimes mount to ro fails. 'busy'. why?
 # remove self
 ( sleep 2 && \

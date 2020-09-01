@@ -181,17 +181,6 @@ httpd -h /usr/local/www
 test -f /etc/udhcpd.conf && udhcpd
 modprobe ppp_async
 
-read AUTOCONF < /sys/firmware/devicetree/base/hwtype_autoconfig
-
-if [ "$AUTOCONF" -eq 1 ]; then
-    case "$(evo-hw hwrev)" in
-        r2-eth)
-            keep_alive
-            evo-hw set-hw auto | logger -st init && fw_setenv hwtype_autoconfig 0
-            ;;
-    esac
-fi
-
 sleep 1
 
 if $WISE; then

@@ -116,12 +116,6 @@ array set evo_vars {
         type s
         protected 0
     }
-    hwtype_autoconfig {
-        name hwtype_autoconfig
-        path /
-        type s
-        protected 0
-    }
 }
 
 proc run {arg} {

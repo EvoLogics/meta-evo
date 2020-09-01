@@ -9,7 +9,6 @@
         target-path = "/";
         __overlay__ {
             compatible = "atmel,sama5", "atmel,sama5d2", "atmel,sama5d2-evo-r2";
-            hwtype_autoconfig = "1";
             ahb {
                 apb {
                     irqman: irqman {
