@@ -57,6 +57,7 @@ IMAGE_INSTALL = "\
     socat \
     readline \
     rlwrap \
+    htop \
     \
     strace \
     \
