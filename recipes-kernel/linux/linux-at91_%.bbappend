@@ -13,6 +13,7 @@ SRC_URI += "\
     file://adc-force-set-csnaat.patch \
     file://spi-nor-prepare-for-romboot-on-shutdown.patch \
     file://add-rstc-reset-gpio.patch \
+    file://0007-Fix-macb-handle-OOM-Killer-and-do-not-kill-eth-inter.patch \
     \
     file://${MACHINE}.dts \
     \

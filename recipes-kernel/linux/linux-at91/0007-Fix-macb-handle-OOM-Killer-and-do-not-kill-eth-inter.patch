@@ -1,0 +1,29 @@
+From 49254988fb24c8014d4c0580c2697b7512e12e27 Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Wed, 26 Aug 2020 18:17:15 +0200
+Subject: [PATCH] Fix macb handle OOM-Killer, and do not kill eth interface
+
+---
+ drivers/net/ethernet/cadence/macb_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index 67483bb53981..47fc6d21bc34 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -899,7 +899,6 @@ static void gem_rx_refill(struct macb_queue *queue)
+ 		/* Make hw descriptor updates visible to CPU */
+ 		rmb();
+ 
+-		queue->rx_prepared_head++;
+ 		desc = macb_rx_desc(queue, entry);
+ 
+ 		if (!queue->rx_skbuff[entry]) {
+@@ -933,6 +932,7 @@ static void gem_rx_refill(struct macb_queue *queue)
+ 			desc->addr &= ~MACB_BIT(RX_USED);
+ 			desc->ctrl = 0;
+ 		}
++		queue->rx_prepared_head++;
+ 	}
+ 
+ 	/* Make descriptor updates visible to hardware */
