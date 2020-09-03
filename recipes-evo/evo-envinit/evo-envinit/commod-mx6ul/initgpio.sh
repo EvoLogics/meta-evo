@@ -1,17 +1,21 @@
 #Initialising OE Line for TXB0108
-echo 68 > /sys/class/gpio/export             
+echo 68 > /sys/class/gpio/export
 echo "out" > /sys/class/gpio/gpio68/direction
 echo 1 > /sys/class/gpio/gpio68/value
 
+#Initialising Reset Line for XBEE
+echo 1 > /sys/class/gpio/export
+echo "out" > /sys/class/gpio/gpio1/direction
+echo 1 > /sys/class/gpio/gpio1/value
 
 #Initialising WIFI_RST Line
-echo 67 > /sys/class/gpio/export             
+echo 67 > /sys/class/gpio/export
 echo "out" > /sys/class/gpio/gpio67/direction
 echo 0 > /sys/class/gpio/gpio67/value
 
 
 #Initialising GPS_RST Line
-echo 3 > /sys/class/gpio/export             
+echo 3 > /sys/class/gpio/export
 echo "out" > /sys/class/gpio/gpio3/direction
 echo 1 > /sys/class/gpio/gpio3/value
 
@@ -44,4 +48,4 @@ stty -F /dev/ttymxc6 115200 raw
 sleep 0.5
 #turn on only wifi by default
 sleep 0.2
-echo "W" > /dev/ttymxc6 
+echo "W" > /dev/ttymxc6
