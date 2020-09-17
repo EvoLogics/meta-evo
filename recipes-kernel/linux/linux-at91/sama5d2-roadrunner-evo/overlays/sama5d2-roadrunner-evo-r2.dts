@@ -73,6 +73,7 @@
                         };
 
                         pinctrl_eth_power_default: eth_power_default {
+                            output-high;
                             pinmux  = <PIN_PC17__GPIO>;
                             bias-pull-up;
                         };
