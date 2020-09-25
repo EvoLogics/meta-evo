@@ -10,6 +10,40 @@ array set ::opt {
 
     config_file /dev/mtd1
     script {}
+
+    dt-mtd       {/dev/mtd1}
+    dt-tmp       {/tmp/edited-dt}
+    dtb-tmp      {$::opt(dt-tmp).dtb}
+    dts-tmp      {$::opt(dt-tmp).dts}
+}
+
+namespace eval ::dt {
+    array set evo_vars {
+        serial# {
+            name serial#
+            path /
+            type s
+            protected 1
+        }
+        ethaddr {
+            name mac-address
+            path /ahb/apb/ethernet
+            type mac
+            protected 1
+        }
+        ethstatus {
+            name status
+            path /ahb/apb/ethernet
+            type s
+            protected 0
+        }
+        bootargs {
+            name bootargs
+            path /chosen
+            type s
+            protected 0
+        }
+    }
 }
 
 remove_nulls -d 0
@@ -18,7 +52,7 @@ log_user 0
 
 set timeout -1
 
-############## start: help function ######################
+############## start: help functions ######################
 array set ::c {
     none  "\033\[0m"    white "\033\[1;37m"
     red   "\033\[0;31m" lred  "\033\[1;31m"
@@ -90,35 +124,104 @@ proc lremove {listVariable value} {
     set var [lreplace $var $idx $idx]
 }
 
-############## end: help function ######################
-array set evo_vars {
-    serial# {
-        name serial#
-        path /
-        type s
-        protected 1
+############## start:dt functions ######################
+proc ::dt::diff {file1 file2} {
+    log_user 1
+    spawn bash -c "dtdiff $file1 $file2"
+    expect eof
+    log_user 0
+
+    lassign [wait] _ _ _ exit_code
+    return $exit_code
+}
+
+proc ::dt::edit {filename} {
+    ::util::exec "dtc -q -I dtb -O dts -o $::opt(dts-tmp) $filename"
+    file copy -force $::opt(dts-tmp) $::opt(dts-tmp).tmp.dts
+
+    while 1 {
+        spawn vi $::opt(dts-tmp)
+        interact
+
+        if {![::dt::diff $::opt(dts-tmp).tmp.dts $::opt(dts-tmp)]} {
+            msg info "No changes\n"
+            file delete $::opt(dts-tmp).tmp.dts $::opt(dts-tmp)
+            exit
+        }
+
+        set prompt "What to do? \[W|e|d|r|q|?\]: "
+        msg info $prompt
+        expect -i $::user_spawn_id -timeout -1 \
+            -re {^[WwYy]\n|^\n} {
+                ::util::exec "dtc -q -I dts -O dtb -o $::opt(dtb-tmp) $::opt(dts-tmp)"
+                file delete $::opt(dts-tmp).tmp.dts $::opt(dts-tmp)
+
+                log_user 1
+                ::util::exec "flashcp -v $::opt(dtb-tmp) $::opt(dt-mtd)"
+                exit
+
+            } -re {^[Dd]\n} {
+                ::dt::diff $::opt(dts-tmp).tmp.dts $::opt(dts-tmp)
+                msg info $prompt
+                exp_continue
+            } -re {^[Ee]\n} {
+            } -re {[Rr]\n} {
+                ::util::exec "dtc -I dtb -O dts -o $::opt(dts-tmp) $filename"
+
+            } -re {^\?\n} {
+                msg info " w or y - write/flash new DT\n\
+                           e      - edir again\n\
+                           d      - show diff again\n\
+                           r      - read DT again\n\
+                           q      - quit\n\n\
+                          "
+                msg info $prompt
+                exp_continue
+            } -re {[Qq]\n} {
+                file delete $::opt(dts-tmp).tmp.dts $::opt(dts-tmp)
+                exit
+
+            #FIXME: handle backspace
+            } -re {.*\n} {
+                msg info $prompt
+                exp_continue
+            }
+        expect_after -i $::user_spawn_id
     }
-    ethaddr {
-        name mac-address
-        path /ahb/apb/ethernet
-        type mac
-        protected 1
+
+
+    file delete $::opt(dts-tmp).tmp.dts $::opt(dts-tmp)
+}
+
+############## end: dt functions ######################
+namespace eval ::util {
+}
+
+# subtitute variables in ::opt and ::fw
+set ::util::subst_opt_done 0
+proc ::util::subst_opt {args} {
+    global ::util::subst_opt_done
+    if {$::util::subst_opt_done} {
+        return
     }
-    ethstatus {
-        name status
-        path /ahb/apb/ethernet
-        type s
-        protected 0
-    }
-    bootargs {
-        name bootargs
-        path /chosen
-        type s
-        protected 0
+
+    set ::util::subst_opt_done 1
+    foreach data $args {
+        if [array exist $data] {
+            foreach {key val} [array get $data] {
+                eval set $data\($key) [list [subst "$val"]]
+            }
+        } else {
+            dict for {id info} [set $data] {
+                foreach {key val} $info {
+                    dict set $data $id $key [subst $val]
+                }
+            }
+        }
     }
 }
 
-proc run {arg} {
+proc ::util::exec {arg} {
     msg dbg "$arg\n"
     spawn /bin/sh -c [concat $arg]
     expect eof
@@ -136,12 +239,12 @@ proc run {arg} {
 }
 
 proc get_env {var} {
-    if {![info exist ::evo_vars($var)]} {
+    if {![info exist ::dt::evo_vars($var)]} {
         msg err "ERROR: Can't find variable $var\n"
         return {}
     }
 
-    array set param $::evo_vars($var)
+    array set param $::dt::evo_vars($var)
     if {$param(type) == {mac}} {
         set type i
     } else {
@@ -179,12 +282,12 @@ proc get_env {var} {
 
 proc set_envs {args} {
     foreach {var val} $args {
-        if {![info exist ::evo_vars($var)]} {
+        if {![info exist ::dt::evo_vars($var)]} {
             msg err "ERROR: variable \"$var\" not supported\n"
             return {}
         }
 
-        array set param $::evo_vars($var)
+        array set param $::dt::evo_vars($var)
         if {$param(protected) && !$::opt(force)} {
             die "Error: Variable $var protected. Use flag -f to force set"
         }
@@ -192,11 +295,11 @@ proc set_envs {args} {
 
     if {[file type $::opt(config_file)] == {characterSpecial}} {
         set cfg_tmp /tmp/1.dtb
-        run "dtc -qI dtb -O dtb -o $cfg_tmp $::opt(config_file)"
+        ::util::exec "dtc -qI dtb -O dtb -o $cfg_tmp $::opt(config_file)"
     }
 
     foreach {var val} $args {
-        array set param $::evo_vars($var)
+        array set param $::dt::evo_vars($var)
         if {$param(type) == {mac}} {
             set type bx
             set val "[split $val :]"
@@ -208,15 +311,15 @@ proc set_envs {args} {
         }
 
         if {[file type $::opt(config_file)] == {characterSpecial}} {
-            run "fdtput -t $type $cfg_tmp $param(path) $param(name) $val"
+            ::util::exec "fdtput -t $type $cfg_tmp $param(path) $param(name) $val"
         } else {
-            run "fdtput -t $type $::opt(config_file) $param(path) $param(name) $val"
+            ::util::exec "fdtput -t $type $::opt(config_file) $param(path) $param(name) $val"
         }
     }
 
     if {[file type $::opt(config_file)] == {characterSpecial}} {
-            run "flash_erase -q $::opt(config_file) 0 0"
-            run "dtc -qI dtb -O dtb -o $::opt(config_file) $cfg_tmp"
+            ::util::exec "flash_erase -q $::opt(config_file) 0 0"
+            ::util::exec "dtc -qI dtb -O dtb -o $::opt(config_file) $cfg_tmp"
             #catch {file delete $cfg_tmp}
             msg warn "To apply changes you need to reboot\n"
     }
@@ -228,7 +331,7 @@ proc do_printenv {argv argc} {
         if {$::opt(noheader)} {
             die "Error: `-n' option requires exactly one argument"
         }
-        set params [array names ::evo_vars]
+        set params [array names ::dt::evo_vars]
     }
 
     foreach var $params {
@@ -348,6 +451,9 @@ proc parse_setenv_args {argv_ argc_} {
 }
 
 set progname [file tail $argv0]
+
+::util::subst_opt ::opt
+
 switch $progname {
     fw_printenv {
         parse_common_args   argv argc
@@ -368,6 +474,11 @@ switch $progname {
                 #echo 127.0.0.1 $HOSTNAME >> /etc/hosts
                 die "Error: checking system parameters and settings integrity not yet implemented"
             }
+
+            edit {
+                ::dt::edit $::opt(dt-mtd)
+            }
+
             default {
                 die "Error: support directly setting dt variables not yet support"
             }
