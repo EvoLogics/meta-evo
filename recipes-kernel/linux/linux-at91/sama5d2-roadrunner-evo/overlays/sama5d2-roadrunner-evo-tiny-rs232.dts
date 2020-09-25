@@ -29,6 +29,24 @@
                     };
 
                     pinctrl@fc038000 {
+                        gpio-ranges = <&pioA 0 0 128>;
+
+                        eth_power_hog {
+                            output-high;
+                            gpio-hog;
+                            gpios = <PIN_PC17 GPIO_ACTIVE_HIGH>;
+                        };
+
+                        pinctrl_eth_power_default: eth_power_default {
+                            pinmux  = <PIN_PC17__GPIO>;
+                            bias-pull-up;
+                        };
+
+                        pinctrl_eth_status_default: eth_status_default {
+                            pinmux  = <PIN_PC16__GPIO>;
+                            bias-pull-up;
+                        };
+
                         pinctrl_macb0_default: macb0_default {
                             pinmux = <PIN_PD9__GTXCK>,
                                      <PIN_PD10__GTXEN>,
@@ -41,16 +59,6 @@
                                      <PIN_PD17__GMDC>,
                                      <PIN_PD18__GMDIO>;
                             bias-disable;
-                        };
-
-                        pinctrl_eth_power_default: eth_power_default {
-                            pinmux  = <PIN_PC17__GPIO>;
-                            bias-pull-up;
-                        };
-
-                        pinctrl_eth_status_default: eth_status_default {
-                            pinmux  = <PIN_PC16__GPIO>;
-                            bias-pull-up;
                         };
 
                         /*

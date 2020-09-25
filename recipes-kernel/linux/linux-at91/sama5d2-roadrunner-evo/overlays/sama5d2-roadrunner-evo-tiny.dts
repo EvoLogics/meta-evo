@@ -9,7 +9,6 @@
         target-path = "/";
         __overlay__ {
             compatible = "atmel,sama5", "atmel,sama5d2", "atmel,sama5d2-evo-tiny";
-            hwtype_autoconfig = "0";
             ahb {
                 apb {
                     irqman: irqman {
@@ -24,6 +23,11 @@
 
                     uart4: serial@fc00c000 {
                         status = "disabled";
+                    };
+                    ethernet@f8008000 {
+                        ethernet-phy@1 {
+                            reg = <0x1>;
+                        };
                     };
                 };
            };

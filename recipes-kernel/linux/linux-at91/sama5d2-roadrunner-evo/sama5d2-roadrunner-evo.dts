@@ -228,7 +228,7 @@
 				phy-mode = "rmii";
 				status = "disabled";
 				ethernet-phy@1 {
-					reg = <0x1>;
+					reg = <0x0>;
 				};
 			};
 

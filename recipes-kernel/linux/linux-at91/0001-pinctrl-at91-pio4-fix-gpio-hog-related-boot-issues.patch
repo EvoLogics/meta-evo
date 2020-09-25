@@ -1,0 +1,54 @@
+From eeb27d15b81fe8762f7b99a265d378a9faf66806 Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Fri, 25 Sep 2020 07:39:42 +0200
+Subject: [PATCH] pinctrl: at91-pio4: fix gpio-hog related boot issues
+
+This patch is based on commit a86caa9ba5d7 ("pinctrl: msm: fix gpio-hog
+related boot issues").
+
+It fixes the issue that the gpio ranges needs to be defined before
+gpiochip_add().
+
+You also have to add the "gpio-ranges" property to the pinctrl device
+node to get it finally working.
+---
+ drivers/pinctrl/pinctrl-at91-pio4.c | 23 ++++++++++++++++++-----
+ 1 file changed, 18 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/pinctrl/pinctrl-at91-pio4.c b/drivers/pinctrl/pinctrl-at91-pio4.c
+index 2ec1cd2d13b7..ed7b6b8e8628 100644
+--- a/drivers/pinctrl/pinctrl-at91-pio4.c
++++ b/drivers/pinctrl/pinctrl-at91-pio4.c
+@@ -1133,11 +1133,24 @@ static int atmel_pinctrl_probe(struct platform_device *pdev)
+ 		goto clk_unprep;
+ 	}
+ 
+-	ret = gpiochip_add_pin_range(atmel_pioctrl->gpio_chip, dev_name(dev),
+-				     0, 0, atmel_pioctrl->gpio_chip->ngpio);
+-	if (ret) {
+-		dev_err(dev, "failed to add gpio pin range\n");
+-		goto gpiochip_add_pin_range_error;
++
++	/*
++	 * For DeviceTree-supported systems, the gpio core checks the
++	 * pinctrl's device node for the "gpio-ranges" property.
++	 * If it is present, it takes care of adding the pin ranges
++	 * for the driver. In this case the driver can skip ahead.
++	 *
++	 * In order to remain compatible with older, existing DeviceTree
++	 * files which don't set the "gpio-ranges" property or systems that
++	 * utilize ACPI the driver has to call gpiochip_add_pin_range().
++	 */
++	if (!of_property_read_bool(dev->of_node, "gpio-ranges")) {
++		ret = gpiochip_add_pin_range(atmel_pioctrl->gpio_chip, dev_name(dev),
++				   0, 0, atmel_pioctrl->gpio_chip->ngpio);
++		if (ret) {
++			dev_err(dev, "failed to add gpio pin range\n");
++			goto gpiochip_add_pin_range_error;
++		}
+ 	}
+ 
+ 	dev_info(&pdev->dev, "atmel pinctrl initialized\n");
+-- 
+2.20.1
+

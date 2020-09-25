@@ -46,6 +46,23 @@
                     };
 
                     pinctrl@fc038000 {
+                        gpio-ranges = <&pioA 0 0 128>;
+
+                        eth_power_hog {
+                            gpio-hog;
+                            gpios = <PIN_PC17 GPIO_ACTIVE_HIGH>;
+                        };
+
+                        pinctrl_eth_power_default: eth_power_default {
+                            pinmux  = <PIN_PC17__GPIO>;
+                            bias-pull-up;
+                        };
+
+                        pinctrl_eth_status_default: eth_status_default {
+                            pinmux  = <PIN_PC16__GPIO>;
+                            bias-pull-up;
+                        };
+
                         pinctrl_uart2_default: uart2_default {
                             pinmux = <PIN_PD4__URXD2>,
                                  <PIN_PD5__UTXD2>;
@@ -70,17 +87,6 @@
                                      <PIN_PD17__GMDC>,
                                      <PIN_PD18__GMDIO>;
                             bias-disable;
-                        };
-
-                        pinctrl_eth_power_default: eth_power_default {
-                            output-high;
-                            pinmux  = <PIN_PC17__GPIO>;
-                            bias-pull-up;
-                        };
-
-                        pinctrl_eth_status_default: eth_status_default {
-                            pinmux  = <PIN_PC16__GPIO>;
-                            bias-pull-up;
                         };
 
                         /*

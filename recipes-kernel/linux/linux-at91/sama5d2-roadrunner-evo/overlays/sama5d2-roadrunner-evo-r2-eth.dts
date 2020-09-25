@@ -8,8 +8,14 @@
             compatible = "atmel,sama5", "atmel,sama5d2", "atmel,sama5d2-evo-r2-eth";
             ahb {
                 apb {
-                    macb0: ethernet@f8008000 {
+                    ethernet@f8008000 {
                         status = "okay";
+                    };
+
+                    pinctrl@fc038000 {
+                       eth_power_hog {
+                           output-low;
+                       };
                     };
                 };
             };

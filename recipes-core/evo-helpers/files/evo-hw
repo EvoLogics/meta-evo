@@ -139,7 +139,7 @@ set_devs_power() {
 set_dev_power() {
     VAL=$(parse_val "$2")
     case "$1" in
-        eth)        VAL=$((!$VAL)); get_dt_status "$1" && pin_set PC17 $VAL || pin_set PC17 1;;
+        eth)        return;; # eth enabled via hog in dt
         rs232)      pin_set PC25 $VAL;;
         rs485|rs422)
             case "$HWMODEL" in
@@ -232,7 +232,7 @@ switch_eth_and_rs232() {
     esac
 }
 
-update_hwtype() {
+update_eth_hwtype() {
     case "$1" in
         eth)
             hw_detect
@@ -271,7 +271,7 @@ update_hwtype() {
     fi
 }
 
-set_hwtype() {
+set_hwtype_dtb() {
     if [ -n "$1" -a "$1" != "auto" ]; then
         HWTYPE="$1"
     fi
@@ -308,7 +308,6 @@ set_hwtype() {
     fdtput -t s $TMP/out.dtb / model     "$DT_MODEL"
     fdtput -t s $TMP/out.dtb / compatible $DT_COMPATIBLE
     evo-update -q -f $TMP/out.dtb
-    update_hwtype auto
     rm -rf $TMP
     warn "You need reboot to apply changes"
 }
@@ -377,7 +376,8 @@ case "$1" in
     set-hw)
         [ -z "$2" ] && usage 1
         hw_detect
-        set_hwtype "$2"
+        set_hwtype_dtb "$2"
+        update_eth_hwtype auto
         ;;
     P[ABCDE][0-9]*)
         if [ -z "$2" ]; then
@@ -386,9 +386,15 @@ case "$1" in
             pin_set "$1" "$2"
         fi
     ;;
+    edit)
+        die "Probably you mean:\nevo-env edit"
+    ;;
     *)
         case "$2" in
-            enable|disable) update_hwtype "$1" "$2" ;;
+            enable|disable)
+                update_eth_hwtype "$1" "$2" 
+                set_hwtype_dtb "$HWTYPE"
+                ;;
             "")
                 STATUS="$(get_dev_status "$1")"
                 [ -n "$STATUS" ] && echo "$1 status: $STATUS"

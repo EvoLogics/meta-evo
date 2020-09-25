@@ -14,6 +14,7 @@ SRC_URI += "\
     file://spi-nor-prepare-for-romboot-on-shutdown.patch \
     file://add-rstc-reset-gpio.patch \
     file://0007-Fix-macb-handle-OOM-Killer-and-do-not-kill-eth-inter.patch \
+    file://0001-pinctrl-at91-pio4-fix-gpio-hog-related-boot-issues.patch \
     \
     file://${MACHINE}.dts \
     \
