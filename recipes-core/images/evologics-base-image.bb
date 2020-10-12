@@ -76,6 +76,7 @@ IMAGE_INSTALL = "\
     erlang-erts \
     erlang-crypto \
     erlang-inets \
+    erlang-asn1 \
     "
 
 DEPENDS += "\
