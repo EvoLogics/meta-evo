@@ -145,6 +145,7 @@ esac
 ln -fs /dev/null /var/run/lastlog
 ln -fs /dev/null /var/run/utmp
 ln -fs /dev/null /var/log/wtmp
+ln -fs /proc/self/fd /dev
 
 syslogd -S -D -C64
 klogd
