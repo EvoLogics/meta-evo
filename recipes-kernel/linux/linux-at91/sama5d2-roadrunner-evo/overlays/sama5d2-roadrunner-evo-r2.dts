@@ -17,6 +17,12 @@
                         fiq-gpios		= <&pioA PIN_PC8  GPIO_ACTIVE_HIGH>; /* EVO_FIQ  */
                     };
 
+                    sscdev: sscdev {
+                        reset-gpios     = <&pioA PIN_PB31 GPIO_ACTIVE_LOW>;  /* Reset on R2 is ACTIVE_LOW */
+                        dsp-irq-gpios	= <&pioA PIN_PD31 GPIO_ACTIVE_HIGH>; /* EVO_IRQ0 */
+                        fiq-gpios		= <&pioA PIN_PC8  GPIO_ACTIVE_HIGH>; /* EVO_FIQ  */
+                    };
+
                     uart2: serial@f8024000 {
                         pinctrl-names = "default";
                         pinctrl-0 = <&pinctrl_uart2_default>;
