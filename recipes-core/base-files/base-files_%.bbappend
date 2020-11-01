@@ -33,6 +33,12 @@ do_install_append_sama5d2-roadrunner-evo() {
 
     # create non-volatile rw partition mount point
     mkdir -p ${D}/data
+
+    # make interactive command immediate write to ~/.bash_history
+    echo 'export PROMPT_COMMAND="history -a;$PROMPT_COMMAND"' >> ${D}/${sysconfdir}/profile
+
+    # do not put duplicate command to history file and ignore command begin with space
+    echo 'export HISTCONTROL=ignoreboth' >> ${D}/${sysconfdir}/profile
 }
 
 do_install_append_tx6() {
