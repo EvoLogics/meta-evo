@@ -254,7 +254,11 @@ update_eth_hwtype() {
         read_etc_hwtype CFG_HWMODEL CFG_HWTYPE VER
         case "$CFG_HWTYPE" in
             *eth*|*rs232*) ;;
-            *) die "Hardware type in \"$HW_REV_FILE\" is \"$CFG_HWTYPE\", and not eth or rs232"
+            *)
+                if ! $OPT_FORCE; then
+                    die "Hardware type in \"$HW_REV_FILE\" is \"$CFG_HWTYPE\", and not eth or rs232. You can use flag -f, if you know what are you doing."
+                fi
+            ;;
         esac
     else
         write_etc_hwtype $HWTYPE || exit 1
