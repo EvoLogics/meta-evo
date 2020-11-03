@@ -148,7 +148,6 @@
 };
 
 
-
 &iomuxc_snvs {
 
 	pinctrl_rtc_int: rtcintgrp {
