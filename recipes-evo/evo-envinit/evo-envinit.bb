@@ -24,6 +24,7 @@ SRC_URI_mx6ul-comm-module = "  						\
         file://21-generate-mac.sh         \
 				file://30-add-dune-cfg.sh 			  \
 				file://31-create-dune-dirs.sh 		\
+        file://32-create-soft-hwclock-dirs.sh     \
 				file://systemd-firstboot.sh 		  \
 				file://se 							          \
         file://init-gpio.service			    \
