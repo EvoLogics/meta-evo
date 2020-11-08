@@ -1,0 +1,30 @@
+From 4b6ba25ca5b33d6eed41f5d067db6ba191a32ccd Mon Sep 17 00:00:00 2001
+From: llewellyn-evo <llewellyn.fernandes@evologics.de>
+Date: Sun, 8 Nov 2020 22:39:43 +0100
+Subject: [PATCH] add state for 2 boot partitions
+
+---
+ arch/arm/dts/imx6ull-phytec-phycore-som-emmc.dts | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/arm/dts/imx6ull-phytec-phycore-som-emmc.dts b/arch/arm/dts/imx6ull-phytec-phycore-som-emmc.dts
+index 3059b0d51..f0cea77cd 100644
+--- a/arch/arm/dts/imx6ull-phytec-phycore-som-emmc.dts
++++ b/arch/arm/dts/imx6ull-phytec-phycore-som-emmc.dts
+@@ -8,6 +8,7 @@
+ 
+ #include <arm/imx6ull.dtsi>
+ #include "imx6ul-phytec-phycore-som.dtsi"
++#include "imx6ul-phytec-state.dtsi"
+ 
+ / {
+ 	model = "Comm-Module-Barebox";
+@@ -45,3 +46,7 @@
+ &usbotg2 {
+ 	status = "okay";
+ };
++
++&state {
++	status = "okay";
++};
+\ No newline at end of file
