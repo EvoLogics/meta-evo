@@ -43,6 +43,12 @@ namespace eval ::dt {
             type s
             protected 0
         }
+        reset_type {
+            name reset-gpios
+            path /ahb/apb/irqman
+            type reset
+            protected 0
+        }
     }
 }
 
@@ -247,6 +253,8 @@ proc get_env {var} {
     array set param $::dt::evo_vars($var)
     if {$param(type) == {mac}} {
         set type i
+    } elseif {$param(type) == {reset}} {
+        set type x
     } else {
         set type $param(type)
     }
@@ -271,7 +279,8 @@ proc get_env {var} {
             msg warn "MAC address wrong format: $rc\n" stderr
             return {}
         }
-
+    } elseif {$param(type) == {reset}} {
+        set rc [expr {[lindex $rc 2] == 1 ? "old" : "new"}]
     }
 
     if {!$::opt(noheader)} {
@@ -303,6 +312,24 @@ proc set_envs {args} {
         if {$param(type) == {mac}} {
             set type bx
             set val "[split $val :]"
+        } elseif {$param(type) == {reset}} {
+
+            set type x
+            spawn fdtget -t $type $::opt(config_file) $param(path) $param(name)
+            expect -re {Error|FDT_ERR} {
+                return {}
+            }
+            set rc $expect_out(buffer)
+            set rc [regsub {\r?\n$} $rc {}]
+
+            if {$val == "old"} {
+                set val 1
+            } elseif {$val == "new"} {
+                set val 0
+            } else {
+                die "wrong value of parameter $param(name): $val"
+            }
+            set val "[lrange $rc 0 1] $val"
         } elseif {$param(type) == {s}} {
             set type $param(type)
             set val "\"$val\""
