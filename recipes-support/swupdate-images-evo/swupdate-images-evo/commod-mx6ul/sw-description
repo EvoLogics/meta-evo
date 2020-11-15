@@ -2,84 +2,79 @@ software =
 {
     version = "@@DISTRO_VERSION@@";
     description = "Firmware system update for EvoLogics Communication Module";
+    hardware-compatibility = ["1.0"];
 
-    stable : {
 
-        copy1 : {
-
-            images: (
-                {
-                    filename = "core-image-minimal-mx6ul-comm-module.tar.gz";
-                    type = "raw";
-                    compressed = true;
-                    device = "/dev/mmcblk1p2";
-                    sha256 = "@core-image-minimal-mx6ul-comm-module.tar.gz";
-                }
-            );
-
-            files: (
-                {
-                    filename = "imx6ul-comm-module.dtb";
-                    path = "/imx6ul-comm-module.dtb";
-                    device = "/dev/mmcblk1p1";
-                    filesystem = "vfat"
-                    sha256 = "@imx6ul-comm-module.dtb"
-                },
-                {
-                    filename = "zImage-mx6ul-comm-module.bin";
-                    path = "/zImage-mx6ul-comm-module.bin";
-                    device = "/dev/mmcblk1p1";
-                    filesystem = "vfat"
-                    sha256 = "@zImage-mx6ul-comm-module.bin"
-                }
-            );
-
-            scripts: (
-                {
-                    filename = "evo-swu-emb.sh";
-                    type = "shellscript";
-                    sha256 = "@evo-swu-emb.sh";
-                }
-            );
-
-        };
-
-        copy2 : {
-
-            images: (
-                {
-                    filename = "core-image-minimal-mx6ul-comm-module.tar.gz";
-                    type = "raw";
-                    compressed = true;
-                    device = "/dev/mmcblk1p4";
-                    sha256 = "@core-image-minimal-mx6ul-comm-module.tar.gz";
-                }
-            );
-
-            files: (
-                {
-                    filename = "imx6ul-comm-module.dtb";
-                    path = "/imx6ul-comm-module.dtb";
-                    device = "/dev/mmcblk1p3";
-                    filesystem = "vfat"
-                    sha256 = "@imx6ul-comm-module.dtb";
-                },
-                {
-                    filename = "zImage-mx6ul-comm-module.bin";
-                    path = "/zImage-mx6ul-comm-module.bin";
-                    device = "/dev/mmcblk1p3";
-                    filesystem = "vfat"
-                    sha256 = "@zImage-mx6ul-comm-module.bin";
-                }
-            );
-
-            scripts: (
-                {
-                    filename = "evo-swu-emb.sh";
-                    type = "shellscript";
-                    sha256 = "@evo-swu-emb.sh";
-                }
-            );
-        };
-    };
+    comm-mod = {
+            stable = {
+                system0: {
+                        files: (
+                        {
+                            filename = "core-image-minimal-mx6ul-comm-module.tar.gz";
+                            type = "archive";
+                            device = "/dev/mmcblk1p2";
+                            filesystem = "ext4";
+                            path = "/";
+                            sha256 = "@core-image-minimal-mx6ul-comm-module.tar.gz";
+                        },
+                        {
+                            filename = "zImage-mx6ul-comm-module.bin";
+                            path = "/zImage-mx6ul-comm-module.bin";
+                            device = "/dev/mmcblk1p1";
+                            filesystem = "vfat"
+                            sha256 = "@zImage-mx6ul-comm-module.bin"
+                        },
+                        {
+                            filename = "imx6ul-comm-module.dtb";
+                            path = "/imx6ul-comm-module.dtb";
+                            device = "/dev/mmcblk1p1";
+                            filesystem = "vfat"
+                            sha256 = "@imx6ul-comm-module.dtb"
+                        }
+                        );
+                        scripts: (
+                        {
+                            filename = "evo-swu-emb-system0.sh";
+                            type = "shellscript";
+                            sha256 = "@evo-swu-emb-system0.sh";
+                        }
+                        );
+                    }
+                system1: {
+                        files: (
+                        {
+                            filename = "core-image-minimal-mx6ul-comm-module.tar.gz";
+                            type = "archive";
+                            filesystem = "ext4"
+                            device = "/dev/mmcblk1p4";
+                            path = "/";
+                            sha256 = "@core-image-minimal-mx6ul-comm-module.tar.gz";
+                        },
+                        {
+                            filename = "zImage-mx6ul-comm-module.bin";
+                            path = "/zImage-mx6ul-comm-module.bin";
+                            device = "/dev/mmcblk1p3";
+                            filesystem = "vfat"
+                            sha256 = "@zImage-mx6ul-comm-module.bin";
+                        },
+                        {
+                            filename = "imx6ul-comm-module.dtb";
+                            path = "/imx6ul-comm-module.dtb";
+                            device = "/dev/mmcblk1p3";
+                            filesystem = "vfat"
+                            sha256 = "@imx6ul-comm-module.dtb"
+                        }
+                        );
+                        scripts: (
+                        {
+                            filename = "evo-swu-emb-system1.sh";
+                            type = "shellscript";
+                            sha256 = "@evo-swu-emb-system1.sh";
+                        }
+                        );
+                    }
+            }
+        }
 }
+
+
