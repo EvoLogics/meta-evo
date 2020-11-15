@@ -12,16 +12,17 @@ FILESEXTRAPATHS_prepend_mx6ul-comm-module := "${THISDIR}/swupdate-images-evo/com
 
 DEPENDS = ""
 
-#SWUPDATE_SIGNING = "RSA"
-#SWUPDATE_PRIVATE_KEY = "/work/evo-updater.pem"
-#SWUPDATE_PASSWORD_FILE = "/work/evo-updater.pass"
+SWUPDATE_SIGNING = "RSA"
+SWUPDATE_PRIVATE_KEY = "/work/evo-updater.pem"
+SWUPDATE_PASSWORD_FILE = "/work/evo-updater.pass"
 
 # Add all local files to be added to the SWU
 # sw-description must always be in the list.
 # You can extend with scripts or wahtever you need
-SRC_URI_append_mx6ul-comm-module = " 	\
-            file://sw-description 		\
-            file://evo-swu-emb.sh 		\
+SRC_URI_append_mx6ul-comm-module = " 	        \
+            file://sw-description 		        \
+            file://evo-swu-emb-system0.sh 		\
+            file://evo-swu-emb-system1.sh     \
 "
 SWUPDATE_IMAGES = "core-image-minimal   \
                    imx6ul-comm-module   \
