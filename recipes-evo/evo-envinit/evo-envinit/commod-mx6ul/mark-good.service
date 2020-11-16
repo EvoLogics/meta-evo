@@ -5,7 +5,7 @@ Requires=boot-complete.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash  /sbin/update-util.sh -mg
+ExecStart=/bin/bash  /sbin/update-util -mg
 
 [Install]
 WantedBy=multi-user.target
