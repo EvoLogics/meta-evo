@@ -3,11 +3,10 @@ FILESEXTRAPATHS_prepend_mx6ul-comm-module := "${THISDIR}/${PN}/commod-mx6ul:"
 
 DEPENDS += "librsync"
 
-#SRC_URI = "file://defconfig"
+SRC_URI_append_mx6ul-comm-module = "file://defconfig"
 
 
 SRCREV = "${AUTOREV}"
-
 
 do_install_prepend_mx6ul-comm-module(){
 
