@@ -19,6 +19,7 @@ SRC_URI_mx6ul-comm-module = "  						\
 				file://07-sshd-dropbear-fix.sh		\
 				file://08-sshd-dropbear-keys.sh   \
 				file://09-monit-id.sh				      \
+        file://10-resize-home.sh          \
         file://12-mount-storage.sh        \
 				file://20-cp-from-skel.sh 			  \
         file://21-generate-mac.sh         \
