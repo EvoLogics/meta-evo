@@ -32,7 +32,13 @@ do_postinst()
     check_command_success $?
     umount /boot
     check_command_success $?
+    /sbin/update-util -sa
     exit 0
+}
+
+do_restart()
+{
+    reboot
 }
 
 echo "$0: $@"
@@ -46,6 +52,10 @@ preinst)
 postinst)
     echo "call do_postinst"
     do_postinst
+    ;;
+restart)
+    echo "call restart"
+    do_restart
     ;;
 *)
     echo "default"
