@@ -8,6 +8,7 @@ usage()
 	update-util [option]
 	-mg , --mark-good
 	-sa , --switch-active
+	-gn , --get-next
 "
 }
 
@@ -42,6 +43,19 @@ mark_good()
 	#Check the value of remaining attempts
 	#If value is greater than 1 do nothing
 	#else reset remaining attempts to 10
+}
+
+get_next()
+{
+	SYSTEM0_PRIORITY=$(/usr/bin/barebox-state -g bootstate.system0.priority)                    
+    SYSTEM1_PRIORITY=$(/usr/bin/barebox-state -g bootstate.system1.priority)
+
+	if [ $SYSTEM0_PRIORITY -gt $SYSTEM1_PRIORITY ]                                              
+        then
+		echo "system1"
+	else
+		echo "system0"
+	fi
 }
 
 switch_active()
@@ -87,6 +101,9 @@ case $1 in
 		;;
 	-sa | --switch-active)
 		switch_active
+		;;
+	-gn | --get-next)
+		get_next
 		;;
 	*)
 		usage
