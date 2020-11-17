@@ -24,14 +24,11 @@ do_install_prepend_mx6ul-comm-module(){
 
 
 do_install_append_mx6ul-comm-module(){
-	rm -f {D}${systemd_unitdir}/system/swupdate-usb@.service
-	rm -f {D}${systemd_unitdir}/system/swupdate-progress.service
-
 	install -d ${D}/${sysconfdir}
 	install -m 0644 ${WORKDIR}/hwrevision ${D}/${sysconfdir}
 
 	if [ -n "${HW_REVISION}" ]
-    then
-        sed -i -e 's!comm-mod 1.0!comm-mod ${HW_REVISION}\/24!g' ${D}/${sysconfdir}/hwrevision
-    fi
+	then
+		sed -i -e 's!comm-mod 1.0!comm-mod ${HW_REVISION}!g' ${D}/${sysconfdir}/hwrevision
+	fi
 }

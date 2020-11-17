@@ -2,7 +2,7 @@ software =
 {
     version = "@@DISTRO_VERSION@@";
     description = "Firmware system update for EvoLogics Communication Module";
-    hardware-compatibility = ["1.0"];
+    hardware-compatibility = ["2.0"];
 
 
     comm-mod = {

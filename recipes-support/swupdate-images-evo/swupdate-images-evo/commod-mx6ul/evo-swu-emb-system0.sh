@@ -36,11 +36,6 @@ do_postinst()
     exit 0
 }
 
-do_restart()
-{
-    reboot
-}
-
 echo "$0: $@"
 set
 
@@ -52,10 +47,6 @@ preinst)
 postinst)
     echo "call do_postinst"
     do_postinst
-    ;;
-restart)
-    echo "call restart"
-    do_restart
     ;;
 *)
     echo "default"
