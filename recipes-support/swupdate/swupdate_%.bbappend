@@ -32,6 +32,6 @@ do_install_append_mx6ul-comm-module(){
 
 	if [ -n "${HW_REVISION}" ]
     then
-        sed -i -e 's!comm-mod 1.0!comm-mod ${HW_REVISION}\/24!g' $${D}/${sysconfdir}/hwrevision
+        sed -i -e 's!comm-mod 1.0!comm-mod ${HW_REVISION}\/24!g' ${D}/${sysconfdir}/hwrevision
     fi
 }
