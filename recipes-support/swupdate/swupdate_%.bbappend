@@ -4,4 +4,3 @@ DEPENDS += "librsync"
 
 #SRC_URI = "file://defconfig"
 
-SRCREV = "${AUTOREV}"
