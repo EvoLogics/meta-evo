@@ -63,8 +63,8 @@
 		ssc1 = &ssc1;
 		serial0 = &uart1; /* console */
 		serial1 = &uart0; /* data */
-		serial2 = &uart3; /* sensor */
-		serial3 = &uart2; /* sensor2 */
+		serial2 = &uart2; /* sensor2/xsense */
+		serial3 = &uart3; /* sensor/pressure */
 		serial4 = &uart4; /* sensor3 */
 		serial5 = &uart5; /* rs485 for tiny */
 	};
@@ -356,8 +356,6 @@
 				fpga-busy-gpios   = <&pioA PIN_PC6  GPIO_ACTIVE_HIGH>;
 				tbuf-empty-gpios  = <&pioA PIN_PC5  GPIO_ACTIVE_HIGH>;
 				boot-jumper-gpios = <&pioA PIN_PB13 GPIO_ACTIVE_HIGH>;
-				/* input0-gpios  = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
-				/* input1-gpios  = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
 
 				/* output */
 				fpga-reset-gpios = <&pioA PIN_PB30 GPIO_ACTIVE_HIGH>;
@@ -367,7 +365,6 @@
 				reset-gpios      = <&pioA PIN_PB31 GPIO_ACTIVE_HIGH>;
 				power-gpios      = <&pioA PIN_PD8  GPIO_ACTIVE_HIGH>;
 				opto0-gpios      = <&pioA PIN_PD6  GPIO_ACTIVE_HIGH>;
-				/* opto1-gpios      = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
 
 				/* sdm */
 				/* rx-almost-full-gpios  = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */

@@ -10,6 +10,11 @@ do_install_append_sama5d2-roadrunner-evo() {
 	install -m 0644 ${WORKDIR}/issue.base ${D}${sysconfdir}
 	install -m 0644 ${WORKDIR}/issue.wise ${D}${sysconfdir}
 
+    if [ -n "${IMAGE_VERSION}" ]; then
+        printf "${DISTRO_NAME} "                      > ${D}${sysconfdir}/issue
+        printf "${DISTRO_VERSION}-${IMAGE_VERSION} " >> ${D}${sysconfdir}/issue
+        printf "\\\n \\\l\n"                         >> ${D}${sysconfdir}/issue
+    fi
     cat ${D}/${sysconfdir}/issue >> ${D}${sysconfdir}/issue.base
     cat ${D}/${sysconfdir}/issue >> ${D}${sysconfdir}/issue.wise
     rm -f ${D}/${sysconfdir}/issue.net
@@ -33,6 +38,12 @@ do_install_append_sama5d2-roadrunner-evo() {
 
     # create non-volatile rw partition mount point
     mkdir -p ${D}/data
+
+    # make interactive command immediate write to ~/.bash_history
+    echo 'export PROMPT_COMMAND="history -a;$PROMPT_COMMAND"' >> ${D}/${sysconfdir}/profile
+
+    # do not put duplicate command to history file and ignore command begin with space
+    echo 'export HISTCONTROL=ignoreboth' >> ${D}/${sysconfdir}/profile
 }
 
 do_install_append_tx6() {

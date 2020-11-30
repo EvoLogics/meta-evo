@@ -15,6 +15,13 @@
                         reset-gpios     = <&pioA PIN_PB31 GPIO_ACTIVE_LOW>;  /* Reset on R2 is ACTIVE_LOW */
                         dsp-irq-gpios	= <&pioA PIN_PD31 GPIO_ACTIVE_HIGH>; /* EVO_IRQ0 */
                         fiq-gpios		= <&pioA PIN_PC8  GPIO_ACTIVE_HIGH>; /* EVO_FIQ  */
+
+                        gpio0-gpios  = <&pioA PIN_PC30  GPIO_ACTIVE_HIGH>; /* INPUT_0 */
+                        gpio1-gpios  = <&pioA PIN_PC18  GPIO_ACTIVE_HIGH>; /* INPUT_1 */
+                        opto1-gpios  = <&pioA PIN_PD1   GPIO_ACTIVE_HIGH>; /* OPTOCOPLER_1 */
+
+                        pinctrl-names = "default";
+                        pinctrl-0 = <&pinctrl_irqman_default>;
                     };
 
                     sscdev: sscdev {
@@ -57,6 +64,13 @@
                         eth_power_hog {
                             gpio-hog;
                             gpios = <PIN_PC17 GPIO_ACTIVE_HIGH>;
+                        };
+
+                        pinctrl_irqman_default: irqman_default {
+                            pinmux  = <PIN_PC30__GPIO>, <PIN_PC18__GPIO>;
+                                      /* gpio0(INPUT_0), gpio1(INPUT_1) */
+                            input;
+                            bias-pull-up;
                         };
 
                         pinctrl_eth_power_default: eth_power_default {
