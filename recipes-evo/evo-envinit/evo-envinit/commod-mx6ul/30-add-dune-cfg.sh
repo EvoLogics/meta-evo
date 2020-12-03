@@ -42,3 +42,4 @@ else
 [Require ${SYSNAME}.ini]
 [Include local.ini]
 EOF
+fi
