@@ -22,17 +22,17 @@ SWUPDATE_PASSWORD_FILE = "/work/evo-updater.pass"
 SRC_URI_append_mx6ul-comm-module = " 	        \
             file://sw-description 		        \
             file://evo-swu-emb-system0.sh 		\
-            file://evo-swu-emb-system1.sh     \
+            file://evo-swu-emb-system1.sh     	\
 "
-SWUPDATE_IMAGES = "core-image-minimal   \
-                   imx6ul-comm-module   \
-                   zImage               \
+SWUPDATE_IMAGES = "core-image-minimal   					\
+                   imx6ul-comm-module-mx6ul-comm-module   	\
+                   zImage               					\
 "
 
 SWUPDATE_IMAGES_FSTYPES[core-image-minimal] = ".tar.gz"
 
-SWUPDATE_IMAGES_FSTYPES[imx6ul-comm-module] = ".dtb"
-SWUPDATE_IMAGES_NOAPPEND_MACHINE[imx6ul-comm-module] = "1"
+SWUPDATE_IMAGES_FSTYPES[imx6ul-comm-module-mx6ul-comm-module] = ".dtb"
+SWUPDATE_IMAGES_NOAPPEND_MACHINE[imx6ul-comm-module-mx6ul-comm-module] = "1"
 
 SWUPDATE_IMAGES_FSTYPES[zImage] = ".bin"
 

@@ -25,11 +25,11 @@ software =
                             sha256 = "@zImage-mx6ul-comm-module.bin"
                         },
                         {
-                            filename = "imx6ul-comm-module.dtb";
-                            path = "/imx6ul-comm-module.dtb";
+                            filename = "imx6ul-comm-module-mx6ul-comm-module.dtb";
+                            path = "/imx6ul-comm-module-mx6ul-comm-module.dtb";
                             device = "/dev/mmcblk1p1";
                             filesystem = "vfat"
-                            sha256 = "@imx6ul-comm-module.dtb"
+                            sha256 = "@imx6ul-comm-module-mx6ul-comm-module.dtb"
                         }
                         );
                         scripts: (
@@ -58,11 +58,11 @@ software =
                             sha256 = "@zImage-mx6ul-comm-module.bin";
                         },
                         {
-                            filename = "imx6ul-comm-module.dtb";
-                            path = "/imx6ul-comm-module.dtb";
+                            filename = "imx6ul-comm-module-mx6ul-comm-module.dtb";
+                            path = "/imx6ul-comm-module-mx6ul-comm-module.dtb";
                             device = "/dev/mmcblk1p3";
                             filesystem = "vfat"
-                            sha256 = "@imx6ul-comm-module.dtb"
+                            sha256 = "@imx6ul-comm-module-mx6ul-comm-module.dtb"
                         }
                         );
                         scripts: (

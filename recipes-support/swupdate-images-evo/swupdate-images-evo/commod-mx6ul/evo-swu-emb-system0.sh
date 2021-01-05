@@ -25,7 +25,7 @@ do_postinst()
     mount /dev/mmcblk1p1 /boot
     check_command_success $?
     echo "Create Copy of device tree"
-    cp /boot/imx6ul-comm-module.dtb /boot/oftree
+    cp /boot/imx6ul-comm-module-mx6ul-comm-module.dtb /boot/oftree
     check_command_success $?
     echo "Create Copy of kernel"
     cp /boot/zImage-mx6ul-comm-module.bin /boot/zImage
