@@ -92,3 +92,7 @@
 &i2c_light {
 	status = "okay";
 };
+
+&ecspi1 {
+	status = "okay";
+};
