@@ -147,6 +147,22 @@
 	status = "disabled";
 };
 
+&ecspi1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi1>;
+	cs-gpios = <&gpio4 26 GPIO_ACTIVE_LOW>;
+	status = "disabled";
+
+	gpiom0: gpio@0 {
+         compatible = "microchip,mcp23s08";
+         #gpio-cells = <2>;
+         gpio-controller;
+         reg = <0>;
+         microchip,spi-present-mask = <0x02>;
+         spi-max-frequency = <10000000>;
+    };
+};
+
 
 &iomuxc_snvs {
 
@@ -164,6 +180,16 @@
 };
 
 &iomuxc {
+
+	pinctrl_ecspi1: ecspi1grp {
+		fsl,pins = <
+			MX6UL_PAD_CSI_DATA04__ECSPI1_SCLK          0x000010B0
+            MX6UL_PAD_CSI_DATA05__ECSPI1_SS0           0x000010B0
+            MX6UL_PAD_CSI_DATA06__ECSPI1_MOSI          0x000010B0
+            MX6UL_PAD_CSI_DATA07__ECSPI1_MISO          0x000010B0
+			MX6UL_PAD_CSI_DATA05__GPIO4_IO26          0x000010B0
+		>;
+	};
 
 	pinctrl_pps0: pps0_default {
 		fsl,pins = <

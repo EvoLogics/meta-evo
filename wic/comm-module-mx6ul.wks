@@ -6,6 +6,8 @@ part BAREBOX --source rawcopy --sourceparams="file=barebox.bin,skip=1024" --ondi
 
 part --source bootimg-partition --fstype=vfat --label boot --ondisk mmc --active --align 4096 --size 20
 part / --source rootfs --fstype=ext4 --label root --ondisk mmc --align 1024 --use-uuid
-part --fstype=ext4 --label data --ondisk mmc --align 1024 --use-uuid --size 10
+
+part --source bootimg-partition --fstype=vfat --label boot --ondisk mmc --active --align 4096 --size 20
+part / --source rootfs --fstype=ext4 --label root --ondisk mmc --align 1024 --use-uuid
 
 bootloader --timeout=0
