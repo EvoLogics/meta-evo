@@ -15,19 +15,22 @@ SRC_URI_mx6-evobb = "file://init \
 
 SRC_URI_mx6ul-comm-module = "  						\
 				file://initgpio.sh 					      \
+        file://update-util.sh             \
 				file://07-sshd-dropbear-fix.sh		\
 				file://08-sshd-dropbear-keys.sh   \
 				file://09-monit-id.sh				      \
-				file://10-resize-home.sh 			    \
+        file://11-create-swupdate-env.sh  \
         file://12-mount-storage.sh        \
 				file://20-cp-from-skel.sh 			  \
         file://21-generate-mac.sh         \
 				file://30-add-dune-cfg.sh 			  \
 				file://31-create-dune-dirs.sh 		\
+        file://32-create-soft-hwclock-dirs.sh     \
 				file://systemd-firstboot.sh 		  \
 				file://se 							          \
         file://init-gpio.service			    \
         file://systemd-firstboot.service	\
+        file://mark-good.service          \
 "
 
 INITSCRIPT_NAME = "evo-envinit"
@@ -57,16 +60,19 @@ do_install_mx6-evobb() {
 SYSTEMD_SERVICE_${PN}_mx6ul-comm-module += "     \
    	init-gpio.service                            \
    	systemd-firstboot.service                    \
+    mark-good.service                            \
 "
 
 do_install_mx6ul-comm-module(){
-	install -d ${D}${systemd_system_unitdir}/
-	install -m 0644 ${WORKDIR}/init-gpio.service ${D}${systemd_system_unitdir}/
-	install -m 0644 ${WORKDIR}/systemd-firstboot.service ${D}${systemd_system_unitdir}/
+	  install -d ${D}${systemd_system_unitdir}/
+	  install -m 0644 ${WORKDIR}/init-gpio.service ${D}${systemd_system_unitdir}/
+	  install -m 0644 ${WORKDIR}/systemd-firstboot.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${WORKDIR}/mark-good.service ${D}${systemd_system_unitdir}/
 
     install -d ${D}${base_sbindir}/evo-envinit
     install -m 0755 ${WORKDIR}/*-*.sh ${D}${base_sbindir}/evo-envinit/
     install -m 0755 ${WORKDIR}/initgpio.sh ${D}${base_sbindir}/
+    install -m 0755 ${WORKDIR}/update-util.sh ${D}${base_sbindir}/update-util
     install -m 0755 ${WORKDIR}/systemd-firstboot.sh ${D}${base_sbindir}/
     install -m 0755 ${WORKDIR}/se ${D}${base_sbindir}/
 }
