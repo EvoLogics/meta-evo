@@ -226,7 +226,7 @@
 
 			ssc1: ssc@fc004000 {
 				compatible = "atmel,at91sam9g45-ssc";
-				reg = <0xf8004000 0x4000>;
+				reg = <0xfc004000 0x4000>;
 				interrupts = <44 IRQ_TYPE_LEVEL_HIGH 4>;
 				dmas = <&dma0
 					(AT91_XDMAC_DT_MEM_IF(0) | AT91_XDMAC_DT_PER_IF(1) |
@@ -369,10 +369,13 @@
 				/* sdm */
 				/* rx-almost-full-gpios  = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
 				/* tx-almost-empty-gpios = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
-				/* rxtx-fifo-inv-gpios   = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
+				rxtx-fifo-inv-gpios = <&pioA PIN_PD27  GPIO_ACTIVE_HIGH>; /* Host.IO1 */
 				/* tx-almost-full-gpios  = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
 				sdm-sync-in-gpios = <&pioA PIN_PC24 GPIO_ACTIVE_HIGH>; /* SYNCIN0, conflict with pps0 */
 				/* syncin1-gpios = <&pioA PIN_PC23 GPIO_ACTIVE_HIGH>; */ /* SYNCIN1, conflict with pps1 */
+
+				/* Unique for roadrunner pin, replace IRQ1 for SDM part */
+				sdm-tx-request-gpios = <&pioA PIN_PD26  GPIO_ACTIVE_HIGH>; /* Host.IO0 */
 
 				/* eclk */
 				lock-gpios      = <&pioA PIN_PB5  GPIO_ACTIVE_HIGH>; /* LOCK(BITE_N) */
