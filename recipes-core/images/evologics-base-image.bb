@@ -86,6 +86,9 @@ DEPENDS += "\
     minicom\
     usbutils \
     \
+    tmux \
+    bash-completion \
+    \
     procps \
     iperf3 \
     wget \
@@ -97,6 +100,7 @@ DEPENDS += "\
     \
     tcpdump \
     ltrace \
+    hdparm \
     \
     packagegroup-erlang-embedded \
     \
