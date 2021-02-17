@@ -82,8 +82,14 @@ IMAGE_INSTALL = "\
 DEPENDS += "\
     packagegroup-base-usbgadget \
     kexec-tools \
+    \
     setserial \
     minicom\
+    ckermit \
+    \
+    pps-tools \
+    rng-tools \
+    \
     usbutils \
     \
     tmux \
