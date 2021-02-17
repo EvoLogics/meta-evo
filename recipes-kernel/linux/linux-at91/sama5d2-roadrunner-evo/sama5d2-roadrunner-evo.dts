@@ -70,7 +70,7 @@
 
 	chosen {
 		stdout-path = "serial0:115200n8";
-		bootargs = "mem=256M console=ttyS0,115200 ubi.mtd=rootfs root=ubi0:sama5d2-roadrunner-evo-rootfs rootfstype=ubifs quiet ro";
+		bootargs = "mem=256M console=ttyS0,115200 rng_core.default_quality=1000 ubi.mtd=rootfs root=ubi0:sama5d2-roadrunner-evo-rootfs rootfstype=ubifs quiet ro";
 	};
 
 	memory {
