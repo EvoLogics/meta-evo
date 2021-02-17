@@ -238,12 +238,16 @@
 				pinctrl-names = "default";
 				pinctrl-0 = <&pinctrl_uart0_default>;
 				status = "okay";
+				atmel,use-dma-tx;
+				atmel,use-dma-rx;
 			};
 
 			uart1: serial@f8020000 {
 				pinctrl-names = "default";
 				pinctrl-0 = <&pinctrl_uart1_default>;
 				status = "okay";
+				atmel,use-dma-tx;
+				atmel,use-dma-rx;
 			};
 
 			i2c0: i2c@f8028000 {
@@ -279,10 +283,22 @@
 				status = "okay";
 			};
 
+			uart2: serial@f8024000 {
+			    atmel,use-dma-tx;
+			    atmel,use-dma-rx;
+			};
+
 			uart3: serial@fc008000 {
 				pinctrl-names = "default";
 				pinctrl-0 = <&pinctrl_uart3_default>;
 				status = "okay";
+				atmel,use-dma-tx;
+				atmel,use-dma-rx;
+			};
+
+			uart4: serial@fc00c000 {
+				atmel,use-dma-tx;
+				atmel,use-dma-rx;
 			};
 
 			flx4: flexcom@fc018000 {
@@ -290,6 +306,8 @@
 				status = "disable";
 
 				uart5: serial@200 {
+					#address-cells = <1>;
+					#size-cells = <0>;
 					compatible = "atmel,at91sam9260-usart";
 					reg = <0x200 0x200>;
 					interrupts = <23 IRQ_TYPE_LEVEL_HIGH 7>;
@@ -297,8 +315,14 @@
 					clock-names = "usart";
 					atmel,fifo-size = <32>;
 					status = "disable";
-				};
 
+					/* for rs485 need to add 'rs485-rx-during-tx' to not freeze application */
+					dmas = <&dma0 (AT91_XDMAC_DT_MEM_IF(0) | AT91_XDMAC_DT_PER_IF(1) | AT91_XDMAC_DT_PERID(19))>,
+							<&dma0 (AT91_XDMAC_DT_MEM_IF(0) | AT91_XDMAC_DT_PER_IF(1) | AT91_XDMAC_DT_PERID(20))>;
+					dma-names = "tx", "rx";
+					atmel,use-dma-tx;
+					atmel,use-dma-rx;
+				};
 			};
 
 			i2c1: i2c@fc028000 {
