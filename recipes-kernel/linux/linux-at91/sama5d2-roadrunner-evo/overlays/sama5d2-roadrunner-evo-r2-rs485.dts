@@ -19,6 +19,7 @@
                         uart5: serial@200 {
                             pinctrl-names = "default";
                             pinctrl-0 = <&pinctrl_flx4_default>;
+                            rs485-rx-during-tx; /* fix freeze with using DMA */
                             linux,rs485-enabled-at-boot-time;
                             rs485-rts-delay = <0 20>;
                             status = "okay";
