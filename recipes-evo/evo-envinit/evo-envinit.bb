@@ -13,25 +13,26 @@ SRC_URI_mx6-evobb = "file://init \
   file://*-*.sh \
   "
 
-SRC_URI_mx6ul-comm-module = "  						\
-				file://initgpio.sh 					      \
-        file://update-util.sh             \
-        file://comm-hw.sh                 \
-				file://07-sshd-dropbear-fix.sh		\
-				file://08-sshd-dropbear-keys.sh   \
-				file://09-monit-id.sh				      \
-        file://11-create-swupdate-env.sh  \
-        file://12-mount-storage.sh        \
-				file://20-cp-from-skel.sh 			  \
-        file://21-generate-mac.sh         \
-				file://30-add-dune-cfg.sh 			  \
-				file://31-create-dune-dirs.sh 		\
-        file://32-create-soft-hwclock-dirs.sh     \
-				file://systemd-firstboot.sh 		  \
-				file://se 							          \
-        file://init-gpio.service			    \
-        file://systemd-firstboot.service	\
-        file://mark-good.service          \
+SRC_URI_mx6ul-comm-module = "                   \
+        file://initgpio.sh                      \
+        file://update-util.sh                   \
+        file://comm-hw.sh                       \
+        file://07-sshd-dropbear-fix.sh          \
+        file://08-sshd-dropbear-keys.sh         \
+        file://09-monit-id.sh                   \
+        file://11-create-swupdate-env.sh        \
+        file://12-mount-storage.sh              \
+        file://20-cp-from-skel.sh               \
+        file://21-generate-mac.sh               \
+        file://30-add-dune-cfg.sh               \
+        file://31-create-dune-dirs.sh           \
+        file://32-create-soft-hwclock-dirs.sh   \
+        file://33-create-sinaps-dirs.sh         \
+        file://systemd-firstboot.sh             \
+        file://se                               \
+        file://init-gpio.service                \
+        file://systemd-firstboot.service        \
+        file://mark-good.service                \
 "
 
 INITSCRIPT_NAME = "evo-envinit"
@@ -50,7 +51,7 @@ do_compile() {
 }
 
 do_install_mx6-evobb() {
-	install -d ${D}${base_sbindir}/evo-envinit
+	  install -d ${D}${base_sbindir}/evo-envinit
     install -m 0755 ${WORKDIR}/se ${D}${base_sbindir}/
     install -m 0755 ${WORKDIR}/*-*.sh ${D}${base_sbindir}/evo-envinit/
 
