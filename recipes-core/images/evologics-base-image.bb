@@ -85,7 +85,7 @@ DEPENDS += "\
     \
     setserial \
     minicom\
-    kermit \
+    ckermit \
     \
     pps-tools \
     rng-tools \
