@@ -373,7 +373,11 @@
 			irqman: irqman {
 				compatible = "irqman";
 
+				/* DEPRICATED: for old fw on new system */
 				atmel,ssc-controller = <&ssc0>;
+
+				atmel,ssc-controller-dsp = <&ssc0>;
+				atmel,ssc-controller-sdm = <&ssc1>;
 				io-channels = <&adc 4>;
 				io-channel-names = "bat0";
 
