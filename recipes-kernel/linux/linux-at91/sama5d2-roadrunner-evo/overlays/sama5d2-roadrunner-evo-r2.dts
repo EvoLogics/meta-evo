@@ -12,7 +12,8 @@
             ahb {
                 apb {
                     irqman: irqman {
-                        reset-gpios     = <&pioA PIN_PB31 GPIO_ACTIVE_LOW>;  /* Reset on R2 is ACTIVE_LOW */
+                        /* Reset on R2: "old" is ACTIVE_LOW, "new" is GPIO_ACTIVE_HIGH */
+                        reset-gpios     = <&pioA PIN_PB31 GPIO_ACTIVE_HIGH>;
                         dsp-irq-gpios	= <&pioA PIN_PD31 GPIO_ACTIVE_HIGH>; /* EVO_IRQ0 */
                         fiq-gpios		= <&pioA PIN_PC8  GPIO_ACTIVE_HIGH>; /* EVO_FIQ  */
 
@@ -25,7 +26,7 @@
                     };
 
                     sscdev: sscdev {
-                        reset-gpios     = <&pioA PIN_PB31 GPIO_ACTIVE_LOW>;  /* Reset on R2 is ACTIVE_LOW */
+                        reset-gpios     = <&pioA PIN_PB31 GPIO_ACTIVE_HIGH>;  /* Reset on R2 is ACTIVE_LOW */
                         dsp-irq-gpios	= <&pioA PIN_PD31 GPIO_ACTIVE_HIGH>; /* EVO_IRQ0 */
                         fiq-gpios		= <&pioA PIN_PC8  GPIO_ACTIVE_HIGH>; /* EVO_FIQ  */
                     };

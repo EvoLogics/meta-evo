@@ -393,7 +393,7 @@
 				/* sdm */
 				/* rx-almost-full-gpios  = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
 				/* tx-almost-empty-gpios = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
-				rxtx-fifo-inv-gpios = <&pioA PIN_PD27  GPIO_ACTIVE_HIGH>; /* Host.IO1 */
+				rxtx-fifo-inv-gpios = <&pioA PIN_PD27  GPIO_ACTIVE_LOW>; /* Host.IO1 why LOW?! */
 				/* tx-almost-full-gpios  = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
 				sdm-sync-in-gpios = <&pioA PIN_PC24 GPIO_ACTIVE_HIGH>; /* SYNCIN0, conflict with pps0 */
 				/* syncin1-gpios = <&pioA PIN_PC23 GPIO_ACTIVE_HIGH>; */ /* SYNCIN1, conflict with pps1 */
