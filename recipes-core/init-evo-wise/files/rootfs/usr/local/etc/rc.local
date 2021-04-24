@@ -12,6 +12,8 @@ ln -sf /var/volatile/run /run
 touch /data/.bash_history
 ln -sf /data/.bash_history /home/root/.bash_history
 
+mkdir -p /media/card
+
 DROPBEAR_RSAKEY=/etc/dropbear/dropbear_rsa_host_key
 if [ ! -f $DROPBEAR_RSAKEY ]; then
     dropbearkey -t rsa -f $DROPBEAR_RSAKEY
