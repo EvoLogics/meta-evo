@@ -2,7 +2,6 @@
 /*
  * Copyright (C) 2019 Evologics GmbH
  * Author: Llewellyn Fernandes <llewellyn.fernandes@evologics.de>
- * TODO: Check SPI1
  */
 
 &iomuxc {
@@ -26,7 +25,15 @@
 		compatible = "pps-gpio";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_pps0>;
-		gpios = <&gpio1 18 GPIO_ACTIVE_HIGH>;
+		gpios = <&gpio1 18 GPIO_ACTIVE_HIGH>;    /* GPIO1_18 -> ATM_CLK_PPS */
+		status = "disabled";
+	};
+
+	pps1: pps1 {
+		compatible = "pps-gpio";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pps1>;
+		gpios = <&gpio5 5 GPIO_ACTIVE_HIGH>;    /* GPIO5_5  -> GPS_PPS */
 		status = "disabled";
 	};
 };
@@ -50,30 +57,44 @@
 &uart2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart2>;
+	dmas = <&sdma 27 4 0>,<&sdma 28 4 0>;
+	dma-names = "rx","tx";
 	status = "disabled";
 };
+
 
 &uart3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart3>;
+	dmas = <&sdma 29 4 0>,<&sdma 30 4 0>;
+	dma-names = "rx","tx";
 	status = "disabled";
 };
+
 
 &uart4 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart4>;
+	dmas = <&sdma 31 4 0>,<&sdma 32 4 0>;
+	dma-names = "rx","tx";
 	status = "disabled";
 };
+
 
 &uart5 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart5>;
+	dmas = <&sdma 33 4 0>,<&sdma 34 4 0>;
+	dma-names = "rx","tx";
 	status = "disabled";
 };
+
 
 &uart6 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart6>;
+	dmas = <&sdma 0 4 0>,<&sdma 47 4 0>;
+	dma-names = "rx","tx";
 	status = "disabled";
 };
 
@@ -81,14 +102,20 @@
 &uart7 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart7>;
+	dmas = <&sdma 43 4 0>,<&sdma 44 4 0>;
+	dma-names = "rx","tx";
 	status = "disabled";
 };
+
 
 &uart8 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart8>;
+	dmas = <&sdma 45 4 0>,<&sdma 46 4 0>;
+	dma-names = "rx","tx";
 	status = "disabled";
 };
+
 
 &i2c1 {
 	#address-cells = <1>;
@@ -100,17 +127,20 @@
 	};
 };
 
+
 &pwm3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm3>;
 	status = "disabled";
 };
 
+
 &pwm4 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm4>;
 	status = "disabled";
 };
+
 
 &fec2 {
 	pinctrl-names = "default";
@@ -194,6 +224,12 @@
 	pinctrl_pps0: pps0_default {
 		fsl,pins = <
 			MX6UL_PAD_UART1_CTS_B__GPIO1_IO18          		0x000010B0
+	    >;
+	};
+
+	pinctrl_pps1: pps1_default {
+		fsl,pins = <
+			MX6UL_PAD_SNVS_TAMPER5__GPIO5_IO05          		0x000110A0
 	    >;
 	};
 

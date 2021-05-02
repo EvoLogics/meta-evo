@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Copyright (C) 2018 PHYTEC Messtechnik GmbH
- * Author:  Riedmueller <s.riedmueller@phytec.de>
+ * Copyright (C) 2019 Evologics GmbH
+ * Author: Llewellyn Fernandes <llewellyn.fernandes@evologics.de>
  */
+
 
 /dts-v1/;
 #include <dt-bindings/input/input.h>
@@ -82,6 +83,10 @@
 };
 
 &pps0{
+	status = "okay";	
+};
+
+&pps1{
 	status = "okay";	
 };
 
