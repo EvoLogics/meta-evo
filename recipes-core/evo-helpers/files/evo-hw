@@ -391,7 +391,7 @@ case "$1" in
         fi
     ;;
     edit)
-        die "Probably you mean:\nevo-env edit"
+        die "Probably you mean:\nevo-env edit\nor\nvidt"
     ;;
     *)
         case "$2" in
