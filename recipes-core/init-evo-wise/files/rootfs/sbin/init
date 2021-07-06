@@ -67,11 +67,11 @@ case "$1" in
 esac
 
 if [ -e /opt/lxc/sandbox/enable ]; then
-	WISE=true
-	REAL_ROOT=toor
+    WISE=true
+    REAL_ROOT=toor
 else
-	REAL_ROOT=root
-	WISE=false
+    REAL_ROOT=root
+    WISE=false
 fi
 
 mount -a
@@ -175,6 +175,7 @@ modprobe g_cdc iManufacturer="EvoLogics GmbH" \
 ifconfig usb0 $IPADDRDEF_USB
 
 export LD_LIBRARY_PATH=/usr/local/lib
+[ -b /dev/mmcblk0p1 ] && mount /media/card
 [ -e /opt/arsp/etc/rc.local ]  && sh /opt/arsp/etc/rc.local&
 [ -e /usr/local/etc/rc.local ] && sh /usr/local/etc/rc.local&
 
@@ -182,19 +183,8 @@ httpd -h /usr/local/www
 test -f /etc/udhcpd.conf && udhcpd
 modprobe ppp_async
 
-sleep 1
-
 if $WISE; then
-	#ubiattach -p /dev/mtd8
-	#ubiattach -p /dev/mtd10
-
-	mount -t cgroup cgroup /sys/fs/cgroup
-	#mount -t ubifs -o sync /dev/ubi4_0 /opt/lxc/sandbox/rootfs
-
-	modprobe ext4
-	##test -b /dev/mmcblk0p1 && mount -t ext4 -o errors=continue /dev/mmcblk0p1 /media/card
-
-	/etc/init.d/lxc start
+    evo-sandbox start
 fi
 
 getty_loop ttyGS0&

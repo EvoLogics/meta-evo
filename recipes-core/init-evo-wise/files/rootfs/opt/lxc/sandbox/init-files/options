@@ -1,0 +1,24 @@
+############################
+# on client side run
+# sudo pppd nocrtscts xonxoff lock noauth 10.10.10.1:10.10.10.2 /dev/ttyUSB0 115200 nodetach debug asyncmap FFFFFFFF escape FF connect 'chat -t 5 -sv "" \\r ogin:--ogin: ppp assword: ppp || exit 0'
+############################
+# uncomment below to debug #
+############################
+#
+#debug
+#logfile /var/log/pppd.log
+#record /var/log/pppd.dump
+
+115200
+lock
+noauth
+nodetach
+notty
+nopersist
+
+xonxoff
+nocrtscts
+
+asyncmap FFFFFFFF
+escape FF
+

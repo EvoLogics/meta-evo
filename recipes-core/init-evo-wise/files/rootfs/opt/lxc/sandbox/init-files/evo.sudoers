@@ -1,0 +1,8 @@
+Defaults env_keep += HOME
+Defaults env_keep += MAIL
+Defaults env_keep += EDITOR
+Defaults env_keep += SUDO_EDITOR
+Defaults env_keep += VISUAL
+
+root ALL=(ALL) ALL
+evo  ALL=NOPASSWD: ALL

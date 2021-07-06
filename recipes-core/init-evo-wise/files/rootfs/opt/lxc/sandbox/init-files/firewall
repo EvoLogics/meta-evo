@@ -1,0 +1,76 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          lighttpd
+# Required-Start:    $local_fs $remote_fs $network $syslog
+# Required-Stop:     $local_fs $remote_fs $network $syslog
+# Should-Start:      fam
+# Should-Stop:       fam
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start the lighttpd web server.
+# Description:       Fast and smalle webserver with minimal memory footprint
+#                    developed with security in mind HTTP/1.1 compliant caching
+#                    proxy server.
+### END INIT INFO
+
+NAME=firewall
+DESC="Firewall"
+
+firewall_start () {
+    IPS="$(ip a s dev eth0 | sed -n 's/.*inet //;tz;b;:z;s,/.*,,;p')"
+    if [ -z "$IPS" ]; then
+       return
+    fi
+    echo 1 > /proc/sys/net/ipv4/ip_forward
+    iptables -t nat -F
+    for IP in $IPS; do
+        echo -n "* setting NAT port forwarding for $IP..."
+        iptables -t nat -A POSTROUTING -s 192.168.42.0/24 -j SNAT --to $IP
+        iptables -t nat -A POSTROUTING -o am -j SNAT --to 192.168.42.1
+
+        # S2C DMAC channel ports
+        iptables -t nat -A PREROUTING -p tcp -d $IP --dport 9200:9232 -j DNAT --to-destination 192.168.42.2:9200-9232
+        
+        # S2C SDM port
+        iptables -t nat -A PREROUTING -p tcp -d $IP --dport 4200 -j DNAT --to-destination 192.168.42.2:4200
+
+        # S2C Transponder Communication port
+        iptables -t nat -A PREROUTING -p tcp -d $IP --dport 8090 -j DNAT --to-destination 192.168.42.2:8090
+
+        # Uncomment this if you want disable lighttpd and use modem web interface directly
+       #iptables -t nat -A PREROUTING -p tcp -d $IP --dport 80 -j DNAT --to-destination 192.168.42.2:80
+        
+        # ssh host
+        iptables -t nat -A PREROUTING -p tcp -d $IP --dport 2222 -j DNAT --to-destination 192.168.42.2:22
+
+    done
+}
+
+firewall_stop () {
+    echo 0 > /proc/sys/net/ipv4/ip_forward
+
+    iptables -t nat -F
+}
+
+case "$1" in
+    start)
+        echo -n "* starting $DESC: $NAME... "
+        firewall_start
+        echo "done."
+        ;;
+    stop)
+        echo -n "* stopping $DESC: $NAME... "
+        firewall_stop
+        echo "done."
+        ;;
+    restart)
+        echo "* restarting $DESC: $NAME... "
+        $0 stop
+        $0 start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
+esac
+

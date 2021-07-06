@@ -1,0 +1,24 @@
+#!/bin/sh
+# redirect /dev/ttyS3 to modem host
+
+printf "Start redirect /dev/ttyS3 => 192.168.42.2:9200\nPress Ctrl-C to interrupt.\n"
+
+trap "gracefull_exit; exit" TERM INT QUIT
+
+PIDFILE=/var/run/$(basename $0)-socat.pid
+
+gracefull_exit() {
+    test -f $PIDFILE && kill `cat $PIDFILE`
+    rm -f $PIDFILE
+}
+
+while :; do
+    # convert cr <=> nl
+    socat TCP4:192.168.42.2:9200,forever \
+          /dev/ttyS3,b19200,cs8,raw,echo=0,parenb=0,cstopb=0 &
+
+    echo $! > $PIDFILE
+    wait
+    sleep .5
+done > /dev/null 2>&1
+

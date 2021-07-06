@@ -1,0 +1,10 @@
+#!/bin/sh
+
+exec 2>&1
+
+case "$1" in
+    status) ip a s dev eth0:dhcp;;
+    up)     ifup   eth0:dhcp ;;
+    down)   ifdown eth0:dhcp ;;
+    *)      echo Unknown action ;;
+esac

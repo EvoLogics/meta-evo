@@ -187,6 +187,10 @@ volume_mode() {
     awk '$2 == "'$1'" {split($4,a,/,/);for(i in a) if(a[i] == "rw" || a[i] == "ro") print a[i]}' /proc/mounts
 }
 
+# Temporary remount to rw if needed
+# Used in pair.
+# First time calling set to rw and set VOL_MODE.
+# Second time calling set to ro and remount properly VOL_MODE.
 temporary_remount() {
     if [ -z "$VOL_MODE" ]; then
         VOL_MODE=$(volume_mode $1)
@@ -215,7 +219,7 @@ update_hostname() {
     temporary_remount /
 
     read HOSTNAME < /etc/hostname
-    HN="$(echo "$HOSTNAME" | sed 's/\(evo-[^-]*-[0-9]*-[0-9]*-\).*/\1'$1'/')"
+    HN="$(echo "$HOSTNAME" | sed 's/\(evo-[^0-9-]*[0-9]*-[0-9]*-\).*/\1'$1'/')"
 
     echo "$HN" > /etc/hostname
     sed -i s/$HOSTNAME/$HN/ /etc/hosts
@@ -286,8 +290,13 @@ set_hwtype_dtb() {
     fi
     echo "Changing hardware type to $HWMODEL-$HWTYPE"
 
+    update_dtb
+}
+
+update_dtb() {
     DT_FILES_ARCH="/boot/$DT_PREFIX.dtb.xz /boot/$DT_PREFIX-$HWMODEL.dtbo.xz"
 
+    # ^^ case modification
     DT_MODEL="$DT_MODEL ${HWMODEL^^}"
     for HW in ${HWTYPE//-/ }; do 
         DTBO=/boot/$DT_PREFIX-$HWMODEL-$HW.dtbo.xz 
@@ -346,6 +355,7 @@ Usage: $(basename $0) [-q] [set-hw [auto|hwtype]]|[on|off]|[[P<ABCDE><0-9>|eth|r
     off     - power off devices depend from hardware type
     type    - show hardware type. -v show more information. -q supress warnings
     set-hw  - set hardware type. 'auto' will set hardware type according straps
+    update  - update dt from /boot
     P<pin>  - set on/off pin number. For example: PA02, PE23
     <hw>    - set on/off/enable/disable hardware. eth, rs422, rs485, rs4xx-term, can, can0, can1
               or show hardware status
@@ -377,6 +387,18 @@ case "$1" in
     hwrev)
         read_sysfs_dt_hwtype HWMODEL HWTYPE
         echo $HWMODEL-$HWTYPE ;;
+    update)
+        hw_detect
+        update_dtb
+        ;;
+    env)
+        hw_detect
+        echo CFG_HWMODEL=$CFG_HWMODEL
+        echo CFG_HWTYPE=$CFG_HWTYPE
+        echo CFG_VER=$CFG_VER
+        echo HWMODEL=$HWMODEL
+        echo HWTYPE=$HWTYPE
+        ;;
     set-hw)
         [ -z "$2" ] && usage 1
         hw_detect
@@ -391,7 +413,7 @@ case "$1" in
         fi
     ;;
     edit)
-        die "Probably you mean:\nevo-env edit"
+        die "Probably you mean:\nevo-env edit\nor\nvidt"
     ;;
     *)
         case "$2" in

@@ -60,6 +60,7 @@
 
 	aliases {
 		ssc0 = &ssc0;
+		ssc1 = &ssc1;
 		serial0 = &uart1; /* console */
 		serial1 = &uart0; /* data */
 		serial2 = &uart2; /* sensor2/xsense */
@@ -220,7 +221,24 @@
 				pinctrl-0 = <&pinctrl_ssc0_tx &pinctrl_ssc0_rx>;
 				clocks = <&ssc0_clk>;
 				clock-names = "pclk";
-				/* status = "disabled"; */
+				status = "okay";
+			};
+
+			ssc1: ssc@fc004000 {
+				compatible = "atmel,at91sam9g45-ssc";
+				reg = <0xfc004000 0x4000>;
+				interrupts = <44 IRQ_TYPE_LEVEL_HIGH 4>;
+				dmas = <&dma0
+					(AT91_XDMAC_DT_MEM_IF(0) | AT91_XDMAC_DT_PER_IF(1) |
+					AT91_XDMAC_DT_PERID(23))>,
+					   <&dma0
+					(AT91_XDMAC_DT_MEM_IF(0) | AT91_XDMAC_DT_PER_IF(1) |
+					AT91_XDMAC_DT_PERID(24))>;
+				dma-names = "tx", "rx";
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_ssc1_tx &pinctrl_ssc1_rx>;
+				clocks = <&ssc1_clk>;
+				clock-names = "pclk";
 				status = "okay";
 			};
 
@@ -352,13 +370,14 @@
 				};
 			};
 
-			/* sscdev: sscdev */
 			irqman: irqman {
-				/* pinctrl-names = "default"; */
-				/* pinctrl-0 = <&pinctrl_sscdev>; */
 				compatible = "irqman";
 
+				/* DEPRICATED: for old fw on new system */
 				atmel,ssc-controller = <&ssc0>;
+
+				atmel,ssc-controller-dsp = <&ssc0>;
+				atmel,ssc-controller-sdm = <&ssc1>;
 				io-channels = <&adc 4>;
 				io-channel-names = "bat0";
 
@@ -378,9 +397,13 @@
 				/* sdm */
 				/* rx-almost-full-gpios  = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
 				/* tx-almost-empty-gpios = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
-				/* rxtx-fifo-inv-gpios   = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
+				rxtx-fifo-inv-gpios = <&pioA PIN_PD27  GPIO_ACTIVE_LOW>; /* Host.IO1 why LOW?! */
 				/* tx-almost-full-gpios  = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
 				sdm-sync-in-gpios = <&pioA PIN_PC24 GPIO_ACTIVE_HIGH>; /* SYNCIN0, conflict with pps0 */
+				/* syncin1-gpios = <&pioA PIN_PC23 GPIO_ACTIVE_HIGH>; */ /* SYNCIN1, conflict with pps1 */
+
+				/* Unique for roadrunner pin, replace IRQ1 for SDM part */
+				sdm-tx-request-gpios = <&pioA PIN_PD26  GPIO_ACTIVE_HIGH>; /* Host.IO0 */
 
 				/* eclk */
 				lock-gpios      = <&pioA PIN_PB5  GPIO_ACTIVE_HIGH>; /* LOCK(BITE_N) */
@@ -390,6 +413,44 @@
 				irq1-gpios	    = <&pioA PIN_PB2  GPIO_ACTIVE_HIGH>; /* EVO_IRQ1 */
 				fiq-gpios		= <&pioA PIN_PB4  GPIO_ACTIVE_HIGH>; /* EVO_FIQ  */
 			};
+
+            sscdev: sscdev {
+                pinctrl-names = "default";
+                pinctrl-0 = <&pinctrl_sscdev>;
+				compatible = "sscdev";
+
+				fpga-busy-gpios   = <&pioA PIN_PC6  GPIO_ACTIVE_HIGH>;
+				tbuf-empty-gpios  = <&pioA PIN_PC5  GPIO_ACTIVE_HIGH>;
+				boot-jumper-gpios = <&pioA PIN_PB13 GPIO_ACTIVE_HIGH>;
+				/* input0-gpios  = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
+				/* input1-gpios  = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
+
+				/* output */
+				fpga-reset-gpios = <&pioA PIN_PB30 GPIO_ACTIVE_HIGH>;
+				tx-done-gpios    = <&pioA PIN_PB28 GPIO_ACTIVE_HIGH>;
+				tx-on-gpios      = <&pioA PIN_PB29 GPIO_ACTIVE_HIGH>;
+				keep-alive-gpios = <&pioA PIN_PD7  GPIO_ACTIVE_HIGH>;
+				reset-gpios      = <&pioA PIN_PB31 GPIO_ACTIVE_HIGH>;
+				power-gpios      = <&pioA PIN_PD8  GPIO_ACTIVE_HIGH>;
+				opto0-gpios      = <&pioA PIN_PD6  GPIO_ACTIVE_HIGH>;
+				/* opto1-gpios      = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
+
+				/* sdm */
+				/* rx-almost-full-gpios  = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
+				/* tx-almost-empty-gpios = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
+				/* rxtx-fifo-inv-gpios   = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
+				/* tx-almost-full-gpios  = <&pioA PIN_P??  GPIO_ACTIVE_HIGH>; */
+				sdm-sync-in-gpios = <&pioA PIN_PC24 GPIO_ACTIVE_HIGH>; /* SYNCIN0, conflict with pps0 */
+				/* syncin1-gpios = <&pioA PIN_PC23 GPIO_ACTIVE_HIGH>; */ /* SYNCIN1, conflict with pps1 */
+
+				/* eclk */
+				lock-gpios      = <&pioA PIN_PB5  GPIO_ACTIVE_HIGH>; /* LOCK(BITE_N) */
+
+				/* IRQs */
+				dsp-irq-gpios	= <&pioA PIN_PB3  GPIO_ACTIVE_HIGH>; /* EVO_IRQ0 */
+				irq1-gpios	    = <&pioA PIN_PB2  GPIO_ACTIVE_HIGH>; /* EVO_IRQ1 */
+				fiq-gpios		= <&pioA PIN_PB4  GPIO_ACTIVE_HIGH>; /* EVO_FIQ  */
+            };
 
 			rstc@f8048000 {
 				compatible = "atmel,sama5d2-roadrunner-evo-rstc";

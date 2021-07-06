@@ -33,5 +33,6 @@ do_install() {
 
     ln -srf ${D}${base_sbindir}/evo-env ${D}${base_sbindir}/fw_printenv
     ln -srf ${D}${base_sbindir}/evo-env ${D}${base_sbindir}/fw_setenv
+    ln -srf ${D}${base_sbindir}/evo-env ${D}${base_sbindir}/vidt
 }
 

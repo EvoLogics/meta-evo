@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# You can use variables
+#
+#PPPLOGNAME=ppp
+#IFNAME=ppp0
+#IPLOCAL=10.10.10.2
+#IPREMOTE=10.10.10.1
+

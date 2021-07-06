@@ -487,11 +487,17 @@ switch $progname {
         parse_printenv_args argv argc
         do_printenv $argv $argc
     }
+
     fw_setenv {
         parse_common_args argv argc
         parse_setenv_args argv argc
         do_setenv $argv $argc
     }
+
+    vidt {
+        ::dt::edit $::opt(dt-mtd)
+    }
+
     evo-env {
         switch [lindex $argv 0] {
             check {

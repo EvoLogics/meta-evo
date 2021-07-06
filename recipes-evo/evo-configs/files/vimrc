@@ -1,0 +1,36 @@
+set autoindent
+set nocompatible
+set history=50      " keep 50 lines of command line history
+set ruler       " show the cursor position all the time
+set showcmd     " display incomplete commands
+set incsearch       " do incremental searching
+set shortmess=aIoO
+set mouse=
+
+" disable alt screen
+set t_ti= t_te=
+
+if &t_Co > 2 || has("gui_running")
+    syntax on
+endif
+set hlsearch
+
+set backspace=indent,eol,start  " more powerful backspacing
+set virtualedit=block           " usefull for rectangle selection
+set tabstop=4 shiftwidth=4 expandtab
+set smartcase
+
+colorscheme desert
+
+command Rolo   set noequalalways winheight=99999 winminheight=0
+command NoRolo set equalalways   winheight=20    winminheight=1
+au VimEnter * :Rolo
+
+command Savesudo set buftype=nowrite | silent execute ':%w !sudo tee %' | set buftype= | e! %
+
+au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif
+set completeopt=menuone,menu,longest,preview
+
+set wildmode=longest,list,full
+
+set statusline=%F%m%r%h%w[%l,%v]%=%-14.(%l,%c%V%)\ %P\ \ fenc[%{&fenc}]\ ff[%{&ff}]\ enc[%{&enc}]%=\ ft[%Y]\ (0x%2B)[%p%%]

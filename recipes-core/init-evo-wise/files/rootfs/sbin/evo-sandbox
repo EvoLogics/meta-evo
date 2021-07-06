@@ -1,0 +1,791 @@
+#!/bin/sh -e
+# NOTE: bash needed for trap ERR function
+
+LXC_DIR=/opt/lxc/sandbox
+ENABLE_FLAG=$LXC_DIR/enable
+ROOTFS_LINK=$LXC_DIR/rootfs
+
+SD_CARD=/dev/mmcblk0p1
+SD_MOUNT_DIR=/media/card
+ROOTFS_DEB_DIR=sandbox-rootfs-deb
+
+DEBIAN_RELEASE=stable
+
+SANDBOX_PASSWORD=evologics
+SSH_AUTH_PUB=$HOME/.ssh/authorized_keys
+
+SANDBOX_HOSTNAME=evo-sandbox
+SANDBOX_ROOT_HOME=$ROOTFS_LINK/root
+
+MODPROBE="xt_tcpudp nft_compat nft_meta nft_counter xt_nat veth bridge"
+
+PROG_FULL="$0"
+PROG=$(basename $0)
+PARAM="$@"
+
+if [ -t 1 ]; then
+    C_NONE="\033[m"
+    C_MSG_ERR="\033[1;31m"
+    C_MSG_WARN="\033[1;35m"
+    C_MSG_INFO="\033[1;37m"
+    C_MSG_TIPS="\033[1;33m"
+    C_MSG_DONE="\033[1;32m"
+fi
+
+die() {
+    msg err "$1"
+    exit $2
+}
+
+msg() {
+    TYPE=$1
+    shift
+    if $OPT_QUIET; then
+        case "$TYPE" in
+            err) ;;
+            warn|norm|info|tips|null|done) return;;
+            *) return ;;
+        esac
+    fi
+    case "$TYPE" in
+        err)  printf "ERROR: $C_MSG_ERR%s$C_NONE\n"    "$*" >&2 ;;
+        warn) printf "WARNING: $C_MSG_WARN%s$C_NONE\n" "$*" >&2 ;;
+        norm) printf "$C_MSG_NORM%s$C_NONE\n" "$*" ;;
+        info) printf "$C_MSG_INFO%s$C_NONE\n" "$*" ;;
+        tips) printf "$C_MSG_TIPS%s$C_NONE\n" "$*" ;;
+        done) printf "$C_MSG_DONE%s$C_NONE\n" "$*" ;;
+        null) ;;
+        *)    printf "%s\n" "$*" ;;
+    esac
+}
+
+volume_mode() {
+    awk '$2 == "'$1'" {split($4,a,/,/);for(i in a) if(a[i] == "rw" || a[i] == "ro") print a[i]}' /proc/mounts
+}
+
+# Temporary remount to rw if needed
+# Used in pair.
+# First time calling set to rw and set VOL_MODE.
+# Second time calling set to ro and remount properly VOL_MODE.
+temporary_remount() {
+    if [ -z "$VOL_MODE" ]; then
+        VOL_MODE=$(volume_mode $1)
+        [ "$VOL_MODE" == "ro" ] && mount -o remount,rw $1 || true
+    else
+        [ "$VOL_MODE" == "ro" ] && mount -o remount,ro $1 || true
+        unset VOL_MODE
+    fi
+}
+
+update_hostname() {
+    read HOSTNAME < /etc/hostname
+    HN="$(echo "$HOSTNAME" | sed 's/\(evo-\)\(base\|wise\|wise-sd\)\(-[0-9]*-[0-9]*-.*\)/\1'$1'\3/')"
+
+    echo "$HN" > /etc/hostname
+    sed -i s/$HOSTNAME/$HN/ /etc/hosts
+    hostname $HN
+}
+
+check_roofs_link() {
+    if [ ! -L "$ROOTFS_LINK" ]; then
+        if [ "$1" = "not-die" ]; then
+            return
+        else
+            die "Not a link $ROOTFS_LINK"
+        fi
+    fi
+
+    ROOTFS_DIR=$(realpath $ROOTFS_LINK)
+
+    ROOTFS_MOUNT_DIR=$ROOTFS_DIR
+    case "$ROOTFS_DIR" in 
+        */$ROOTFS_DEB_DIR) ROOTFS_MOUNT_DIR=$(dirname $ROOTFS_DIR);;
+    esac
+
+    if [ ! -d "$ROOTFS_MOUNT_DIR" ]; then
+        if [ "$1" = "not-die" ]; then
+            return 1
+        else 
+            die "Link $ROOTFS_LINK not point to sd-card mount directory $ROOTFS_MOUNT_DIR"
+        fi
+    fi
+    return 0
+}
+
+get_sn() {
+    if [ -f "/sys/firmware/devicetree/base/serial#" ]; then
+        IFS=/ read NUM SR < '/sys/firmware/devicetree/base/serial#' || true
+        SN="$NUM/$SR"
+    fi
+}
+
+get_host_ip() {
+    get_sn
+
+    GATEWAY=192.168.0.1
+    IPADDR=192.168.0.126
+    NETMASK=255.255.255.0
+
+    if [ -n "$NUM" -a "$NUM" -ge 126 -a "$NUM" -le 254 ]; then
+        IPADDR=192.168.0.$NUM
+        NETMASK=255.255.255.0
+    fi
+
+    if [ -f /usr/local/etc/config/ipaddr ]; then
+        IPADDR=$(cat /usr/local/etc/config/ipaddr)
+        if [ -f /usr/local/etc/config/netmask ]; then
+            NETMASK=$(cat /usr/local/etc/config/netmask)
+        fi
+    fi
+
+    if [ -f /usr/local/etc/config/gateway ]; then
+        GATEWAY=$(cat /usr/local/etc/config/gateway)
+    fi
+}
+
+check_run_screen() {
+    $OPT_RUN_LXC || return 0
+    
+    case "$TERM" in
+        screen*)
+            case "$STY" in
+                *.$PROG)
+                    # switch off caption and creaning screen after quit
+                    screen -S $PROG -X caption splitonly || true
+                    screen -S $PROG -X termcapinfo '*' 'ti=;te=' || true
+                ;;
+            esac
+        ;;
+        *) exec screen -S $PROG -ln $0 $PARAM;;
+    esac
+}
+
+sandbox_is_run() {
+    lxc-info -n sandbox > /dev/null 2>&1
+}
+
+sandbox_is_inited() {
+    if [ ! -e $ROOTFS_LINK/etc/init.d/firewall ]; then
+        msg tips "Run \"$PROG init\" or \"$PROG init-sd\""
+        die "Sandbox not inited"
+    fi
+}
+
+sandbox_is_enabled() {
+    if [ ! -L $LXC_DIR/config -o ! -L $LXC_DIR/rootfs ]; then
+        msg tips "Run \"$PROG wise\" or \"$PROG wise-sd\""
+        die "Sandbox not enabled"
+    fi
+}
+
+sandbox_console() {
+    sandbox_is_run || die "sandbox do not runned"
+    lxc-console -n sandbox
+}
+
+sandbox_ssh() {
+    sandbox_is_run || die "sandbox do not runned"
+    ssh root@192.168.42.1
+}
+
+sandbox_start_stop() {
+
+    $OPT_RUN_LXC || return 0
+    
+    case $1 in
+        start) sandbox_is_run && return 0;;
+        stop)  sandbox_is_run || return 0;;
+    esac
+    
+    while printf "${C_MSG_TIPS}$2${C_NONE}" 
+          read ANS; do
+        case $ANS in
+            [Yy]|"")
+                eval sandbox_$1
+                break
+                ;;
+            [Nn]) exit ;;
+            *);;
+        esac
+    done
+}
+
+sandbox_status() {
+    if [ -e $ENABLE_FLAG ]; then
+        if sandbox_is_run; then
+            echo 'mode: WiSE. sandbox running now'
+        else
+            msg warn 'mode: WiSE. sandbox NOT running now'
+        fi
+    else
+        if sandbox_is_run; then
+            msg warn 'mode: base. sandbox running now'
+        else
+            echo 'mode: base'
+        fi
+    fi
+    
+    ROOTFS_DIR=$(readlink $ROOTFS_LINK)
+    [ -n "$ROOTFS_DIR" ] && echo "$ROOTFS_LINK link to $ROOTFS_DIR"
+}
+
+do_base() {
+    if [ -e /etc/shadow.wise-root -o ! -e $ENABLE_FLAG ]; then
+        echo 'system already base type'
+        exit
+    fi
+    
+    check_run_screen
+    sandbox_start_stop stop 'sandbox running. do you want stop it?[Y/n]: '
+    
+    # we don't
+    #$OPT_RUN_LXC && sandbox_umount || true
+    
+    temporary_remount /
+    
+    sed -n '/^root:/p' /etc/shadow > /etc/shadow.wise-root
+    # toor password => root
+    sed -i -n 'H;$!b;g;s/\(.*\)\(\ntoor[^\n]*\)/\2\1/;s/\n\(toor:\([^\n:]*\).*root:\)\([^\n:]*\)/\1\2/;p' /etc/shadow
+    sed -i '/root.*lxc-login-sh/{s,,root:x:0:0::/home/root:/bin/bash,}' /etc/passwd
+    
+    ln -fs /etc/issue.base /etc/issue
+    
+    update_hostname base
+    rm -f $ENABLE_FLAG
+    rm -f $LXC_DIR/rootfs $LXC_DIR/config
+    
+    temporary_remount /
+    msg done "Done. System is base type now."
+    echo
+    msg info "To change hostname in prompt run:"
+    msg tips "exec bash"
+}
+
+do_wise_sd() {
+    if [ -e $ENABLE_FLAG -o ! -e /etc/shadow.wise-root ]; then
+        die 'system already WiSE type'
+    fi
+
+    temporary_remount /
+    cd $LXC_DIR
+    ln -sf $SD_MOUNT_DIR/$ROOTFS_DEB_DIR rootfs 2> /dev/null || true
+    ln -sf config-sd config 2> /dev/null || true
+    cd - > /dev/null 2>&1
+    temporary_remount /
+    
+    trap 'sandbox_rollback_wise_sd' ERR
+
+    #if sandbox_mount not-die; then
+    sandbox_mount
+    sandbox_is_inited
+    
+    check_run_screen
+    temporary_remount /
+    
+    sed -i "s,^root.*,root:x:10000:10000::$ROOTFS_LINK:/usr/bin/lxc-login-sh," /etc/passwd
+
+    if [ -e /etc/shadow.wise-root ]; then
+        sed -i -e '/^root:/d;1!b;r /etc/shadow.wise-root' /etc/shadow
+        rm /etc/shadow.wise-root
+    else
+        msg warn "FIXME: take password hash from sandbox"
+        printf "evologics\nevologics\n" | passwd root
+    fi
+    
+    ln -fs /etc/issue.wise /etc/issue
+    
+    update_hostname wise-sd
+    touch $ENABLE_FLAG
+    temporary_remount /
+
+    msg done "Done. System is wise-sd type now."
+    echo
+    sandbox_start_stop start 'sandbox not running. do you want start it?[Y/n]: '
+    echo
+    msg info "To change hostname in prompt run:"
+    msg tips "exec bash"
+}
+
+do_wise() {
+    die "FIXME: do_wise not yet implemented"
+}
+
+sandbox_mount()
+{
+    check_roofs_link
+
+    if ! mount | grep -q " on $ROOTFS_MOUNT_DIR"; then
+        case $ROOTFS_DIR in
+            *$ROOTFS_DEB_DIR) mount -o sync $SD_CARD $ROOTFS_DIR || die "Cannot mount $SD_CARD to $ROOTFS_DIR";;
+            *)
+                echo "TODO: mount -t ubifs -o sync /dev/ubi4_0 $ROOTFS_DIR;;"
+                echo "TODO: mount | grep -q /media/card ||    test -b /dev/mmcblk0p1 && mount -t ext3 -o errors=continue /dev/mmcblk0p1 /media/card;;"
+                die "Only wise-sd implementing"
+                ;;
+        esac
+    fi
+    mount | grep -q 'on /sys/fs/cgroup ' || mount -t cgroup2 none /sys/fs/cgroup
+}
+
+sandbox_umount() {
+    check_roofs_link
+    mount | grep -q 'on /sys/fs/cgroup ' && umount /sys/fs/cgroup
+    #[ -n "$ROOTFS_MOUNT_DIR" ] && mount | grep -q "on $ROOTFS_MOUNT_DIR " && umount $ROOTFS_MOUNT_DIR
+}
+
+sandbox_chroot() {
+    check_roofs_link
+    sandbox_mount
+
+    cd $ROOTFS_LINK
+    [ -d proc ]    || mkdir proc;
+    [ -d sys  ]    || mkdir sys;
+    [ -d dev/pts ] || mkdir dev/pts;
+
+    mount | grep -q "on $ROOTFS_DIR/proc "    || mount -t proc   proc   proc;
+    mount | grep -q "on $ROOTFS_DIR/sys "     || mount -t sysfs  sysfs  sys;
+    mount | grep -q "on $ROOTFS_DIR/dev/pts " || mount -t devpts devpts dev/pts;
+
+    /usr/sbin/chroot . bash -li;
+
+    mount | grep -q "on $ROOTFS_DIR/proc "    && umount proc;
+    mount | grep -q "on $ROOTFS_DIR/sys "     && umount sys;
+    mount | grep -q "on $ROOTFS_DIR/dev/pts " && umount dev/pts;
+    cd - > /dev/null
+}
+
+sandbox_adduser_fwd_deb() {
+    chroot $ROOTFS_LINK deluser $1 > /dev/null 2>&1 || true
+    chroot $ROOTFS_LINK sh -c "printf 'evologics\nevologics\nS2C forward user\n\n\n\n\n\n' | adduser $1 --shell $FWD_SH" > /dev/null 2>&1
+    chroot $ROOTFS_LINK sed -i "s/^\($1:\)[^:]*/\1/" /etc/shadow
+}
+
+sandbox_init_deb() {
+    sandbox_is_enabled
+    check_roofs_link
+    sandbox_mount
+
+    if [ ! -e $ROOTFS_LINK/etc/debian_version ]; then
+        die "SD Card do not contain Debian distrobution? No $LXC_ROOT/etc/debian_version"
+    fi
+    
+    ###############################################################################
+    msg info "Init locale"
+    echo en_US.UTF-8 UTF-8 | tee $ROOTFS_LINK/etc/locale.gen > /dev/null                                   
+    chroot $ROOTFS_LINK locale-gen en_US.UTF-8 UTF-8
+    chroot $ROOTFS_LINK update-locale LANG=en_US.UTF-8       
+
+    ###############################################################################
+    msg info "Set default root password"
+    printf "$SANDBOX_PASSWORD\n$SANDBOX_PASSWORD\n" | 
+        chroot $ROOTFS_LINK passwd > /dev/null 2>&1
+
+    ###############################################################################
+    msg info "Set securetty for console"
+    grep -q '^pts/0' $ROOTFS_LINK/etc/securetty || 
+        echo "pts/0" | tee -a $ROOTFS_LINK/etc/securetty > /dev/null
+
+    ###############################################################################
+    msg info "Setup apt"
+    cat << END | tee $ROOTFS_LINK/etc/apt/sources.list > /dev/null
+deb     http://ftp.de.debian.org/debian $DEBIAN_RELEASE main contrib non-free
+deb-src http://ftp.de.debian.org/debian $DEBIAN_RELEASE main contrib non-free
+
+deb http://security.debian.org/ $DEBIAN_RELEASE/updates main contrib non-free
+END
+
+    cat << END | tee $ROOTFS_LINK/etc/apt/apt.conf.d/000main > /dev/null
+APT::Default-Release "$DEBIAN_RELEASE";
+APT::Install-Recommends "0";
+APT::Install-Suggests "0";
+END
+
+    echo 'net.ipv4.icmp_echo_ignore_broadcasts = 0' > $ROOTFS_LINK/etc/sysctl.d/00-icmp-broadcast.conf
+
+    ###############################################################################
+    msg info "Set hostname"
+    echo $SANDBOX_HOSTNAME | tee $ROOTFS_LINK/etc/hostname > /dev/null
+
+    ###############################################################################
+    msg info "Setup default network"
+    cat << END | tee $ROOTFS_LINK/etc/hosts > /dev/null
+127.0.0.1 localhost.localdomain localhost evo-sandbox
+192.168.42.2 am evo evologics
+192.168.0.1 repos.evologics.de
+END
+    
+    rm -f $ROOTFS_LINK/etc/network/interfaces.d/*
+
+    cat << END | tee $ROOTFS_LINK/etc/network/interfaces.d/lo > /dev/null
+auto lo
+iface lo inet loopback
+END
+    
+    cat << END | tee $ROOTFS_LINK/etc/network/interfaces.d/eth0-dhcp > /dev/null
+## Uncomment this if you want use DHCP to have access to internet
+#auto eth0:dhcp
+iface eth0:dhcp inet dhcp
+END
+    
+    get_host_ip
+    cat << END | tee $ROOTFS_LINK/etc/network/interfaces.d/eth0-0 > /dev/null
+auto eth0:0
+iface eth0:0 inet static
+    address $IPADDR
+    netmask $NETMASK
+    gateway $GATEWAY
+END
+
+    ###############################################################################
+    msg info "Setup firewall with port redirecting"
+    install -m 0755 -o 0 -g 0 $LXC_DIR/init-files/firewall      $ROOTFS_LINK/etc/init.d/
+    chroot $ROOTFS_LINK /usr/sbin/update-rc.d -f firewall defaults
+
+    ###############################################################################
+    msg info "Setup www"
+    install -m 0644 -o 0  -g 0  $LXC_DIR/init-files/index.html       $ROOTFS_LINK/var/www/html/
+    install -m 0644 -o 0  -g 0  $LXC_DIR/init-files/www-data.sudoers $ROOTFS_LINK/etc/sudoers.d/www-data
+    install -m 0755 -o 33 -g 33 $LXC_DIR/init-files/hello.cgi        $ROOTFS_LINK/usr/lib/cgi-bin/hello
+    install -m 0755 -o 33 -g 33 $LXC_DIR/init-files/eth-dhcp.cgi     $ROOTFS_LINK/usr/lib/cgi-bin/eth-dhcp
+    install -m 0755 -o 33 -g 33 $LXC_DIR/init-files/eth-ctl          $ROOTFS_LINK/usr/local/bin/eth-ctl
+    
+    ###############################################################################
+    msg info "Setup lighttpd"
+    install -m 0644 -o 0 -g 0 $LXC_DIR/init-files/lighttpd-evo-proxy.conf \
+                              $ROOTFS_LINK/etc/lighttpd/conf-available/42-evo-proxy.conf
+    chroot $ROOTFS_LINK lighty-disable-mod unconfigured || true
+    chroot $ROOTFS_LINK lighttpd-enable-mod cgi evo-proxy || true
+
+    ###############################################################################
+    msg info "Setup serial2tcp-socat"
+    install -m 0755 -o 0 -g 0 $LXC_DIR/init-files/serial2tcp-socat.init $ROOTFS_LINK/etc/init.d/
+    install -m 0755 -o 0 -g 0 $LXC_DIR/init-files/serial2tcp-socat      $ROOTFS_LINK/etc/init.d/
+
+    ###############################################################################
+    msg info "Setup dhclient"
+    sed -i 's/^#\(send dhcp-lease-time.*\)/\1/' $ROOTFS_LINK/etc/dhcp/dhclient.conf
+    # isc-dhcp-client did't work without /etc/fstab
+    touch $ROOTFS_LINK/etc/fstab
+
+    ###############################################################################
+    msg info "Generate sshd keys"
+    # taken from /usr/share/lxc/templates/lxc-debian
+    if [ -x "$ROOTFS_LINK/var/lib/dpkg/info/openssh-server.postinst" ]; then
+        cat << END > "$ROOTFS_LINK/usr/sbin/policy-rc.d"
+#!/bin/sh
+exit 101
+END
+        chmod +x "$ROOTFS_LINK/usr/sbin/policy-rc.d"
+    
+        if [ -f "$ROOTFS_LINK/etc/init/ssh.conf" ]; then
+            mv "$ROOTFS_LINK/etc/init/ssh.conf" "$ROOTFS_LINK/etc/init/ssh.conf.disabled"
+        fi
+    
+        rm -f "$ROOTFS_LINK/etc/ssh/"ssh_host_*key*
+        
+        DPKG_MAINTSCRIPT_PACKAGE=openssh DPKG_MAINTSCRIPT_NAME=postinst chroot "$ROOTFS_LINK" /var/lib/dpkg/info/openssh-server.postinst configure
+        sed -i "s/root@.*/root@$SANDBOX_HOSTNAME/g" "$ROOTFS_LINK/etc/ssh/"ssh_host_*.pub
+    
+        if [ -f "$ROOTFS_LINK/etc/init/ssh.conf.disabled" ]; then
+            mv "$ROOTFS_LINK/etc/init/ssh.conf.disabled" "$ROOTFS_LINK/etc/init/ssh.conf"
+        fi
+
+        rm -f "$ROOTFS_LINK/usr/sbin/policy-rc.d"
+    fi
+
+    ###############################################################################
+    msg info "Fix sshd_config to allow root login"
+    sed -i 's/^[ #]*PermitRootLogin.*/PermitRootLogin yes/'               $ROOTFS_LINK/etc/ssh/sshd_config
+    sed -i 's/^[ #]*PasswordAuthentication.*/PasswordAuthentication yes/' $ROOTFS_LINK/etc/ssh/sshd_config
+    
+    ###############################################################################
+    msg info "Setup user evo"
+    chroot $ROOTFS_LINK deluser evo > /dev/null 2>&1 || true
+    chroot $ROOTFS_LINK sh -c "printf 'evologics\nevologics\nWiSE sandbox user\n\n\n\n\n\n' | adduser evo" > /dev/null 2>&1
+    chroot $ROOTFS_LINK adduser evo sudo
+
+    if [ -f "$SSH_AUTH_PUB" ]; then
+        msg info "Inserted SSH public key from '$SSH_AUTH_PUB' into $ROOTFS_LINK/home/evo/.ssh/authorized_keys"
+        mkdir -p $ROOTFS_LINK/home/evo/.ssh
+        cp "$SSH_AUTH_PUB" $ROOTFS_LINK/home/evo/.ssh/authorized_keys
+        chmod -R 700 $ROOTFS_LINK/home/evo/.ssh
+    else
+        msg warn "No $SSH_AUTH_PUB found. No copy to $SANDBOX_ROOT_HOME/.ssh/authorized_keys"
+    fi
+
+    xzcat /usr/share/evo-configs/bashrc.xz    > $ROOTFS_LINK/home/evo/.bashrc
+    xzcat /usr/share/evo-configs/vimrc.xz     > $ROOTFS_LINK/home/evo/.vimrc
+    xzcat /usr/share/evo-configs/screenrc.xz  > $ROOTFS_LINK/home/evo/.screenrc
+    xzcat /usr/share/evo-configs/tmux.conf.xz > $ROOTFS_LINK/home/evo/.tmux.conf.screen-like
+    chown -R 1000:1000 $ROOTFS_LINK/home/evo/
+
+    install -m 0644 -o 0    -g 0    $LXC_DIR/init-files/evo.sudoers $ROOTFS_LINK/etc/sudoers.d/evo
+
+    msg info "Setup user root"
+    ###############################################################################
+    if [ -f "$SSH_AUTH_PUB" ]; then
+        msg info "Inserted SSH public key from '$SSH_AUTH_PUB' into $SANDBOX_ROOT_HOME/.ssh/authorized_keys"
+        mkdir -p $SANDBOX_ROOT_HOME/.ssh
+        cp "$SSH_AUTH_PUB" $SANDBOX_ROOT_HOME/.ssh/authorized_keys
+        chmod -R 700 $SANDBOX_ROOT_HOME/.ssh
+    else
+        msg warn "No $SSH_AUTH_PUB found. No copy to $SANDBOX_ROOT_HOME/.ssh/authorized_keys"
+    fi
+
+    msg info "Setup user root"
+    ###############################################################################
+    xzcat /usr/share/evo-configs/bashrc.xz    > $SANDBOX_ROOT_HOME/.bashrc
+    xzcat /usr/share/evo-configs/vimrc.xz     > $SANDBOX_ROOT_HOME/.vimrc
+    xzcat /usr/share/evo-configs/screenrc.xz  > $SANDBOX_ROOT_HOME/.screenrc
+    xzcat /usr/share/evo-configs/tmux.conf.xz > $SANDBOX_ROOT_HOME/.tmux.conf.screen-like
+
+    ###############################################################################
+    msg info "Configure /etc/motd"
+    cat $ROOTFS_LINK/etc/issue.net > $ROOTFS_LINK/etc/motd
+    echo 'Welcome to Evologics S2C Modem Sandbox. Have fun :)' >> $ROOTFS_LINK/etc/motd
+
+    ###############################################################################
+    msg info "Disable useless services"
+    chroot $ROOTFS_LINK systemctl mask apt-daily.service apt-daily-upgrade.service
+    chroot $ROOTFS_LINK systemctl disable apt-daily.service apt-daily-upgrade.service
+    chroot $ROOTFS_LINK systemctl disable apt-daily.timer apt-daily-upgrade.timer
+
+    chroot $ROOTFS_LINK /usr/sbin/update-rc.d -f etc-setserial disable
+    chroot $ROOTFS_LINK /usr/sbin/update-rc.d -f setserial disable
+
+    ###############################################################################
+    msg info "Allow empty passwords in sandbox"
+    sed -i -e 's/\(nullok\)_secure/\1/' $ROOTFS_LINK/etc/pam.d/common-auth
+    sed -i 's/^[ #]*PermitEmptyPasswords.*/PermitEmptyPasswords yes/' $ROOTFS_LINK/etc/ssh/sshd_config
+
+    ###############################################################################
+    msg info "Create forward shell"
+    FWD_SH=/usr/local/bin/fwd-sh
+    printf '#!/bin/sh\nexec ssh -y -y -A -t $USER@am $@\n' > $ROOTFS_LINK/$FWD_SH
+    chmod +x $ROOTFS_LINK/$FWD_SH
+    grep -q $FWD_SH $ROOTFS_LINK/etc/shells || echo $FWD_SH >> $ROOTFS_LINK/etc/shells
+
+    ###############################################################################
+    msg info "Setup forward user config, upgrade, toor"
+    sandbox_adduser_fwd_deb config
+    sandbox_adduser_fwd_deb upgrade
+    sandbox_adduser_fwd_deb toor
+
+    msg done "done"
+
+    # tips
+    # 1. To connect to modem AT inteface from sandbox address 172.... or am
+    #    For example by using netcat: rlwrap nc am 9200
+    # 2. Example web interface on http://192.168.0.NUM, where NUM
+    #    is a modem number.
+    # 3. You can get internet via local DHCP service by command:
+    #    ifup eth0:dhcp
+    #
+}
+
+sandbox_rollback_start() {
+    echo sandbox startup error. set default IP >&2
+    set +e
+    for MOD in $MODPROBE; do
+        modprobe -r $MOD
+    done 2> /dev/null
+    set -e
+}
+
+sandbox_rollback_wise_sd() {
+    rm -f $LXC_ROOT/config $LXC_ROOT/rootfs
+    echo rallback wise sd >&2
+}
+
+sandbox_start() {
+    sandbox_is_enabled
+    check_roofs_link
+    sandbox_mount
+    sandbox_is_inited
+
+    sandbox_is_run && die "sandbox is alreasy runned"
+
+    #mount -o remount,rw /dev/pts
+    #mount -o remount,rw /opt/lxc/sandbox/rootfs
+    
+    trap 'sandbox_rollback_start' ERR
+
+    ifconfig br0 down 2> /dev/null && brctl delbr br0
+    
+    for MOD in $MODPROBE; do
+        modprobe $MOD
+    done
+    
+    if true; then
+    if ifconfig eth0 > /dev/null 2>&1; then
+        ifconfig eth0 down
+        
+        OLD_MAC=$(ifconfig eth0 | sed -n 's/.*HWaddr //p')
+        MAC=$(evo-gen-mac)
+        
+        while [ "$OLD_MAC" == "$MAC" ]; do
+            MAC=$(evo-gen-mac -r)
+        done
+        
+        if ! ifconfig eth0 hw ether $MAC; then
+            echo "setup $MAC fail" >&2
+            i=3
+            while [ $i -ne 0 ]; do
+                MAC=$(evo-gen-mac -r)
+                [ "$OLD_MAC" == "$MAC" ] && continue
+                    
+                ifconfig eth0 hw ether $MAC && break 
+                    
+                echo "setup $MAC fail" >&2
+                sleep 1
+                i=$((i - 1))
+            done
+            if [ $i -eq 0 ]; then
+                die "cannot set MAC. fail" >&2
+            fi
+         fi
+    fi
+    fi # if true
+        
+    brctl addbr br0
+    ifconfig br0 0.0.0.0
+    
+    # TODO: add usb0 IP to br0 also?
+    #if ifconfig usb0 > /dev/null 2>&1; then
+    #    brctl addif br0 usb0
+    #fi
+
+    if ifconfig eth0 > /dev/null 2>&1; then
+        brctl addif br0 eth0
+        ifconfig eth0 0.0.0.0
+    fi
+    
+    if [ -z "$OLD_MAC" ]; then
+        OLD_MAC=$(evo-gen-mac -r)
+    fi
+    sed 's/MY_MAC/'"$OLD_MAC"/ /opt/lxc/sandbox/config > /tmp/lxc-config
+    
+    lxc-start -d -n sandbox -f /tmp/lxc-config #-l debug -o /tmp/lxc-start.log
+    sleep .2
+    
+    echo -n Waing sandbox start.
+    DONE=false
+    for i in $(seq 20); do
+        if ifconfig vlxc 192.168.42.2 2>/dev/null; then
+            DONE=true
+            break
+        fi
+        echo -n .
+        sleep .1
+    done
+    
+    if ! $DONE; then
+        echo " fail"
+        exit 1
+    fi
+    echo " ok"
+    
+    route add default gw 192.168.42.1
+    
+    ifconfig br0  down; ifconfig eth0 down > /dev/null 2>&1 || true
+    sleep 1
+    ifconfig br0  up; ifconfig eth0 up > /dev/null 2>&1|| true
+}
+
+sandbox_stop() {
+    sandbox_is_run || die "sandbox not runned"
+
+    lxc-stop -n sandbox 2> /dev/null || true
+    if ifconfig eth0 > /dev/null 2>&1; then
+        brctl delif br0 eth0
+        
+        ifconfig eth0 down
+
+         MAC=$(fw_printenv|sed -n 's/ethaddr=//p')
+        if [ -n "$MAC" ]; then
+            ifconfig eth0 hw ether $(fw_printenv|sed -n 's/ethaddr=//p')
+        fi
+
+        get_host_ip
+        ifconfig eth0 $IPADDR netmask $NETMASK
+    fi
+    ifconfig br0 down
+    brctl delbr br0
+    
+    if ifconfig eth0 > /dev/null 2>&1; then
+        ifconfig eth0 down;
+        sleep 1
+        ifconfig eth0 up
+    fi
+}
+
+usage() {
+    cat << END
+Usage: $(basename $0) [-h] [-q] [-v] [-n] [command]
+    -h       - this help
+    -n       - do not run/stop lxc
+    -q       - quiet mode
+    -v       - verbose mode. double flag enable tracing
+    -f       - force
+    
+    wise     - enable poky sandbox
+    wise-sd  - enable debian sandbox 
+    base     - disable sandbox 
+
+    start    - start sandbox
+    stop     - stop sandbox
+
+    console  - connect to sandbox via console
+    ssh      - connect to sandbox via ssh
+
+    mount    - mount sandbox partition
+    umount   - unmount sandbox partition
+
+    init-sd  - init system in SD card (password, hostname, IP, etc)
+    chroot   - chroot to sandbox
+END
+    exit $1
+}
+
+OPT_TRACE=false        
+OPT_VERBOSE=false        
+OPT_QUIET=false          
+OPT_FORCE=false                       
+OPT_RUN_LXC=true
+
+while getopts nfvqh FLAG; do                       
+    case "$FLAG" in
+        n) OPT_RUN_LXC=false ;;
+        f) OPT_FORCE=true    ;;
+        q) OPT_QUIET=true    ;;
+        v) [ -n "$OPT_VERBOSE" ] && OPT_TRACE=true; OPT_VERBOSE=true ;;
+        h) usage ;;
+        *) usage ;;          
+    esac
+done
+
+shift $(expr $OPTIND - 1)
+
+$OPT_TRACE && set -x
+
+case "$1" in
+    base)    do_base          ;;
+    wise)    do_wise          ;;
+    wise-sd) do_wise_sd       ;;
+
+    start)   sandbox_start    ;;
+    stop)    sandbox_stop     ;;
+
+    console) sandbox_console  ;;
+    ssh)     sandbox_ssh      ;;
+
+    mount)   sandbox_mount    ;;
+    umount)  sandbox_umount   ;;
+
+    init-sd) sandbox_init_deb ;;
+    chroot)  sandbox_chroot   ;;
+
+    status)  sandbox_status   ;;
+    "")      sandbox_status   ;;
+    *)       usage            ;;
+esac
