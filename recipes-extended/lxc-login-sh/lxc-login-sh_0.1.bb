@@ -1,7 +1,7 @@
 DESCRIPTION = "Linux Containers tools console login"
 SECTION = "extended"
 LICENSE = "GPLv3"
-LIC_FILES_CHKSUM="file://${WORKDIR}/lxc-login-sh.c;beginline=4;endline=15;md5=e0e3d4e18ff1a38b0ba46ebb8b05c2b5"
+LIC_FILES_CHKSUM="file://${WORKDIR}/lxc-login-sh.c;beginline=4;endline=15;md5=840dbf26bec65cb9092f42bf1242debf"
 PR = "r2"
 
 SRC_URI = " \
