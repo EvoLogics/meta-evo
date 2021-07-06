@@ -1,0 +1,11 @@
+[Unit]
+Description=Updater Good-marking Service
+After=boot-complete.target
+Requires=boot-complete.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash  /sbin/update-util -mg
+
+[Install]
+WantedBy=multi-user.target

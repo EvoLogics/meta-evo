@@ -6,7 +6,13 @@
 #
 monit=/usr/bin/monit
 pidfile=/var/run/monit.pid
-monit_args="-c /etc/monitrc"
+grep -i ' / ' /etc/fstab | grep -qe '[, ] *ro[, ] *'
+if [ $? -eq 0 ]; then
+  monit_conf="/etc/monitrc-ro-rootfs"
+else
+  monit_conf="/etc/monitrc"
+fi
+monit_args="-c ${monit_conf}"
 
 test -x "$monit" || exit 0
 

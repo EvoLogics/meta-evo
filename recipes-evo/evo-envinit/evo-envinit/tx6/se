@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [ $# -ne 1 ]; then
+  echo "Usage: se /"
+  exit 1
+fi
+
+# Simple se replacement
+mount | grep " $1 " | grep -q 'ro,' && { mount $1 -o remount,rw && echo "Remounted / as rw" && exit 0; }
+mount | grep " $1 " | grep -q 'rw,' && { sync && mount $1 -o remount,ro && echo "Remounted / as ro" && exit 0; }
+echo "Something wrong!"

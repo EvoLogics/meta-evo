@@ -1,0 +1,360 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright (C) 2019 Evologics GmbH
+ * Author: Llewellyn Fernandes <llewellyn.fernandes@evologics.de>
+ */
+
+&iomuxc {
+	/delete-node/ rtcintgrp;
+	/delete-node/ stmpegrp;
+	/delete-node/ uart2grp;
+	/delete-node/ uart3grp;
+	/delete-node/ uart4grp;
+	/delete-node/ uart5grp;
+	/delete-node/ uart6grp;
+	/delete-node/ uart7grp;
+	/delete-node/ uart8grp;
+};
+
+
+/ {
+	model = "PHYTEC phyBOARD-Segin i.MX 6ULL";
+	compatible = "phytec,imx6ull-pbacd-10", "phytec,imx6ull-pcl063","fsl,imx6ull";
+
+	pps0: pps0 {
+		compatible = "pps-gpio";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pps0>;
+		gpios = <&gpio1 18 GPIO_ACTIVE_HIGH>;    /* GPIO1_18 -> ATM_CLK_PPS */
+		status = "disabled";
+	};
+
+	pps1: pps1 {
+		compatible = "pps-gpio";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pps1>;
+		gpios = <&gpio5 5 GPIO_ACTIVE_HIGH>;    /* GPIO5_5  -> GPS_PPS */
+		status = "disabled";
+	};
+};
+
+
+&usbotg1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usb_otg1_id>;
+	dr_mode = "host";
+	status = "disabled";
+};
+
+&can1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan1>;
+	//xceiver-supply = <&reg_can1_en>;
+	status = "disabled";
+};
+
+
+&uart2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart2>;
+	dmas = <&sdma 27 4 0>,<&sdma 28 4 0>;
+	dma-names = "rx","tx";
+	status = "disabled";
+};
+
+
+&uart3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart3>;
+	dmas = <&sdma 29 4 0>,<&sdma 30 4 0>;
+	dma-names = "rx","tx";
+	status = "disabled";
+};
+
+
+&uart4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart4>;
+	dmas = <&sdma 31 4 0>,<&sdma 32 4 0>;
+	dma-names = "rx","tx";
+	status = "disabled";
+};
+
+
+&uart5 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart5>;
+	dmas = <&sdma 33 4 0>,<&sdma 34 4 0>;
+	dma-names = "rx","tx";
+	status = "disabled";
+};
+
+
+&uart6 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart6>;
+	dmas = <&sdma 0 4 0>,<&sdma 47 4 0>;
+	dma-names = "rx","tx";
+	status = "disabled";
+};
+
+
+&uart7 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart7>;
+	dmas = <&sdma 43 4 0>,<&sdma 44 4 0>;
+	dma-names = "rx","tx";
+	status = "disabled";
+};
+
+
+&uart8 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart8>;
+	dmas = <&sdma 45 4 0>,<&sdma 46 4 0>;
+	dma-names = "rx","tx";
+	status = "disabled";
+};
+
+
+&i2c1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	i2c_light: light@10 {
+		compatible = "vishay,veml6030";
+		reg = <0x10>;
+		status = "disabled";
+	};
+};
+
+
+&pwm3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm3>;
+	status = "disabled";
+};
+
+
+&pwm4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm4>;
+	status = "disabled";
+};
+
+
+&fec2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_enet2>;
+	phy-mode = "rmii";
+	phy-handle = <&ethphy2>;
+	phy-reset-gpios = <&gpio5 3 GPIO_ACTIVE_LOW>; /* GPIO5_3 */
+	status = "disabled";
+};
+
+
+
+&mdio {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	ethphy2: ethernet-phy@2 {
+		compatible = "ethernet-phy-id2000.5ce1";
+		reg = <3>;
+		clocks = <&clks IMX6UL_CLK_ENET2_REF>;
+		clock-names = "rmii-ref";
+		status = "disabled";
+	};
+};
+
+&usdhc1 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc1>;
+	pinctrl-1 = <&pinctrl_usdhc1_100mhz>;
+	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
+	cd-gpios = <&gpio1 19 GPIO_ACTIVE_LOW>;
+	no-1-8-v;
+	keep-power-in-suspend;
+	wakeup-source;
+	status = "disabled";
+};
+
+&ecspi1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi1>;
+	cs-gpios = <&gpio4 26 GPIO_ACTIVE_LOW>;
+	status = "disabled";
+
+	gpiom0: gpio@0 {
+         compatible = "microchip,mcp23s08";
+         #gpio-cells = <2>;
+         gpio-controller;
+         reg = <0>;
+         microchip,spi-present-mask = <0x02>;
+         spi-max-frequency = <10000000>;
+    };
+};
+
+
+&iomuxc_snvs {
+
+	pinctrl_rtc_int: rtcintgrp {
+		fsl,pins = <
+			MX6ULL_PAD_SNVS_TAMPER1__GPIO5_IO01			0x17059
+		>;
+	};
+
+	pinctrl_stmpe: stmpegrp {
+		fsl,pins = <
+			MX6ULL_PAD_SNVS_TAMPER3__GPIO5_IO03			0x17059
+		>;
+	};
+};
+
+&iomuxc {
+
+	pinctrl_ecspi1: ecspi1grp {
+		fsl,pins = <
+			MX6UL_PAD_CSI_DATA04__ECSPI1_SCLK          0x000010B0
+            MX6UL_PAD_CSI_DATA05__ECSPI1_SS0           0x000010B0
+            MX6UL_PAD_CSI_DATA06__ECSPI1_MOSI          0x000010B0
+            MX6UL_PAD_CSI_DATA07__ECSPI1_MISO          0x000010B0
+			MX6UL_PAD_CSI_DATA05__GPIO4_IO26          0x000010B0
+		>;
+	};
+
+	pinctrl_pps0: pps0_default {
+		fsl,pins = <
+			MX6UL_PAD_UART1_CTS_B__GPIO1_IO18          		0x000010B0
+	    >;
+	};
+
+	pinctrl_pps1: pps1_default {
+		fsl,pins = <
+			MX6UL_PAD_SNVS_TAMPER5__GPIO5_IO05          		0x000110A0
+	    >;
+	};
+
+	pinctrl_usb_otg1_id: usbotg1idgrp {
+		fsl,pins = <
+			MX6UL_PAD_GPIO1_IO00__ANATOP_OTG1_ID			0x17059
+		>;
+	};
+
+	pinctrl_flexcan1: flexcan1 {
+		fsl,pins = <
+			MX6UL_PAD_UART3_CTS_B__FLEXCAN1_TX				0x0b0b0
+			MX6UL_PAD_UART3_RTS_B__FLEXCAN1_RX				0x0b0b0
+		>;
+	};
+	
+
+	pinctrl_enet2: enet2grp {
+		fsl,pins = <
+			MX6UL_PAD_ENET2_RX_EN__ENET2_RX_EN				0x1b0b0
+			MX6UL_PAD_ENET2_RX_ER__ENET2_RX_ER				0x1b0b0
+			MX6UL_PAD_ENET2_RX_DATA0__ENET2_RDATA00			0x1b0b0
+			MX6UL_PAD_ENET2_RX_DATA1__ENET2_RDATA01			0x1b0b0
+			MX6UL_PAD_ENET2_TX_EN__ENET2_TX_EN				0x1b010
+			MX6UL_PAD_ENET2_TX_DATA0__ENET2_TDATA00			0x1b010
+			MX6UL_PAD_ENET2_TX_DATA1__ENET2_TDATA01			0x1b010
+			MX6UL_PAD_ENET2_TX_CLK__ENET2_REF_CLK2			0x4001b010
+		>;
+	};
+
+	pinctrl_uart2: uart2grp {
+         fsl,pins = <
+             MX6UL_PAD_UART2_RX_DATA__UART2_DCE_RX      0x1b0b1
+             MX6UL_PAD_UART2_TX_DATA__UART2_DCE_TX      0x1b0b1
+         >;
+     };
+
+    pinctrl_uart3: uart3grp {
+         fsl,pins = <
+             MX6UL_PAD_UART3_RX_DATA__UART3_DCE_RX      0x1b0b1
+             MX6UL_PAD_UART3_TX_DATA__UART3_DCE_TX      0x1b0b1
+         >;
+    };
+
+    pinctrl_uart4: uart4grp {
+         fsl,pins = <
+             MX6UL_PAD_LCD_CLK__UART4_DCE_TX      		0x1b0b1
+             MX6UL_PAD_LCD_ENABLE__UART4_DCE_RX      	0x1b0b1
+         >;
+    };
+
+	pinctrl_uart5: uart5grp {
+		fsl,pins = <
+			MX6UL_PAD_UART5_TX_DATA__UART5_DCE_TX		0x1b0b1
+			MX6ULL_PAD_UART5_RX_DATA__UART5_DCE_RX		0x1b0b1
+			MX6UL_PAD_GPIO1_IO08__UART5_DCE_RTS			0x1b0b1
+			MX6UL_PAD_GPIO1_IO09__UART5_DCE_CTS			0x1b0b1
+		>;
+	};
+
+	pinctrl_uart6: uart6grp {
+         fsl,pins = <
+             MX6UL_PAD_CSI_MCLK__UART6_DCE_TX      		0x1b0b1
+             MX6UL_PAD_CSI_PIXCLK__UART6_DCE_RX      	0x1b0b1
+         >;
+    };
+
+    pinctrl_uart7: uart7grp {
+		fsl,pins = <
+			MX6UL_PAD_LCD_DATA16__UART7_DCE_TX			0x1b0b1
+			MX6UL_PAD_LCD_DATA17__UART7_DCE_RX			0x1b0b1
+		>;
+	};
+	pinctrl_uart8: uart8grp {
+		fsl,pins = <
+			MX6UL_PAD_LCD_DATA20__UART8_DCE_TX			0x1b0b1
+			MX6UL_PAD_LCD_DATA21__UART8_DCE_RX			0x1b0b1
+		>;
+	};
+
+	pinctrl_pwm3: pwm3grp {
+		fsl,pins = <
+			MX6UL_PAD_GPIO1_IO04__PWM3_OUT				0x0b0b0
+		>;
+	};
+	
+	pinctrl_pwm4: pwm4grp {
+		fsl,pins = <
+			MX6UL_PAD_LCD_DATA03__PWM4_OUT	0x0b0b0
+		>;
+	};
+
+	pinctrl_usdhc1: usdhc1grp {
+		fsl,pins = <
+			MX6UL_PAD_SD1_CMD__USDHC1_CMD		0x17059
+			MX6UL_PAD_SD1_CLK__USDHC1_CLK		0x10059
+			MX6UL_PAD_SD1_DATA0__USDHC1_DATA0	0x17059
+			MX6UL_PAD_SD1_DATA1__USDHC1_DATA1	0x17059
+			MX6UL_PAD_SD1_DATA2__USDHC1_DATA2	0x17059
+			MX6UL_PAD_SD1_DATA3__USDHC1_DATA3	0x17059
+			MX6UL_PAD_UART1_RTS_B__GPIO1_IO19	0x17059
+		>;
+	};
+
+	pinctrl_usdhc1_100mhz: usdhc1grp100mhz {
+		fsl,pins = <
+			MX6UL_PAD_SD1_CMD__USDHC1_CMD		0x170b9
+			MX6UL_PAD_SD1_CLK__USDHC1_CLK		0x100b9
+			MX6UL_PAD_SD1_DATA0__USDHC1_DATA0	0x170b9
+			MX6UL_PAD_SD1_DATA1__USDHC1_DATA1	0x170b9
+			MX6UL_PAD_SD1_DATA2__USDHC1_DATA2	0x170b9
+			MX6UL_PAD_SD1_DATA3__USDHC1_DATA3	0x170b9
+		>;
+	};
+
+	pinctrl_usdhc1_200mhz: usdhc1grp200mhz {
+		fsl,pins = <
+			MX6UL_PAD_SD1_CMD__USDHC1_CMD		0x170f9
+			MX6UL_PAD_SD1_CLK__USDHC1_CLK		0x100f9
+			MX6UL_PAD_SD1_DATA0__USDHC1_DATA0	0x170f9
+			MX6UL_PAD_SD1_DATA1__USDHC1_DATA1	0x170f9
+			MX6UL_PAD_SD1_DATA2__USDHC1_DATA2	0x170f9
+			MX6UL_PAD_SD1_DATA3__USDHC1_DATA3	0x170f9
+		>;
+	};
+
+
+};
