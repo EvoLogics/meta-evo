@@ -1,1 +1,4 @@
 *.sw?
+*.orig
+*.bak
+*.bak?
