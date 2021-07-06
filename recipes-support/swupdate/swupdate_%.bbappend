@@ -1,7 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 FILESEXTRAPATHS_prepend_mx6ul-comm-module := "${THISDIR}/${PN}/commod-mx6ul:"
 
-DEPENDS += "librsync"
+DEPENDS += "librsync json-c"
 
 SRC_URI_append_mx6ul-comm-module = "			\
 				file://defconfig   				\
