@@ -1,9 +1,13 @@
 #!/bin/sh
 # init script called once at first boot from /sbin/init
+
 echo '=== First boot initial setup start ==='
 touch /tmp/init-setup.lock
 
 mount -o remount,rw /
+
+#exec > /home/root/rc.local.log 2>&1
+#set -x
 
 [ -d /run ] && rmdir /run
 ln -sf /var/volatile/run /run
@@ -11,6 +15,9 @@ ln -sf /var/volatile/run /run
 # make bash history permanent
 touch /data/.bash_history
 ln -sf /data/.bash_history /home/root/.bash_history
+xzcat /usr/share/evo-configs/bashrc.xz    > /home/root/.bashrc
+xzcat /usr/share/evo-configs/screenrc.xz  > /home/root/.screenrc
+xzcat /usr/share/evo-configs/tmux.conf.xz > /home/root/.tmux.conf
 
 mkdir -p /media/card
 
@@ -25,6 +32,13 @@ HWTYPE=$(evo-hw -q type)
 IMAGE_VERSION=XXXXX
 echo roadrunner-evo-$HWTYPE $IMAGE_VERSION > /etc/hwrevision
 
+# FIXME: move it to init-evo-wise
+# create shadow. base-passwd did't create shadow file
+# it's created by 'shadow' package, what we don't need.
+# busybox shadow support used
+awk -F: '{print $1":*:0:0:99999:7:::"}' /etc/passwd > /etc/shadow
+chmod 400 /etc/shadow
+
 echo config::0:0:FW Config Shell,,,:/tmp:/usr/local/bin/sersh >> /etc/passwd
 echo config::0:0:99999:7::: >> /etc/shadow
 echo /usr/local/bin/sersh >> /etc/shells
@@ -32,6 +46,18 @@ echo /usr/local/bin/sersh >> /etc/shells
 echo upgrade::0:0:Upgrade System Shell,,,:/tmp:/sbin/eush >> /etc/passwd
 echo upgrade::0:0:99999:7::: >> /etc/shadow
 echo /sbin/eush >> /etc/shells
+
+# create fake root for loging to sandbox via serial interface
+printf 'evologics\nevologics\n' | adduser -u 10000 -g 10000 -H -h /opt/lxc/sandbox/rootfs -s /usr/bin/lxc-login-sh rename-me
+sed -i -e 's/^root:/toor:/;s/^rename-me:/root:/' /etc/passwd
+sed -i -e 's/^root:/toor:/;s/^rename-me:/root:/' /etc/shadow
+sed -i -e 's/^root:/toor:/;s/^rename-me:/root:/' /etc/group
+
+printf 'ppp\nppp\n' | adduser -u 42424 -g 42424 -s /usr/sbin/ppp-login ppp
+sed -i '/^ppp:/s/42424/0/g' /etc/passwd
+sed -i '/^ppp:/s/42424/0/g' /etc/group
+echo /usr/sbin/ppp-login >> /etc/shells
+touch /home/ppp/.hushlogin
 
 SN="$(fw_printenv serial\# | sed 's,.*=,,')"
 NUM="${SN%/*}"
@@ -62,13 +88,12 @@ case "$NUM" in
         ;;
 esac
 
-TYPE=base
-if [ -f /opt/lxc/sandbox/enable ]; then
-    TYPE=wise
-fi
-HOSTNAME=evo-$TYPE-$NUM-$SR-$HWTYPE
+HOSTNAME=evo-base-$NUM-$SR-$HWTYPE
 echo $HOSTNAME > /etc/hostname
-echo 127.0.0.1 $HOSTNAME >> /etc/hosts
+echo 127.0.0.1 $HOSTNAME              >> /etc/hosts
+echo 192.168.42.1 sandbox sb lxc      >> /etc/hosts
+echo 192.168.0.192 repos.evologics.de >> /etc/hosts
+echo 'telnet stream tcp nowait toor /usr/sbin/telnetd telnetd -i' >> /etc/inetd.conf
 
 # needed for sersh 'ip' command
 ln -s /sbin/ip /bin/ip
@@ -77,6 +102,10 @@ case "$(evo-hw hwrev)" in
     r2-eth) ;;
     *) chmod -x /usr/local/etc/rc-post.d/99-hwtype_autoconfig.sh;;
 esac
+
+# emulate sandbox, evo-sandbox will care about
+touch /opt/lxc/sandbox/enable
+evo-sandbox -n base
 
 # FIXME: sometimes mount to ro fails. 'busy'. why?
 # remove self

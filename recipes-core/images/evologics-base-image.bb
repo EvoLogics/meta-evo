@@ -6,9 +6,11 @@ LICENSE = "MIT"
 IMAGE_FEATURES += "ssh-server-dropbear package-management"
 
 # kernel-dev ?
-TOOLCHAIN_TARGET_TASK_append = " kernel-devsrc zlib libcsv"
+TOOLCHAIN_TARGET_TASK_append = " kernel-devsrc zlib zlib-staticdev libcsv"
 # for sdmsh
-TOOLCHAIN_TARGET_TASK_append = " readline bsd-headers-dev"
+TOOLCHAIN_TARGET_TASK_append = " readline readline-staticdev \
+                                 ncurses-staticdev musl-staticdev \
+                                 bsd-headers-dev"
 
 # for needed tcl-staticdev for libplconv for lbl-node
 TOOLCHAIN_TARGET_TASK_append = " tcl-staticdev"
@@ -24,7 +26,25 @@ IMAGE_INSTALL = "\
     kernel-module-ppp-async \
     kernel-module-veth \
     kernel-module-bridge \
-    kernel-module-iptable-nat \
+    kernel-module-nft-nat \
+    kernel-module-nf-tables-ipv4 \
+    kernel-module-nft-chain-nat-ipv4 \
+    kernel-module-nf-nat-ipv4 \
+    kernel-module-xt-tcpudp \
+    kernel-module-nft-compat \
+    kernel-module-nft-meta \
+    kernel-module-nft-counter \
+    kernel-module-xt-nat \
+    kernel-module-nf-tables-ipv4 \
+    kernel-module-nft-chain-nat-ipv4 \
+    kernel-module-nf-tables \
+    kernel-module-nfnetlink \
+    kernel-module-nf-conntrack-ipv4 \
+    kernel-module-nf-defrag-ipv4 \
+    kernel-module-nf-nat-ipv4 \
+    kernel-module-nf-nat \
+    kernel-module-nf-conntrack \
+    kernel-module-x-tables \
     \
     swupdate \
     swupdate-www \
@@ -33,7 +53,7 @@ IMAGE_INSTALL = "\
     evo-helpers \
     \
     packagegroup-core-boot \
-    lrzsz \
+    distro-feed-configs \
     opkg \
     \
     busybox-udhcpd \
@@ -54,6 +74,7 @@ IMAGE_INSTALL = "\
     \
     screen \
     \
+    lrzsz \
     socat \
     readline \
     rlwrap \
@@ -77,6 +98,13 @@ IMAGE_INSTALL = "\
     erlang-crypto \
     erlang-inets \
     erlang-asn1 \
+    \
+    liblxc-bin-lxc-start \
+    liblxc-bin-lxc-stop  \
+    liblxc-bin-lxc-info  \
+    liblxc-bin-lxc-attach  \
+    liblxc-bin-lxc-console  \
+    ppp \
     "
 
 DEPENDS += "\

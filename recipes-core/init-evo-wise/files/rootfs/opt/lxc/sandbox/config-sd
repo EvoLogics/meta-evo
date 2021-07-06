@@ -1,0 +1,87 @@
+lxc.uts.name = sandbox
+lxc.tty.max = 1                                 
+lxc.pty.max = 16                               
+lxc.rootfs.path = /opt/lxc/sandbox/rootfs        
+#lxc.init.cmd = /sbin/init verbose systemd.unified_cgroup_hierarchy=legacy --log-level=debug
+#lxc.init.cmd = /sbin/init systemd.debug-shell=1
+
+#lxc.mount.auto = proc:rw sys:rw
+lxc.mount.auto = proc:rw sys:rw cgroup-full:rw:force
+lxc.tty.dir =
+                                           
+lxc.net.0.type=veth
+lxc.net.0.link=br0       
+#lxc.net.0.link=eth0                           
+#lxc.net.0.flags=up                             
+#lxc.net.0.ipv4.address=$SB_IP/24                
+lxc.net.0.name=eth0
+lxc.net.0.hwaddr=MY_MAC
+lxc.net.0.veth.pair=rlxc          
+                                    
+lxc.net.1.type=veth               
+##lxc.net.1.link=br0                           
+lxc.net.1.flags=up                
+lxc.net.1.ipv4.address=192.168.42.1/24    
+lxc.net.1.name=am                 
+lxc.net.1.veth.pair=vlxc          
+                                    
+# no init.sysvinit                  
+#mknod -m 600 /dev/initctl p        
+# ??? do not reboot modem
+#lxc.mount.entry=/dev/initctl /opt/lxc/sandbox/rootfs/dev/initctl none bind 0 0
+
+lxc.autodev = 1
+lxc.hook.autodev = /opt/lxc/sandbox/lxc-dev-populate.sh
+     
+# http://wiki.progress-linux.org/software/lxc/
+# sys_admin net_raw
+#lxc.cap.drop = sys_module mknod setuid
+lxc.cap.drop = sys_module mknod
+                                     
+## Limits                            
+lxc.cgroup.cpu.shares                  = 512
+#lxc.cgroup.cpuset.cpus                 = 0
+lxc.cgroup.memory.limit_in_bytes       = 128M
+#lxc.cgroup.memory.memsw.limit_in_bytes = 0
+
+lxc.cgroup.devices.deny = a           
+# Allow to mknod all devices (but not using them)
+#lxc.cgroup.devices.allow                = c *:* m
+#lxc.cgroup.devices.allow                = b *:* m
+                                
+# see sources/meta-evo/files/device_table-minimal.txt
+# /dev/null, zero, full
+lxc.cgroup.devices.allow = c 1:3 rwm
+lxc.cgroup.devices.allow = c 1:5 rwm
+lxc.cgroup.devices.allow = c 1:7 rwm
+# console, /dev/{,u}random, ptmx, tty, tty0, tty1
+lxc.cgroup.devices.allow = c 5:1 rwm
+lxc.cgroup.devices.allow = c 1:9 rwm
+lxc.cgroup.devices.allow = c 1:8 rwm
+lxc.cgroup.devices.allow = c 5:2 rwm
+lxc.cgroup.devices.allow = c 5:0 rwm
+lxc.cgroup.devices.allow = c 4:0 rwm # tty0
+lxc.cgroup.devices.allow = c 4:1 rwm # tty1
+lxc.cgroup.devices.allow = c 4:9 rwm # tty9 debug-shell(?)
+# /dev/pts/*
+lxc.cgroup.devices.allow = c 136:* rwm
+# rtc0
+lxc.cgroup.devices.allow = c 253:0 rwm
+# ttyS{1,2,3,4}
+lxc.cgroup.devices.allow = c 4:65 rwm # /dev/ttyS1
+lxc.cgroup.devices.allow = c 4:66 rwm # /dev/ttyS2
+lxc.cgroup.devices.allow = c 4:67 rwm
+lxc.cgroup.devices.allow = c 4:68 rwm
+lxc.cgroup.devices.allow = c 4:69 rwm # /dev/ttyS5
+# flash card
+lxc.cgroup.devices.allow = b 179:0 rwm
+lxc.cgroup.devices.allow = b 179:1 rwm
+# evogpip0
+lxc.cgroup.devices.allow = c 252:0 rwm
+# ppp
+lxc.cgroup.devices.allow = c 108:0 rwm
+# watchdog*
+lxc.cgroup.devices.allow = c 10:130 rwm # watchdog
+lxc.cgroup.devices.allow = c 248:0  rwm # watchdog0
+# hwrng
+lxc.cgroup.devices.allow = c 10:183 rwm

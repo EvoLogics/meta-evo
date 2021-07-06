@@ -187,6 +187,10 @@ volume_mode() {
     awk '$2 == "'$1'" {split($4,a,/,/);for(i in a) if(a[i] == "rw" || a[i] == "ro") print a[i]}' /proc/mounts
 }
 
+# Temporary remount to rw if needed
+# Used in pair.
+# First time calling set to rw and set VOL_MODE.
+# Second time calling set to ro and remount properly VOL_MODE.
 temporary_remount() {
     if [ -z "$VOL_MODE" ]; then
         VOL_MODE=$(volume_mode $1)
@@ -215,7 +219,7 @@ update_hostname() {
     temporary_remount /
 
     read HOSTNAME < /etc/hostname
-    HN="$(echo "$HOSTNAME" | sed 's/\(evo-[^-]*-[0-9]*-[0-9]*-\).*/\1'$1'/')"
+    HN="$(echo "$HOSTNAME" | sed 's/\(evo-[^0-9-]*[0-9]*-[0-9]*-\).*/\1'$1'/')"
 
     echo "$HN" > /etc/hostname
     sed -i s/$HOSTNAME/$HN/ /etc/hosts

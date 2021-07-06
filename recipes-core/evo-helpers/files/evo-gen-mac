@@ -5,7 +5,7 @@ if [ "$1" = "-r" ]; then
 	RANDOM_MAC=1
 fi
 
-fw_printenv | awk -vrnd_rnd=$RANDOM_MAC '
+fw_printenv | awk -vrnd_mac=$RANDOM_MAC '
 	sub(/serial#=/,"") {
 		split($0, s, "/");
 		prefix = sprintf("%02x:%02x", s[1], s[2]);
