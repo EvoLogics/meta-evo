@@ -140,6 +140,21 @@ remount_all() {
     done
 }
 
+# Temporary remount to rw if needed
+# Used in pair.
+# First time calling set to rw and set VOL_MODE.
+# Second time calling set to ro and remount properly VOL_MODE.
+temporary_remount() {
+    if [ -z "$VOL_MODE" ]; then
+        VOL_MODE=$(volume_mode $1)
+        [ "$VOL_MODE" == "ro" ] && mount -o remount,rw $1 || true
+    else
+        [ "$VOL_MODE" == "ro" ] && mount -o remount,ro $1 || true
+        unset VOL_MODE
+    fi
+}
+
+
 var_data_restore() {
     fw_setenv -q -f -s $VAR_DT_PARAM_BAK
 
@@ -581,10 +596,20 @@ while [ -n "$1" ]; do
             esac
             exit
             ;;
+        *.ipk)
+            IPK="$IPK $1"
+            shift
+            ;;
         *)
             die "Unknown parameter \"$1\""
             ;;
     esac
 done
+
+if [ -n "$IPK" ]; then
+    temporary_remount /
+    opkg install --force-reinstall "$IPK"
+    temporary_remount /
+fi
 
 $OPT_REBOOT && reboot
