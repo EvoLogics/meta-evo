@@ -100,7 +100,7 @@ check_roofs_link() {
     ROOTFS_MOUNT_DIR=$ROOTFS_DIR
     case "$ROOTFS_DIR" in 
         */$ROOTFS_DEB_DIR)
-            if [ ! -d $ROOTFS_DEB_DIR/$ROOTFS_DEB_DIR ]; then
+            if [ ! -d $ROOTFS_DIR/$ROOTFS_DEB_DIR ]; then
                 die "No $ROOTFS_DEB_DIR/$ROOTFS_DEB_DIR directory. You need to copy Debian roots to SD Card" 
             fi
             ROOTFS_MOUNT_DIR=$(dirname $ROOTFS_DIR);;
