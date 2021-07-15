@@ -234,6 +234,7 @@ sandbox_status() {
 }
 
 do_base() {
+    
     if [ -e /etc/shadow.wise-root -o ! -e $ENABLE_FLAG ]; then
         echo 'system already base type'
         exit
@@ -246,7 +247,7 @@ do_base() {
     #$OPT_RUN_LXC && sandbox_umount || true
     
     temporary_remount /
-    
+
     sed -n '/^root:/p' /etc/shadow > /etc/shadow.wise-root
     # toor password => root
     sed -i -n 'H;$!b;g;s/\(.*\)\(\ntoor[^\n]*\)/\2\1/;s/\n\(toor:\([^\n:]*\).*root:\)\([^\n:]*\)/\1\2/;p' /etc/shadow
