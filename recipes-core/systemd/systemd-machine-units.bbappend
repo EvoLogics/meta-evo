@@ -2,18 +2,19 @@ SUMMARY = "Machine specific systemd units"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+
 PR = "r23"
 inherit systemd
 
 NATIVE_SYSTEMD_SUPPORT = "1"
 ALLOW_EMPTY_${PN} = "1"
 
-FILESEXTRAPATHS_prepend_mx6ul-comm-module := "${THISDIR}/commod-mx6ul:"
 
 # Don't generate empty -dbg package
 PACKAGES = "${PN}"
 
-SRC_URI_mx6ul-comm-module += "  \
+SRC_URI_append_mx6ul-comm-module = "  \
     file://10-eth0.network      \
     file://10-eth1.network      \
     file://Bridge.network       \
