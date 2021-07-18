@@ -14,8 +14,9 @@ SRC_URI_mx6-evobb = "file://init \
 
 SRC_URI_append_mx6ul-comm-module = "            \
         file://initgpio.sh                      \
-        file://update-util.sh                   \
-        file://comm-hw.sh                       \
+        file://update-util                      \
+        file://comm-hw                          \
+        file://ub482-config                     \
         file://07-sshd-dropbear-fix.sh          \
         file://08-sshd-dropbear-keys.sh         \
         file://09-monit-id.sh                   \
@@ -74,8 +75,9 @@ do_install_mx6ul-comm-module(){
     install -d ${D}${base_sbindir}/evo-envinit
     install -m 0755 ${WORKDIR}/*-*.sh ${D}${base_sbindir}/evo-envinit/
     install -m 0755 ${WORKDIR}/initgpio.sh ${D}${base_sbindir}/
-    install -m 0755 ${WORKDIR}/update-util.sh ${D}${base_sbindir}/update-util
-    install -m 0755 ${WORKDIR}/comm-hw.sh ${D}${base_sbindir}/comm-hw
+    install -m 0755 ${WORKDIR}/update-util ${D}${base_sbindir}/update-util
+    install -m 0755 ${WORKDIR}/comm-hw ${D}${base_sbindir}/
+    install -m 0755 ${WORKDIR}/ub482-config ${D}${base_sbindir}/
 
     install -m 0755 ${WORKDIR}/systemd-firstboot.sh ${D}${base_sbindir}/
     install -m 0755 ${WORKDIR}/se ${D}${base_sbindir}/
