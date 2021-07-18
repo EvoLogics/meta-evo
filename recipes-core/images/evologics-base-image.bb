@@ -48,6 +48,7 @@ IMAGE_INSTALL = "\
     \
     swupdate \
     swupdate-www \
+    openssh-sftp-server \
     \
     libgpiod \
     evo-helpers \
