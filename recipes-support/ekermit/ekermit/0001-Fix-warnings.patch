@@ -1,0 +1,50 @@
+From e53915bafd29301515d70348729a37b9c49a2604 Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Tue, 20 Jul 2021 12:07:41 +0200
+Subject: [PATCH] Fix warnings
+
+---
+ main.c   | 4 ++++
+ unixio.c | 3 +++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/main.c b/main.c
+index b387fee..0b8bfc2 100644
+--- a/main.c
++++ b/main.c
+@@ -47,6 +47,8 @@
+ #ifdef __linux
+ #include <errno.h>
+ #include <stdlib.h>
++#include <unistd.h> /* access() */
++#include <ctype.h>  /* isdigit() */
+ #endif /* __linux */
+ 
+ /*
+@@ -328,7 +330,9 @@ main(int argc, char ** argv) {
+ 
+     debug(DB_MSG,"Initializing...",0,0);
+     debug(DB_LOG,"SIMULATED ERROR RATE:",0,errorrate);
++#ifdef DEBUG
+     if (errorrate) srand(seed);		/* Init random error generator */
++#endif
+ 
+ /*  Fill in parameters for this run */
+ 
+diff --git a/unixio.c b/unixio.c
+index 6a7e0f0..44e8e7d 100644
+--- a/unixio.c
++++ b/unixio.c
+@@ -42,6 +42,9 @@
+ #include <sys/stat.h>
+ #include <time.h>
+ #include <errno.h>
++#include <stdlib.h> /* system() */
++#include <unistd.h> /* write()  */
++#include <sys/types.h> /* creat() */
+ #ifndef O_WRONLY
+ #include <sys/file.h>
+ #ifdef X_OK
+-- 
+2.20.1
+
