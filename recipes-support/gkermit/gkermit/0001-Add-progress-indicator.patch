@@ -1,0 +1,66 @@
+From 04d91a852119d32084304a5a9fbd5fd107652fa3 Mon Sep 17 00:00:00 2001
+From: Masayuki Hatta <mhatta@debian.org>
+Date: Tue, 20 Jul 2021 14:10:12 +0200
+Subject: [PATCH] Add progress indicator
+
+---
+ gcmdline.c | 5 +++++
+ gkermit.c  | 5 +++++
+ gkermit.h  | 1 +
+ 3 files changed, 11 insertions(+)
+
+diff --git a/gcmdline.c b/gcmdline.c
+index 27e2fc0..95838f1 100644
+--- a/gcmdline.c
++++ b/gcmdline.c
+@@ -287,6 +287,11 @@ doarg(x) char x;
+ 	    quiet = 1;
+ 	    break;
+ 
++	  case 'v':			/* Verbose */
++	    progress = 1;		/* (lame) progress indicator */
++	    quiet = 0;			/* Turn messages back on */
++	    break;
++
+ 	  case 'K':			/* Keep incompletely received files */
+ 	    keep = 1;
+ 	    break;
+diff --git a/gkermit.c b/gkermit.c
+index f54bb5e..43e2b3a 100644
+--- a/gkermit.c
++++ b/gkermit.c
+@@ -100,6 +100,7 @@ char **cmlist = NULL;			/* Pointer to file list in argv */
+ 
+ FILE * db = NULL;			/* Debug log file pointer */
+ int debug = 0;				/* Debugging on */
++int progress = 0;			/* display (lame) progress */
+ int failure = 0;			/* Return status */
+ int retries = 0;			/* Packet retry counter */
+ int sendtype = 0;			/* Type of last packet sent */
+@@ -276,10 +277,14 @@ input() {				/* to get the next packet. */
+     return(type);			/* Return its type */
+ }
+ 
++char *twirl = "|/-\\";
++
+ VOID
+ nxtpkt() {				/* Next packet */
+     retries = 0;			/* Reset per-packet retry count */
+     seq = (seq + 1) & 63;		/* Next packet number, mod 64 */
++    if (progress)
++      fprintf(stderr,"%c\r", twirl[seq & 3]);
+ }
+ 
+ int
+diff --git a/gkermit.h b/gkermit.h
+index 65e9a8c..38a2c7e 100644
+--- a/gkermit.h
++++ b/gkermit.h
+@@ -247,6 +247,7 @@ extern int errno;
+ #endif /* ERRNO_H */
+ #ifndef _GKERMIT_C
+ extern int debug;
++extern int progress;
+ #endif /* _GKERMIT_C */
+ 
+ #endif /* _GKERMIT_H */

@@ -1,0 +1,34 @@
+From 7742749c8aa8ae327771e0aaae12c0bc2f482058 Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Thu, 29 Jul 2021 17:05:01 +0200
+Subject: [PATCH] Fix warnings
+
+---
+ gkermit.c | 1 +
+ gunixio.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/gkermit.c b/gkermit.c
+index 43e2b3a..f067d8d 100644
+--- a/gkermit.c
++++ b/gkermit.c
+@@ -73,6 +73,7 @@ char *build =  "stty";
+ 
+ #define _GKERMIT_C
+ #include <stdio.h>
++#include <unistd.h> /* sleep() */
+ #include "gkermit.h"
+ 
+ /* Forward declarations of functions used within this module... */
+diff --git a/gunixio.c b/gunixio.c
+index d833cf6..27e5232 100644
+--- a/gunixio.c
++++ b/gunixio.c
+@@ -82,6 +82,7 @@
+ #include <setjmp.h>			/* Longjumps */
+ #include <sys/stat.h>			/* File exist, file size */
+ #include <errno.h>			/* Error symbols */
++#include <unistd.h>			/* dup2(), close(), write(), ... */
+ #include "gkermit.h"			/* gkermit definitions */
+ 
+ /* All versions of HP-UX need Xon/Xoff */
