@@ -76,6 +76,7 @@ IMAGE_INSTALL = "\
     screen \
     \
     lrzsz \
+    gkermit \
     socat \
     readline \
     rlwrap \
