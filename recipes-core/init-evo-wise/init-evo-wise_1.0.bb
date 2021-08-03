@@ -8,7 +8,11 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.GPLv2;md5=751419260aa954499f
 #SECTION = ""
 
 RDEPENDS_${PN} = "busybox expect lxc-login-sh liblxc evo-configs ppp"
+# need satisfy QA for ssh-proxy-sh, but actually don't need it
+RDEPENDS_${PN} += "bash"
+
 DEPENDS_${PN} += "xz-native"
+
 ALLOW_EMPTY_${PN}-dbg = "0"
 ALLOW_EMPTY_${PN}-dev = "0"
 
@@ -32,6 +36,7 @@ SRC_URI = "file://rootfs/sbin/init \
            file://rootfs/opt/lxc/sandbox/init-files/eth-dhcp.cgi \
            file://rootfs/opt/lxc/sandbox/init-files/eth-ctl \
            file://rootfs/opt/lxc/sandbox/init-files/www-data.sudoers \
+           file://rootfs/opt/lxc/sandbox/init-files/ssh-proxy-sh \
            \
            file://rootfs/opt/lxc/sandbox/init-files/serial2tcp-socat \
            file://rootfs/opt/lxc/sandbox/init-files/serial2tcp-socat.init \
@@ -97,6 +102,7 @@ do_install() {
         ${WORKDIR}/rootfs/opt/lxc/sandbox/init-files/hello.cgi \
         ${WORKDIR}/rootfs/opt/lxc/sandbox/init-files/eth-dhcp.cgi \
         ${WORKDIR}/rootfs/opt/lxc/sandbox/init-files/eth-ctl \
+        ${WORKDIR}/rootfs/opt/lxc/sandbox/init-files/ssh-proxy-sh \
             ${D}/opt/lxc/sandbox/init-files/
 
     install -m 0644 -o root -g root \

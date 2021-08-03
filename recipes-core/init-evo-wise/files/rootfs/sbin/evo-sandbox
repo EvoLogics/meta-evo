@@ -361,7 +361,7 @@ sandbox_chroot() {
 
 sandbox_adduser_fwd_deb() {
     chroot $ROOTFS_LINK deluser $1 > /dev/null 2>&1 || true
-    chroot $ROOTFS_LINK sh -c "printf 'evologics\nevologics\nS2C forward user\n\n\n\n\n\n' | adduser $1 --shell $FWD_SH" > /dev/null 2>&1
+    chroot $ROOTFS_LINK sh -c "printf 'evologics\nevologics\nS2C user\n\n\n\n\n\n' | adduser $1 --shell $SSH_PROXY_SH" > /dev/null 2>&1
     chroot $ROOTFS_LINK sed -i "s/^\($1:\)[^:]*/\1/" /etc/shadow
 }
 
@@ -564,14 +564,13 @@ END
     sed -i 's/^[ #]*PermitEmptyPasswords.*/PermitEmptyPasswords yes/' $ROOTFS_LINK/etc/ssh/sshd_config
 
     ###############################################################################
-    msg info "Create forward shell"
-    FWD_SH=/usr/local/bin/fwd-sh
-    printf '#!/bin/sh\nexec ssh -y -y -A -t $USER@am $@\n' > $ROOTFS_LINK/$FWD_SH
-    chmod +x $ROOTFS_LINK/$FWD_SH
-    grep -q $FWD_SH $ROOTFS_LINK/etc/shells || echo $FWD_SH >> $ROOTFS_LINK/etc/shells
+    msg info "Install ssh proxy shell"
+    SSH_PROXY_SH=/usr/local/bin/ssh-proxy-sh
+    install -m 0755 -o 0 -g 0 $LXC_DIR/init-files/ssh-proxy-sh  $ROOTFS_LINK$SSH_PROXY_SH
+    grep -q $SSH_PROXY_SH $ROOTFS_LINK/etc/shells || echo $SSH_PROXY_SH >> $ROOTFS_LINK/etc/shells
 
     ###############################################################################
-    msg info "Setup forward user config, upgrade, toor"
+    msg info "Setup ssh proxy users: config, upgrade, toor"
     sandbox_adduser_fwd_deb config
     sandbox_adduser_fwd_deb upgrade
     sandbox_adduser_fwd_deb toor
