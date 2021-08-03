@@ -5,7 +5,6 @@
         up*-mode) exec conspy -c 42;; \
     esac; \
     exec expect -f "$0" -- "$@"
-
 set prog [file tail $argv0]
 set ::env(PATH) /bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 
@@ -30,17 +29,28 @@ array set ::opt {
     interactive 1
 }
 
+# NOTE: ::opt(help) will be parsed in gen_keywords_file
 set ::opt(help) "\
-ver     - show versions of components (not implemented)\n\
-rz      - receive file via zmodem\n\
+ver     - Show versions of components\n\
+rz      - Uploading upgrade files via zmodem.\n\
+rx      - Uploading upgrade files via xmodem.\n\
+kermit  - Uploading upgrade files via kermit.\n\
 upgrade - run upgrade\n\
 ls      - show uploaded upgrade files\n\
 remove  - remove uploaded upgrade files\n\
 reboot  - reboot device\n\
 reset   - reset terminal\n\
 exit    - exit from shell\n\
-help    - this command\n"
-
+help    - this command\n\
+\n\
+For ssh connection scp/pscp can be used to upload files.\n\
+For example: scp swupdate-images-evo-sama5d2-roadrunner-evo.swu.xz upgrade@IP:\n\
+\n\
+Command 'rz' start 'rz' zmodem receive session on remote host. Usefull for serial connection\n\
+You nees start 'sz' on PC.\n\
+For Linux use 'zssh' for ssh connection and 'minicom'/'ckermit'/.. for RS232\n\
+For Windows use 'putty-evo' from https://downloads.evologics.de/software/windows/putty/\n\
+"
 log_user 0
 
 remove_nulls -d 1
@@ -121,6 +131,7 @@ proc exec_append {out_ descr arg} {
 proc show_versions {} {
     lappend out "Serial Numer:    [get_sn]"
 
+    exec_append out "MAC address:    " {fw_printenv ethaddr | sed 's/.*=//'}
     exec_append out "Interface type: " {evo-hw type}
     exec_append out "Kernel version: " {uname -r}
     exec_append out "FW version:     " \
@@ -167,6 +178,10 @@ proc show_uploaded_files {} {
 
 proc gen_keywords_file {} {
     foreach line [split $::opt(help) \n] {
+        if {$line == {} || $line == { }} {
+            # stop on first empty line
+            break
+        }
         lappend keywords [lindex [split [string trim $line]] 0]
     }
     exec echo [join $keywords] > $::opt(keywords_file)
@@ -202,7 +217,7 @@ proc handle_command {cmd} {
                 send_tty "Skip incoming data with timeout $skip_timeout seconds.\n"
 
                 spawn -open [open /dev/null w]
-                interact -input $tty_spawn_id \
+                interact -input $::tty_spawn_id \
                     timeout $skip_timeout {
                         log_debug "skip: interact timeout"
                         return
@@ -219,11 +234,22 @@ proc handle_command {cmd} {
 
         {^rx$|^rx .*} {
             set rx [regexp -all -inline {\S+} $cmd]
-            set rc [catch {system "rx -R [lrange $rx 1 end]"} result options]
+            # Fix hack like: rx $(echo > /tmp/you-are-hacked.txt)
+            set rc [catch {system "rx -R [regsub -all {[$<>`\\]} [lrange $rx 1 end] {\\&}]"} result options]
 
             if {$rc} {
                 send_error "rx error: $result\n"
                 log_debug  "rx error:\n1. $result\n2. $options"
+            }
+        }
+
+        {^kermit($| .*)} {
+            set rx [regexp -all -inline {\S+} $cmd]
+            set rc [catch {system "kermit -wSir"} result options]
+
+            if {$rc} {
+                send_error "kermit error: $result\n"
+                log_debug  "kermit error:\n1. $result\n2. $options"
             }
         }
 
@@ -234,6 +260,15 @@ proc handle_command {cmd} {
                 log_debug  "scp error:\n1. $result\n2. $options"
             }
         }
+
+        #{^(/usr/lib/openssh/sftp-server|/usr/libexec/sftp-server)$} {
+        #    # FIXME: Dangerous. Need to be run in chroot
+        #    set rc [catch {system "/usr/libexec/sftp-server -d ."} result options]
+        #    if {$rc} {
+        #        send_error "scp error: $result\n"
+        #        log_debug  "scp error:\n1. $result\n2. $options"
+        #    }
+        #}
 
         {^upgrade$} {
             set files [glob -nocomplain -type f *.swu.*]
