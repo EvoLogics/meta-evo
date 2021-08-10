@@ -15,7 +15,7 @@ usage()
 
 config_base()
 {
-	echo "\r\nConfiguring UB482 GPS to Basestation mode\r\n"
+	printf "\r\nConfiguring UB482 GPS to Basestation mode\r\n"
 	stty -F ${PORT} ${BAUD} time 1 min 1 raw
 
 	# Base station configuration.
@@ -37,7 +37,7 @@ config_base()
 
 config_rover()
 {
-	echo "\r\nConfiguring UB482 GPS to Rover mode\r\n"
+	printf "\r\nConfiguring UB482 GPS to Rover mode\r\n"
 	stty -F ${PORT} ${BAUD} time 1 min 1 raw
 	# Rover mode.
 	printf "mode rover\r\n" > ${PORT}
