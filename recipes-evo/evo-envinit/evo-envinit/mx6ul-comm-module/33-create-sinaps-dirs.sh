@@ -17,12 +17,13 @@ if [ $? -eq 0 ]; then
   echo "found!"
 
   for dir in ${LINK_DIRS}; do
-    mkdir -p /mnt/storage/sinaps-${dir}
+    mkdir -p /mnt/storage/sinaps/${dir}
+    chown sinaps: /mnt/storage/sinaps/${dir}
 
-    grep -iq "/mnt/storage/sinaps-${dir}" /etc/fstab || cat >> /etc/fstab << EOF
+    grep -iq "/mnt/storage/sinaps/${dir}" /etc/fstab || cat >> /etc/fstab << EOF
 
-# uncomment this for sinaps-${dir} bind
-/mnt/storage/sinaps-${dir}   /opt/sinaps/${dir}   none   defaults,bind   0   0
+# uncomment this for sinaps/${dir} bind
+/mnt/storage/sinaps/${dir}   /opt/sinaps/${dir}   none   defaults,bind   0   0
 EOF
   done
 
