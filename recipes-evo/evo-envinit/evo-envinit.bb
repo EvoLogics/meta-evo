@@ -28,6 +28,7 @@ SRC_URI_append_mx6ul-comm-module = "            \
         file://31-create-dune-dirs.sh           \
         file://32-create-soft-hwclock-dirs.sh   \
         file://33-create-sinaps-dirs.sh         \
+        file://40-create-pure-ftpd-db.sh        \
         file://systemd-firstboot.sh             \
         file://se                               \
         file://init-gpio.service                \
@@ -92,5 +93,12 @@ do_install_mx6ul-comm-module(){
         echo "sleep 0.2"                                        >> ${D}${base_sbindir}/initgpio.sh
         echo "printf \"XBEE_SW=1\\\r\\\n\" > /dev/ttymxc6"      >> ${D}${base_sbindir}/initgpio.sh
         echo "sleep 0.2"                                        >> ${D}${base_sbindir}/initgpio.sh
+    fi
+
+    if ${@bb.utils.contains("IMAGE_CONFIGS","gpspps",'true','false',d)}; then
+        echo "\r\n/sbin/comm-hw pps_sel gps\r\n"                   >> ${D}${base_sbindir}/initgpio.sh
+    fi
+    if ${@bb.utils.contains("IMAGE_CONFIGS","atmclkpps",'true','false',d)}; then
+        echo "\r\n/sbin/comm-hw pps_sel atmclk\r\n"                >> ${D}${base_sbindir}/initgpio.sh
     fi
 }
