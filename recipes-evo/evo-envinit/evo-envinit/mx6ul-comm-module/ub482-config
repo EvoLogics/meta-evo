@@ -6,10 +6,11 @@
 : ${GPSD_PERIOD:=1.0}
 : ${NAVI_PORT:=com1}
 : ${NAVI_PERIOD:=0.1}
+: ${NAVI_PERIOD_BUOY:=0.2}
 
 usage()
 {
-	echo "Usage: ub482-config <rover, base>"
+	echo "Usage: ub482-config <rover, base, buoy>"
 }
 
 
@@ -52,6 +53,23 @@ config_rover()
 	printf "saveconfig\r\n" > ${PORT}
 }
 
+config_buoy()
+{
+  printf "\r\nConfiguring UB482 GPS to Buoy mode\r\n"
+  stty -F ${PORT} ${BAUD} time 1 min 1 raw
+  # Rover mode.
+  printf "mode rover\r\n" > ${PORT}
+  # NMEA stream for GPSD.
+  printf "gpgga ${GPSD_PORT} ${GPSD_PERIOD}\r\n" > ${PORT}
+  printf "gprmc ${GPSD_PORT} ${GPSD_PERIOD}\r\n" > ${PORT}
+  # NMEA stream for the navigation filter.
+  printf "gpgga ${NAVI_PORT} ${NAVI_PERIOD_BUOY}\r\n" > ${PORT}
+  printf "gprmc ${NAVI_PORT} ${NAVI_PERIOD_BUOY}\r\n" > ${PORT}
+  printf "gphdt ${NAVI_PORT} ${NAVI_PERIOD_BUOY}\r\n" > ${PORT}
+  # Save the configuration.
+  printf "saveconfig\r\n" > ${PORT}
+}
+
 
 if [ $# -eq 0 ]
 then
@@ -66,6 +84,9 @@ case $1 in
 	base)
 		config_base
 		;;
+  buoy)
+    config_buoy
+    ;;
 	*)
 		usage
 		;;
