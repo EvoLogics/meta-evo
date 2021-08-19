@@ -3,7 +3,7 @@ DESCRIPTION = "These scripts help to initialize the system on the first run"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
-FILESEXTRAPATHS_prepend_mx6-evobb := "${THISDIR}/${PN}/tx6:"
+FILESEXTRAPATHS_prepend_mx6-evobb := "${THISDIR}/${PN}/mx6:"
 
 PR = "r1"
 
