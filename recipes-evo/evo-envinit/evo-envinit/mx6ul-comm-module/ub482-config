@@ -1,0 +1,93 @@
+#!/bin/sh
+
+: ${PORT:=/dev/ttymxc1}
+: ${BAUD:=115200}
+: ${GPSD_PORT:=com2}
+: ${GPSD_PERIOD:=1.0}
+: ${NAVI_PORT:=com1}
+: ${NAVI_PERIOD:=0.1}
+: ${NAVI_PERIOD_BUOY:=0.2}
+
+usage()
+{
+	echo "Usage: ub482-config <rover, base, buoy>"
+}
+
+
+config_base()
+{
+	printf "\r\nConfiguring UB482 GPS to Basestation mode\r\n"
+	stty -F ${PORT} ${BAUD} time 1 min 1 raw
+
+	# Base station configuration.
+	printf "mode base time 60 1.5 2.5\r\n" > ${PORT}
+	# NMEA stream for GPSD.
+	printf "gpgga ${GPSD_PORT} ${GPSD_PERIOD}\r\n" > ${PORT}
+	printf "gprmc ${GPSD_PORT} ${GPSD_PERIOD}\r\n" > ${PORT}
+	# RTCM stream.
+	printf "rtcm1033 ${RTCM_PORT} 10.0\r\n" > ${PORT}
+	printf "rtcm1006 ${RTCM_PORT} 10.0\r\n" > ${PORT}
+	printf "rtcm1074 ${RTCM_PORT} 1.0\r\n" > ${PORT}
+	printf "rtcm1124 ${RTCM_PORT} 1.0\r\n" > ${PORT}
+	printf "rtcm1084 ${RTCM_PORT} 1.0\r\n" > ${PORT}
+	printf "rtcm1094 ${RTCM_PORT} 1.0\r\n" > ${PORT}
+	# Save the configuration.
+	printf "saveconfig\r\n" > ${PORT}
+}
+
+
+config_rover()
+{
+	printf "\r\nConfiguring UB482 GPS to Rover mode\r\n"
+	stty -F ${PORT} ${BAUD} time 1 min 1 raw
+	# Rover mode.
+	printf "mode rover\r\n" > ${PORT}
+	# NMEA stream for GPSD.
+	printf "gpgga ${GPSD_PORT} ${GPSD_PERIOD}\r\n" > ${PORT}
+	printf "gprmc ${GPSD_PORT} ${GPSD_PERIOD}\r\n" > ${PORT}
+	# NMEA stream for the navigation filter.
+	printf "gpgga ${NAVI_PORT} ${NAVI_PERIOD}\r\n" > ${PORT}
+	printf "gprmc ${NAVI_PORT} ${NAVI_PERIOD}\r\n" > ${PORT}
+	printf "gpgst ${NAVI_PORT} ${NAVI_PERIOD}\r\n" > ${PORT}
+	# Save the configuration.
+	printf "saveconfig\r\n" > ${PORT}
+}
+
+config_buoy()
+{
+  printf "\r\nConfiguring UB482 GPS to Buoy mode\r\n"
+  stty -F ${PORT} ${BAUD} time 1 min 1 raw
+  # Rover mode.
+  printf "mode rover\r\n" > ${PORT}
+  # NMEA stream for GPSD.
+  printf "gpgga ${GPSD_PORT} ${GPSD_PERIOD}\r\n" > ${PORT}
+  printf "gprmc ${GPSD_PORT} ${GPSD_PERIOD}\r\n" > ${PORT}
+  # NMEA stream for the navigation filter.
+  printf "gpgga ${NAVI_PORT} ${NAVI_PERIOD_BUOY}\r\n" > ${PORT}
+  printf "gprmc ${NAVI_PORT} ${NAVI_PERIOD_BUOY}\r\n" > ${PORT}
+  printf "gphdt ${NAVI_PORT} ${NAVI_PERIOD_BUOY}\r\n" > ${PORT}
+  # Save the configuration.
+  printf "saveconfig\r\n" > ${PORT}
+}
+
+
+if [ $# -eq 0 ]
+then
+	usage
+	exit 1
+fi
+
+case $1 in
+	rover)
+		config_rover
+		;;
+	base)
+		config_base
+		;;
+  buoy)
+    config_buoy
+    ;;
+	*)
+		usage
+		;;
+esac

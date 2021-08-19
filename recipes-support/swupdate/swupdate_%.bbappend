@@ -1,5 +1,4 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-FILESEXTRAPATHS_prepend_mx6ul-comm-module := "${THISDIR}/${PN}/commod-mx6ul:"
 
 DEPENDS += "librsync json-c"
 
@@ -12,15 +11,7 @@ SRC_URI_append_mx6ul-comm-module = "			\
 
 SRCREV = "${AUTOREV}"
 
-SYSTEMD_SERVICE_${PN}_mx6-comm-module = "swupdate.service"
-
-do_install_prepend_mx6ul-comm-module(){
-
-	cp tools/swupdate-client_unstripped tools/client_unstripped
-	cp tools/swupdate-progress_unstripped tools/progress_unstripped
-	cp tools/swupdate-hawkbitcfg_unstripped tools/hawkbitcfg_unstripped
-	cp tools/swupdate-sendtohawkbit_unstripped tools/sendtohawkbit_unstripped
-}
+SYSTEMD_SERVICE_${PN}_mx6ul-comm-module = "swupdate.service"
 
 
 do_install_append_mx6ul-comm-module(){
