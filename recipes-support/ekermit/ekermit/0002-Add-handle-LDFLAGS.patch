@@ -1,0 +1,25 @@
+From 20274e7802b955ae8ddfb2627bd1e09f86fad1b1 Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Tue, 20 Jul 2021 13:20:27 +0200
+Subject: [PATCH] Add handle LDFLAGS
+
+---
+ makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/makefile b/makefile
+index 4234ef3..d850d86 100644
+--- a/makefile
++++ b/makefile
+@@ -11,7 +11,7 @@ ALL = $(EK)
+ all: $(ALL)
+ 
+ ek: $(OBJS)
+-	$(CC) $(CFLAGS) -o ek $(OBJS)
++	$(CC) $(CFLAGS) $(LDFLAGS) -o ek $(OBJS)
+ 
+ #Dependencies
+ 
+-- 
+2.20.1
+

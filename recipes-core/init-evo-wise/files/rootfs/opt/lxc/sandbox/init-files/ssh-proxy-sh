@@ -1,0 +1,52 @@
+#!/bin/bash
+# (c) 2021 komar@evologics.de
+# User shell ssh/scp proxy. Running command on remote host
+# Need to be installed as default user shell in /etc/passwd
+
+# Change host name if needed
+REMOTE_HOST=$USER@am
+
+###########################################
+SSH_OPT="-qyAo StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $REMOTE_HOST"
+
+set -o noglob
+#exec 2> /tmp/ssh-proxy-sh.log #2>&1
+#set -x
+
+if [ "$1" = "-c" ]; then
+    shift
+    case "$1" in
+    */sftp-server)
+        # Cannot check ForwardAgent=yes as for scp and return error.
+        # Becouse sftp use binary protocol and cannot receive custrom errors.
+        # Read ~/cool.txt "trying to send some error message to sftp client".
+
+        exec ssh -oProtocol=2 -s $SSH_OPT -- sftp 
+    ;;
+    scp\ *)
+        if ! ssh -o PasswordAuthentication=no $SSH_OPT true; then
+            IP="$(echo $SSH_CONNECTION | awk '{print $3}')"
+            echo "You can use scp/sftp only with ssh keys and ForwardAgent=yes. In order to use them you need to create wrapper:" >&2
+            echo "\$ printf '#!/bin/bash\\ncase \"\$@\" in *sftp) set -- \${@// /=};; esac\\nexec ssh \${@/-oForwardAgent?no/-oForwardAgent=yes}\\n' > ssh-fwd-agent-on.sh" >&2
+            echo "\$ chmod +x ssh-fwd-agent-on.sh" >&2
+            echo "\$ scp -S ./ssh-fwd-agent-on.sh $USER@$IP:.." >&2
+            echo "or" >&2
+            echo "\$ sftp -S ./ssh-fwd-agent-on.sh $USER@$IP" >&2
+            exit 1
+        fi
+
+        exec ssh $SSH_OPT $@
+        ;;
+    *)
+        if ! ssh -o PasswordAuthentication=no $SSH_OPT true; then
+            if [ ! -t 0 ]; then
+                echo Please run ssh with flag -t
+                exit 1
+            fi
+        fi
+        exec ssh $SSH_OPT $@
+        ;;
+    esac
+fi
+
+exec ssh -t $SSH_OPT $@

@@ -1,6 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 # Additional configure options for pure-ftpd
+
 EXTRA_OECONF_append = " --with-puredb --with-ftpwho"
 
 SRC_URI_append_mx6-evobb = "         \

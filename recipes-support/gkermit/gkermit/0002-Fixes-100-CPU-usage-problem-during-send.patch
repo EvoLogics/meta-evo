@@ -1,0 +1,53 @@
+From 87c20f82030c83001e950413768afcf307d32438 Mon Sep 17 00:00:00 2001
+From: Steve Fosdick <dbugs@pelvoux.nildram.co.uk>
+Date: Tue, 20 Jul 2021 14:11:36 +0200
+Subject: [PATCH] Fixes 100% CPU usage problem during send
+
+---
+ gunixio.c | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/gunixio.c b/gunixio.c
+index 718271e..d833cf6 100644
+--- a/gunixio.c
++++ b/gunixio.c
+@@ -312,6 +312,7 @@ dopar(ch) char ch;
+ 
+ int
+ ttopen(ttname) char *ttname; {		/* "Open" the communication device */
++	int oflags, ofd;
+     if (debug) {			/* Vital statistics for debug log */
+ #ifdef __STDC__
+ 	fprintf(db,"ttopen __STDC__\n");
+@@ -371,8 +372,30 @@ ttopen(ttname) char *ttname; {		/* "Open" the communication device */
+ 	errno = 0;
+ 	if (fcntl(0, F_SETFL,ttflags|O_NDELAY) == -1)
+ 	  logerr("ttopen fcntl(0,F_SETFL,O_NDELAY)");
+-	else
++	else {
+ 	  nonblock = 1;
++	  /*
++	   It is possible that stdin and stdout are different file
++	   descriptors refering to the same kernel file table entry.
++	   If this is the case then setting non-blocking mode on stdin
++	   above will have set it on stdout too and that will cause a
++	   loop in ttol to busy-wait thus using nearly 100% system
++	   CPU.  So, we test if stdout is in non-blocking mode and if
++	   it is we close it and reopen /dev/tty to get an independant
++	   file table entry.
++	   */
++
++	  if ((oflags = fcntl(1, F_GETFL)) == -1)
++	    logerr("ttopen fcntl(1,F_GETFL)");
++	  else if (oflags & O_NDELAY) {
++	  	if ((ofd = open("/dev/tty", O_WRONLY, 0)) == -1)
++	  	  logerr("open(\"/dev/tty\",O_WRONLY)");
++	  	else if (dup2(ofd, 1) == -1)
++	  	  logerr("dup2");
++	  	else
++		  close(ofd);
++	  }
++       }
+     }
+ #endif /* F_SETFL */
+ #endif /* O_NDELAY */

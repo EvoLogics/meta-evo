@@ -1,0 +1,40 @@
+From 4c47b4a16ba073075601d9bd77a5c057b5a3ce7a Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Tue, 20 Jul 2021 15:08:26 +0200
+Subject: [PATCH] Fix non native build issue
+
+---
+ makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/makefile b/makefile
+index 95ee24f..ff933af 100644
+--- a/makefile
++++ b/makefile
+@@ -58,7 +58,7 @@ gwart:		gwart.o
+ 		$(CC) $(CFLAGS) -c $<
+ 
+ gproto.c:	gproto.w gkermit.h
+-		./gwart gproto.w gproto.c
++		gwart gproto.w gproto.c
+ 
+ gkermit.o:	gkermit.c gkermit.h
+ 
+@@ -67,7 +67,7 @@ gunixio.o:	gunixio.c gkermit.h
+ gcmdline.o:	gcmdline.c gkermit.h
+ 
+ gkermit:	gproto.o gkermit.o gunixio.o gcmdline.o
+-		$(CC) -o gkermit $(OBJECTS)
++		$(CC) $(CFLAGS) $(LDFLAGS) -o gkermit $(OBJECTS)
+ 
+ bsd:		gwart
+ 		$(MAKE) "CC=$(CC)" "CFLAGS=-DBSD -O $(KFLAGS)" gkermit
+@@ -86,7 +86,7 @@ stty:		gwart
+ 		$(MAKE) "CC=$(CC)" "CFLAGS=$(KFLAGS)" gkermit
+ 
+ bsd211:		gwart
+-		./gwart gproto.w gproto.c
++		gwart gproto.w gproto.c
+ 		cc -DBSD $(KFLAGS) -c gkermit.c
+ 		cc -DBSD $(KFLAGS) -c gproto.c
+ 		cc -DBSD $(KFLAGS) -c gcmdline.c

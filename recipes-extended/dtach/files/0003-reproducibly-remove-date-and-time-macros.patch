@@ -1,0 +1,41 @@
+From: =?utf-8?q?Stefan_V=C3=B6lkel?= <bd@bc-bd.org>
+Date: Fri, 16 Nov 2018 15:03:13 +0100
+Subject: reproducibly: remove date and time macros
+
+---
+ main.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/main.c b/main.c
+index 5fd7bcc..7d024ea 100644
+--- a/main.c
++++ b/main.c
+@@ -50,7 +50,7 @@ static void
+ usage()
+ {
+ 	printf(
+-		"dtach - version %s, compiled on %s at %s.\n"
++		"dtach - version %s\n"
+ 		"Usage: dtach -a <socket> <options>\n"
+ 		"       dtach -A <socket> <options> <command...>\n"
+ 		"       dtach -c <socket> <options> <command...>\n"
+@@ -80,7 +80,7 @@ usage()
+ 		"\t\t    winch: Send a WINCH signal to the program.\n"
+ 		"  -z\t\tDisable processing of the suspend key.\n"
+ 		"\nReport any bugs to <" PACKAGE_BUGREPORT ">.\n",
+-		PACKAGE_VERSION, __DATE__, __TIME__);
++		PACKAGE_VERSION);
+ 	exit(0);
+ }
+ 
+@@ -100,8 +100,8 @@ main(int argc, char **argv)
+ 			usage();
+ 		else if (strncmp(*argv, "--version", strlen(*argv)) == 0)
+ 		{
+-			printf("dtach - version %s, compiled on %s at %s.\n",
+-				PACKAGE_VERSION, __DATE__, __TIME__);
++			printf("dtach - version %s\n",
++				PACKAGE_VERSION);
+ 			return 0;
+ 		}
+ 

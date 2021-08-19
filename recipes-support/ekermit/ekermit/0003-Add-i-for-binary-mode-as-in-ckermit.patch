@@ -1,0 +1,33 @@
+From 84e85dab867585cb1a9503e900c9213bd5400262 Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Tue, 3 Aug 2021 22:12:18 +0200
+Subject: [PATCH] Add -i for binary mode as in ckermit
+
+---
+ main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/main.c b/main.c
+index 0b8bfc2..558931a 100644
+--- a/main.c
++++ b/main.c
+@@ -130,7 +130,7 @@ usage() {
+     fprintf(stderr," -b [1235]    Block check type: 1, 2, 3, or 5\n");
+ #endif /* F_CRC */
+     fprintf(stderr," -k           Keep incompletely received files\n");
+-    fprintf(stderr," -B           Force binary mode\n");
++    fprintf(stderr," -B or -i     Force binary mode\n");
+     fprintf(stderr," -T           Force text mode\n");
+     fprintf(stderr," -R           Remote mode (vs local)\n");
+     fprintf(stderr," -L           Local mode (vs remote)\n");
+@@ -238,6 +238,7 @@ doarg(char c) {				/* Command-line option parser */
+ 	    usage();
+ 
+ 	  case 'B':			/* Force binary file transfer */
++	  case 'i':			/* Capability flag with ckermit */
+ 	    xmode = 1;			/* So no automatic switching */
+ 	    ftype = BINARY;
+ 	    break;
+-- 
+2.20.1
+

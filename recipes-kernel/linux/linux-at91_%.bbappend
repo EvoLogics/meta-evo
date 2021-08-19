@@ -33,6 +33,7 @@ SRC_URI += "\
     file://overlays/${MACHINE}-r2-can.dts \
     \
     file://${MACHINE}_defconfig \
+    file://sandbox.cfg \
 "
 
 PACKAGES_append = " ${KERNEL_PACKAGE_NAME}-devicetree-compressed"

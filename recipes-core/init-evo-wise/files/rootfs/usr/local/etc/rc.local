@@ -7,6 +7,7 @@ touch /tmp/init-setup.lock
 mount -o remount,rw /
 
 #exec > /home/root/rc.local.log 2>&1
+#exec > /data/rc.local.log 2>&1
 #set -x
 
 [ -d /run ] && rmdir /run
@@ -107,11 +108,8 @@ esac
 touch /opt/lxc/sandbox/enable
 evo-sandbox -n base
 
-# FIXME: sometimes mount to ro fails. 'busy'. why?
-# remove self
-( sleep 2 && \
-    rm -f /usr/local/etc/rc.local && \
-        mount -o remount,ro /; \
-            printf '\n=== First boot initial setup ends ===\n' && \
-                rm /tmp/init-setup.lock ) &
+rm -f /usr/local/etc/rc.local
+sync /
 
+printf '\n=== First boot initial setup ends ===\n'
+rm /tmp/init-setup.lock

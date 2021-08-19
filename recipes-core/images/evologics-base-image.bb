@@ -48,6 +48,7 @@ IMAGE_INSTALL = "\
     \
     swupdate \
     swupdate-www \
+    openssh-sftp-server \
     \
     libgpiod \
     evo-helpers \
@@ -75,6 +76,7 @@ IMAGE_INSTALL = "\
     screen \
     \
     lrzsz \
+    gkermit \
     socat \
     readline \
     rlwrap \

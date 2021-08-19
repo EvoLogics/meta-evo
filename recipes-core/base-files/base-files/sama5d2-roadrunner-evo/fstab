@@ -9,5 +9,5 @@ sysfs                /sys                 sysfs      defaults              0  0
 
 # Will be mounted in /sbin/init
 # DO NOT REMOVE 'noauto'!
-/dev/mmcblk0p1 /media/card auto noauto,errors=continue  0  0
+/dev/mmcblk0p1 /media/card auto noauto,commit=1,errors=continue  0  0
 
