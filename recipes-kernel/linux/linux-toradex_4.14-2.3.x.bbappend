@@ -38,6 +38,7 @@ FILESEXTRAPATHS_prepend_tx6 := "${THISDIR}/linux-karo-common:"
 
 SRC_URI_append_tx6 = "\
   file://defconfig \
+  file://0002-net-fec-reset-PHY-whenever-enet-out-clock-has-been-r.patch \
   "
 
 SRC_URI_append_tx6 = "\
