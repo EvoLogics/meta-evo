@@ -17,6 +17,13 @@ iface eth0:hsn inet static
   address 192.168.13.1
   netmask 255.255.255.0
 
+# External IP mapping
+auto eth0:evo
+iface eth0:evo inet static
+  address 172.16.0.3
+  netmask 255.255.255.0
+  post-up route del -net 172.16.0.0/24 dev eth0
+
 # CAN interfaces
 auto can0
 iface can0 inet manual
