@@ -30,7 +30,7 @@ prefix = "/opt/soft-hwclock"
 inherit systemd update-rc.d
 
 INITSCRIPT_NAME = "soft-hwclock"
-INITSCRIPT_PARAMS = "defaults 30"
+INITSCRIPT_PARAMS = "defaults 19"
 
 S = "${WORKDIR}"
 
