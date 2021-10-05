@@ -27,6 +27,7 @@ SRC_URI_mx6-evobb = " \
 
 SRC_URI_append_sonobot-r5 = " \
   file://sonobot-r5-config \
+  file://13-format-storage.sh \
   "
 
 SRC_URI_append_mx6ul-comm-module = "            \
