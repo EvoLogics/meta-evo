@@ -16,7 +16,7 @@ SRC_URI_mx6-evobb = " \
   file://09-monit-id.sh \
   file://10-add-eth0-sn.sh \
   file://11-add-kvm-group.sh \
-  file://12-mount-storage.sh \
+  file://15-mount-storage.sh \
   file://20-cp-from-skel.sh \
   file://30-add-dune-cfg.sh \
   file://31-create-dune-dirs.sh \
