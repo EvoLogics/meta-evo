@@ -5,8 +5,6 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384
 
 FILESEXTRAPATHS_append:= ":${THISDIR}/${PN}"
 
-FILESEXTRAPATHS_append_mx6ul-comm-module := ":${THISDIR}/${PN}/commod-mx6ul"
-
 PR = "r1"
 
 
@@ -14,7 +12,7 @@ SRC_URI = " \
     file://soft-hwclock \
     "
 
-SRC_URI_mx6ul-comm-module_append = "      \
+SRC_URI_append_mx6ul-comm-module = "      \
     file://soft-hwclock.service           \
     file://soft-hwclock-tick.service      \
     file://soft-hwclock-tick.timer        \
