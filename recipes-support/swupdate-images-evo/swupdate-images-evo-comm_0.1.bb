@@ -10,8 +10,8 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.GPLv2;md5=751419260aa954499f
 DEPENDS = ""
 
 SWUPDATE_SIGNING = "RSA"
-SWUPDATE_PRIVATE_KEY = "/work/evo-updater.pem"
-SWUPDATE_PASSWORD_FILE = "/work/evo-updater.pass"
+SWUPDATE_PRIVATE_KEY = "/work/private/evo-updater.pem"
+SWUPDATE_PASSWORD_FILE = "/work/private/evo-updater.pass"
 
 # Add all local files to be added to the SWU
 # sw-description must always be in the list.
