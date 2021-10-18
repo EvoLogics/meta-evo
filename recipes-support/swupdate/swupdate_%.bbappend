@@ -11,6 +11,7 @@ SRC_URI_append_mx6ul-comm-module = "			\
 
 SRC_URI_append_mx6 = " \
 	file://hwrevision	\
+  file://swupdate.default \
 	"
 
 SYSTEMD_SERVICE_${PN}_mx6ul-comm-module = "swupdate.service"
@@ -26,6 +27,7 @@ do_install_append_mx6ul-comm-module(){
 }
 
 do_install_append_mx6(){
-	install -d ${D}/${sysconfdir}
+	install -d ${D}/${sysconfdir}/default
 	install -m 0644 ${WORKDIR}/hwrevision ${D}/${sysconfdir}
+  install -m 0644 ${WORKDIR}/swupdate.default ${D}/${sysconfdir}/default/swupdate
 }
