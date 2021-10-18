@@ -8,6 +8,7 @@ DEPENDS += "ncurses-native lz4-native"
 SRCREV = "7e44ddb093c3b8d723e16212c9a04cd56c77d165"
 
 # NOTE: when you add new dts, do not forget add to meta-evo/conf/machine/sama5d2-roadrunner-evo.conf
+SRC_URI_remove = "file://0001-Drop-using-_-in-version.patch"
 SRC_URI += "\
     file://adc-remove-regulator-hack.patch \
     file://adc-force-set-csnaat.patch \
