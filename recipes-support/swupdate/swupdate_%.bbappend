@@ -13,8 +13,6 @@ SRC_URI_append_mx6 = " \
 	file://hwrevision	\
 	"
 
-SRCREV = "${AUTOREV}"
-
 SYSTEMD_SERVICE_${PN}_mx6ul-comm-module = "swupdate.service"
 
 do_install_append_mx6ul-comm-module(){
