@@ -11,6 +11,7 @@ UBOOT_BINARY="u-boot.bin"
 
 PREFERRED_PROVIDER_u-boot ?= "u-boot-karo"
 PREFERRED_PROVIDER_u-boot-fw-utils ?= "u-boot-karo-fw-utils"
+PREFERRED_PROVIDER_u-boot-mfgtool ?= "u-boot-karo-mfgtool"
 PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-karo"
 
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-toradex"
