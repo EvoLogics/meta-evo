@@ -10,6 +10,7 @@ UBOOT_MAKE_TARGET = "u-boot.bin"
 UBOOT_BINARY="u-boot.bin"
 
 PREFERRED_PROVIDER_u-boot ?= "u-boot-karo"
+PREFERRED_PROVIDER_u-boot-fw-utils ?= "u-boot-karo-fw-utils"
 PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-karo"
 
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-karo"
