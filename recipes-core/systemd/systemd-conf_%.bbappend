@@ -59,9 +59,9 @@ do_install_mx6ul-comm-module(){
 }
 
 do_install_append_tegra194-evo() {
-    install -d ${D}${systemd_unitdir}/network/
+    install -d ${D}${sysconfdir}/systemd/network
     for file in $(find ${WORKDIR} -maxdepth 1 -type f -name *.network); do
-        install -m 0644 "$file" ${D}${systemd_unitdir}/network/
+        install -m 0644 "$file" ${D}${sysconfdir}/systemd/network/
     done
     install -d ${D}${systemd_system_unitdir}/
     for file in $(find ${WORKDIR} -maxdepth 1 -type f -name *.service); do
@@ -77,4 +77,5 @@ do_install_append_tegra194-evo() {
 
 FILES_${PN} += "\
     ${systemd_system_unitdir} \
+    ${sysconfdir} \
 "
