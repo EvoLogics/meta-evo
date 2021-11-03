@@ -54,6 +54,22 @@ SRC_URI_append_mx6ul-comm-module = "            \
         file://mark-good.service                \
 "
 
+SRC_URI_append_tegra194-evo = "                 \
+        file://07-sshd-dropbear-fix.sh          \
+        file://08-sshd-dropbear-keys.sh         \
+        file://09-monit-id.sh                   \
+        file://12-mount-storage.sh              \
+        file://20-cp-from-skel.sh               \
+        file://30-add-dune-cfg.sh               \
+        file://31-create-dune-dirs.sh           \
+        file://32-create-soft-hwclock-dirs.sh   \
+        file://33-create-sinaps-dirs.sh         \
+        file://40-create-pure-ftpd-db.sh        \
+        file://systemd-firstboot.sh             \
+        file://se                               \
+        file://systemd-firstboot.service        \
+"
+
 INITSCRIPT_NAME = "evo-envinit"
 INITSCRIPT_PARAMS = "defaults 07"
 
@@ -86,6 +102,10 @@ SYSTEMD_SERVICE_${PN}_mx6ul-comm-module += "     \
     init-gpio.service                            \
     systemd-firstboot.service                    \
     mark-good.service                            \
+"
+
+SYSTEMD_SERVICE_${PN}_tegra194-evo      += "     \
+    systemd-firstboot.service                    \
 "
 
 do_install_mx6ul-comm-module(){
@@ -123,4 +143,17 @@ do_install_mx6ul-comm-module(){
     if ${@bb.utils.contains("IMAGE_CONFIGS","atmclkpps",'true','false',d)}; then
         echo "\r\n/sbin/comm-hw pps_sel atmclk\r\n"                >> ${D}${base_sbindir}/initgpio.sh
     fi
+}
+
+
+do_install_tegra194-evo(){
+
+    install -d ${D}${systemd_system_unitdir}/
+    install -m 0644 ${WORKDIR}/systemd-firstboot.service ${D}${systemd_system_unitdir}/
+
+    install -d ${D}${base_sbindir}/evo-envinit
+    install -m 0755 ${WORKDIR}/*-*.sh ${D}${base_sbindir}/evo-envinit/
+
+    install -m 0755 ${WORKDIR}/systemd-firstboot.sh ${D}${base_sbindir}/
+    install -m 0755 ${WORKDIR}/se ${D}${base_sbindir}/
 }
