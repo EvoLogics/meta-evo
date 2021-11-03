@@ -23,7 +23,16 @@ SRC_URI_append_mx6ul-comm-module = "  \
     ${@bb.utils.contains("IMAGE_CONFIGS", "can", "file://can0.service", "", d)} \
 "
 
+SRC_URI_append_tegra194-evo = " \
+    file://10-watchdog.conf \
+    file://10-eth0.network \
+    file://90-dhcp-default.network \
+    ${@bb.utils.contains("IMAGE_CONFIGS", "can", "file://can0.service", "", d)} \
+"
+
 SYSTEMD_SERVICE_${PN}_mx6ul-comm-module = "${@bb.utils.contains("IMAGE_CONFIGS", "can", "can0.service", "", d)}"
+SYSTEMD_SERVICE_${PN}_tegra194-evo = "${@bb.utils.contains("IMAGE_CONFIGS", "can", "can0.service", "", d)}"
+
 
 do_install_mx6ul-comm-module(){
     install -d ${D}${systemd_unitdir}/network/
@@ -48,3 +57,24 @@ do_install_mx6ul-comm-module(){
         install -m 0644 "$file" ${D}${systemd_system_unitdir}/
     done
 }
+
+do_install_append_tegra194-evo() {
+    install -d ${D}${systemd_unitdir}/network/
+    for file in $(find ${WORKDIR} -maxdepth 1 -type f -name *.network); do
+        install -m 0644 "$file" ${D}${systemd_unitdir}/network/
+    done
+    install -d ${D}${systemd_system_unitdir}/
+    for file in $(find ${WORKDIR} -maxdepth 1 -type f -name *.service); do
+        install -m 0644 "$file" ${D}${systemd_system_unitdir}/
+    done
+
+    [ -e ${WORKDIR}/10-watchdog.conf ] && \
+      install -m 0644 ${WORKDIR}/10-watchdog.conf ${D}${systemd_unitdir}/system.conf.d/10-watchdog.conf
+
+    rm -rf ${D}${systemd_unitdir}/network/wired.network
+    rm -rf ${D}${systemd_unitdir}/network/80-wired.network
+}
+
+FILES_${PN} += "\
+    ${systemd_system_unitdir} \
+"
