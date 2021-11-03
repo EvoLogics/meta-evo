@@ -1,0 +1,9 @@
+[Match]
+Name=usb* rndis*
+Type=gadget
+
+[Link]
+RequiredForOnline=no
+
+[Network]
+Bridge=usbbr0
