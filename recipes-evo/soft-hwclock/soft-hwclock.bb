@@ -3,7 +3,7 @@ DESCRIPTION = "This scripts saves the time periodically in a file and loads this
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
-FILESEXTRAPATHS_append:= ":${THISDIR}/${PN}"
+FILESEXTRAPATHS_append:= "${THISDIR}/${PN}:"
 
 PR = "r1"
 
@@ -13,6 +13,12 @@ SRC_URI = " \
     "
 
 SRC_URI_append_mx6ul-comm-module = "      \
+    file://soft-hwclock.service           \
+    file://soft-hwclock-tick.service      \
+    file://soft-hwclock-tick.timer        \
+"
+
+SRC_URI_append_tegra194-evo = "      \
     file://soft-hwclock.service           \
     file://soft-hwclock-tick.service      \
     file://soft-hwclock-tick.timer        \
@@ -34,6 +40,8 @@ S = "${WORKDIR}"
 
 FILES_${PN}_mx6ul-comm-module = "${prefix}/soft-hwclock ${prefix}/data/"
 FILES_${PN}_mx6 = "${prefix}/soft-hwclock ${prefix}/data/ ${sysconfdir}/init.d ${sysconfdir}/monit.d/"
+FILES_${PN}_tegra194-evo = "${prefix}/soft-hwclock ${prefix}/data/"
+
 
 do_configure() {
 	:
@@ -48,6 +56,11 @@ SYSTEMD_SERVICE_${PN}_mx6ul-comm-module += "      \
     soft-hwclock-tick.service                     \
 "
 
+SYSTEMD_SERVICE_${PN}_tegra194-evo       += "     \
+    soft-hwclock.service                          \
+    soft-hwclock-tick.service                     \
+"
+
 do_install_mx6ul-comm-module(){
 	install -d ${D}${prefix}/
   install -d ${D}${prefix}/data
@@ -58,6 +71,18 @@ do_install_mx6ul-comm-module(){
 	install -m 0644 ${WORKDIR}/soft-hwclock-tick.service ${D}${systemd_system_unitdir}/
   install -m 0644 ${WORKDIR}/soft-hwclock-tick.timer ${D}${systemd_system_unitdir}/
 }
+
+do_install_tegra194-evo(){
+  install -d ${D}${prefix}/
+  install -d ${D}${prefix}/data
+  install -m 0755 ${WORKDIR}/soft-hwclock ${D}${prefix}/
+
+  install -d ${D}${systemd_system_unitdir}/
+  install -m 0644 ${WORKDIR}/soft-hwclock.service ${D}${systemd_system_unitdir}/
+  install -m 0644 ${WORKDIR}/soft-hwclock-tick.service ${D}${systemd_system_unitdir}/
+  install -m 0644 ${WORKDIR}/soft-hwclock-tick.timer ${D}${systemd_system_unitdir}/
+}
+
 
 do_install_mx6(){
 	install -d ${D}${prefix}/
