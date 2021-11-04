@@ -3,16 +3,21 @@ FILESEXTRAPATHS_prepend_mx6-evobb := "${THISDIR}/${PN}/mx6:"
 
 DEPENDS += "librsync json-c"
 
-SRC_URI_append_mx6ul-comm-module = "			\
-				file://defconfig   				\
-				file://swupdate.service     	\
-				file://hwrevision				\
-				"
+SRC_URI_append_mx6ul-comm-module = "  \
+	file://defconfig   				          \
+	file://swupdate.service     	      \
+	file://hwrevision				            \
+	"
 
 SRC_URI_append_mx6 = " \
 	file://hwrevision	\
   file://swupdate.default \
 	"
+
+SRC_URI_append_tegra194-evo = " \
+  file://hwrevision             \
+  file://defconfig              \
+  "
 
 SYSTEMD_SERVICE_${PN}_mx6ul-comm-module = "swupdate.service"
 
@@ -30,4 +35,9 @@ do_install_append_mx6(){
 	install -d ${D}/${sysconfdir}/default
 	install -m 0644 ${WORKDIR}/hwrevision ${D}/${sysconfdir}
   install -m 0644 ${WORKDIR}/swupdate.default ${D}/${sysconfdir}/default/swupdate
+}
+
+do_install_append_tegra194-evo(){
+  install -d ${D}/${sysconfdir}
+  install -m 0644 ${WORKDIR}/hwrevision ${D}/${sysconfdir}
 }
