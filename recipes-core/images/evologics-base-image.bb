@@ -5,6 +5,8 @@ LICENSE = "MIT"
 
 IMAGE_FEATURES += "ssh-server-dropbear package-management"
 
+##################### install target packages ##################################
+TOOLCHAIN_TARGET_TASK_append = " opkg-arch-config"
 # kernel-dev ?
 TOOLCHAIN_TARGET_TASK_append = " kernel-devsrc zlib zlib-staticdev libcsv"
 # for sdmsh
@@ -15,8 +17,12 @@ TOOLCHAIN_TARGET_TASK_append = " readline readline-staticdev \
 # for needed tcl-staticdev for libplconv for lbl-node
 TOOLCHAIN_TARGET_TASK_append = " tcl-staticdev"
 
-TOOLCHAIN_HOST_TASK_append = " nativesdk-erlang nativesdk-rebar nativesdk-erlang-modules-dev \
+##################### install nativesdk packages ##################################
+TOOLCHAIN_HOST_TASK_append = " nativesdk-erlang nativesdk-rebar \
+                               nativesdk-erlang-modules-dev \
                                nativesdk-tcl-staticdev"
+
+TOOLCHAIN_HOST_TASK_append = " nativesdk-opkg-arch-config"
 
 
 IMAGE_INSTALL = "\

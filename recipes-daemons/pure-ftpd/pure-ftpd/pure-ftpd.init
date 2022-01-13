@@ -1,0 +1,38 @@
+#!/bin/sh
+#
+# Start pure-ftpd
+#
+NAME=pure-ftpd
+DAEMON=/usr/sbin/${NAME}
+PIDFILE=/var/run/${NAME}.pid
+DBFILE=/etc/pureftpd.pdb
+PORT=2142
+
+if [ -f "/etc/default/${NAME}" ]; then
+    . /etc/default/${NAME}
+fi
+
+# create database if missing
+#[ ! -e ${DBFILE} ] && which pure-pw > /dev/null && pure-pw mkdb ${DBFILE}
+
+case "$1" in
+  start)
+  	printf "Starting ${NAME}: "
+	  ${DAEMON} -B -S ${PORT} -l puredb:${DBFILE} -g ${PIDFILE}
+	  [ $? = 0 ] && echo "OK" || echo "FAIL"
+	  ;;
+  stop)
+	  printf "Stopping ${NAME}: "
+  	pkill -F ${PIDFILE}
+    [ $? = 0 ] && echo "OK" || echo "FAIL"
+	  ;;
+  restart)
+	  "$0" stop
+	  "$0" start
+	  ;;
+  *)
+	  echo "Usage: $0 {start|stop|restart}"
+	  exit 1
+esac
+
+exit $?

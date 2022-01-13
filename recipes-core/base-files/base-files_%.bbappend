@@ -52,8 +52,9 @@ do_install_append_sama5d2-roadrunner-evo() {
     # do not put duplicate command to history file and ignore command begin with space
     echo 'export HISTCONTROL=ignoreboth' >> ${D}/${sysconfdir}/profile
 
-    echo "alias sudo=''" >> ${D}/${sysconfdir}/profile
     echo 'export LD_LIBRARY_PATH=/usr/local/lib:/usr/lib:/lib' >> ${D}/${sysconfdir}/profile
+    echo 'export RLWRAP_HOME=/data' >> ${D}/${sysconfdir}/profile
+    echo "alias sudo=''" >> ${D}/${sysconfdir}/profile
     echo '[ -e $HOME/.bashrc ] && . $HOME/.bashrc' >> ${D}/${sysconfdir}/profile
     echo 'export RLWRAP_HOME=/data' >> ${D}/${sysconfdir}/profile
 }

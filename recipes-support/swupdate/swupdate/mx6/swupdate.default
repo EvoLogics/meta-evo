@@ -1,0 +1,2 @@
+export SWUPDATE_EXTRA_ARGS=" -k /etc/ca-certificates/swu-pub.pem -e sonobot,stable "
+export SWUPDATE_MONGOOSE_EXTRA_ARGS="-p 1234"

@@ -1,0 +1,7 @@
+# Listen interface(s)
+LISTEN="-S 2142"
+
+AUTH="-l puredb:/etc/pureftpd.pdb"
+
+# Add options you want here
+OPTS=""

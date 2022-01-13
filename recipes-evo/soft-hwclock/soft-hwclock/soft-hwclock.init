@@ -1,0 +1,27 @@
+#!/bin/sh
+NAME=soft-hwclock
+DAEMON=/opt/soft-hwclock/${NAME}
+
+if [ -f "/etc/default/${NAME}" ]; then
+    . /etc/default/${NAME}
+fi
+
+case "$1" in
+  start)
+  	printf "Starting ${NAME}: "
+	  ${DAEMON} load && echo "OK" || echo "FAIL"
+	  ;;
+  stop)
+	  printf "Stopping ${NAME}: "
+    ${DAEMON} save && echo "OK" || echo "FAIL"
+	  ;;
+  restart)
+	  "$0" stop
+	  "$0" start
+	  ;;
+  *)
+	  echo "Usage: $0 {start|stop|restart}"
+	  exit 1
+esac
+
+exit $?

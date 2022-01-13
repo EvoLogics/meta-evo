@@ -24,7 +24,7 @@ echo 1 > /sys/class/gpio/gpio3/value
 echo 0 > /sys/class/pwm/pwmchip0/export
 echo 10000000 > /sys/class/pwm/pwmchip0/pwm0/period
 echo 5000000 > /sys/class/pwm/pwmchip0/pwm0/duty_cycle
-echo 1 > /sys/class/pwm/pwmchip0/pwm0/enable
+echo 0 > /sys/class/pwm/pwmchip0/pwm0/enable
 
 
 #Initialising PWM for LED Flasher
@@ -42,8 +42,3 @@ echo "in" > /sys/class/gpio/gpio23/direction
 echo 130 > /sys/class/gpio/export
 echo "out" > /sys/class/gpio/gpio130/direction
 echo 0 > /sys/class/gpio/gpio130/value
-
-
-stty -F /dev/ttymxc6 115200 raw
-#turn on only wifi by default
-echo "W" > /dev/ttymxc6

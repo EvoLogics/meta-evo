@@ -1,0 +1,5 @@
+# soft-hwclock
+check program soft-hwclock
+    with path "/opt/soft-hwclock/soft-hwclock tick"
+    every 2 cycles
+    if status != 0 then alert

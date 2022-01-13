@@ -1,5 +1,5 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-FILESEXTRAPATHS_prepend_mx6ul-comm-module := "${THISDIR}/${PN}/commod-mx6ul:"
+FILESEXTRAPATHS_prepend_mx6-evobb := "${THISDIR}/${PN}/mx6:"
 
 DEPENDS += "librsync json-c"
 
@@ -9,19 +9,12 @@ SRC_URI_append_mx6ul-comm-module = "			\
 				file://hwrevision				\
 				"
 
+SRC_URI_append_mx6 = " \
+	file://hwrevision	\
+  file://swupdate.default \
+	"
 
-SRCREV = "${AUTOREV}"
-
-SYSTEMD_SERVICE_${PN}_mx6-comm-module = "swupdate.service"
-
-do_install_prepend_mx6ul-comm-module(){
-
-	cp tools/swupdate-client_unstripped tools/client_unstripped
-	cp tools/swupdate-progress_unstripped tools/progress_unstripped
-	cp tools/swupdate-hawkbitcfg_unstripped tools/hawkbitcfg_unstripped
-	cp tools/swupdate-sendtohawkbit_unstripped tools/sendtohawkbit_unstripped
-}
-
+SYSTEMD_SERVICE_${PN}_mx6ul-comm-module = "swupdate.service"
 
 do_install_append_mx6ul-comm-module(){
 	install -d ${D}/${sysconfdir}
@@ -31,4 +24,10 @@ do_install_append_mx6ul-comm-module(){
 	then
 		sed -i -e 's!comm-mod 1.0!comm-mod ${HW_REVISION}!g' ${D}/${sysconfdir}/hwrevision
 	fi
+}
+
+do_install_append_mx6(){
+	install -d ${D}/${sysconfdir}/default
+	install -m 0644 ${WORKDIR}/hwrevision ${D}/${sysconfdir}
+  install -m 0644 ${WORKDIR}/swupdate.default ${D}/${sysconfdir}/default/swupdate
 }

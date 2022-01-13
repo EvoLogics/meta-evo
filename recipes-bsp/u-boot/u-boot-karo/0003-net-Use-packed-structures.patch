@@ -1,0 +1,133 @@
+Subject: [PATCH] net: Use packed structures for networking, orig
+ 704f3acfcf55343043bbed01c5fb0a0094a68e8a
+
+---
+ include/net.h | 14 +++++++-------
+ net/bootp.h   |  2 +-
+ net/dns.h     |  2 +-
+ net/nfs.h     |  2 +-
+ net/sntp.h    |  2 +-
+ 5 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/include/net.h b/include/net.h
+index af8617b..367153a 100644
+--- a/include/net.h
++++ b/include/net.h
+@@ -274,7 +274,7 @@ struct ethernet_hdr {
+ 	u8		et_dest[6];	/* Destination node		*/
+ 	u8		et_src[6];	/* Source node			*/
+ 	u16		et_protlen;	/* Protocol or length		*/
+-};
++} __attribute__((packed));
+ 
+ /* Ethernet header size */
+ #define ETHER_HDR_SIZE	(sizeof(struct ethernet_hdr))
+@@ -292,7 +292,7 @@ struct e802_hdr {
+ 	u8		et_snap2;
+ 	u8		et_snap3;
+ 	u16		et_prot;	/* 802 protocol			*/
+-};
++} __attribute__((packed));
+ 
+ /* 802 + SNAP + ethernet header size */
+ #define E802_HDR_SIZE	(sizeof(struct e802_hdr))
+@@ -306,7 +306,7 @@ struct vlan_ethernet_hdr {
+ 	u16		vet_vlan_type;	/* PROT_VLAN			*/
+ 	u16		vet_tag;	/* TAG of VLAN			*/
+ 	u16		vet_type;	/* protocol type		*/
+-};
++} __attribute__((packed));
+ 
+ /* VLAN Ethernet header size */
+ #define VLAN_ETHER_HDR_SIZE	(sizeof(struct vlan_ethernet_hdr))
+@@ -333,7 +333,7 @@ struct ip_hdr {
+ 	u16		ip_sum;		/* checksum			*/
+ 	struct in_addr	ip_src;		/* Source IP address		*/
+ 	struct in_addr	ip_dst;		/* Destination IP address	*/
+-};
++} __attribute__((packed));
+ 
+ #define IP_OFFS		0x1fff /* ip offset *= 8 */
+ #define IP_FLAGS	0xe000 /* first 3 bits */
+@@ -361,7 +361,7 @@ struct ip_udp_hdr {
+ 	u16		udp_dst;	/* UDP destination port		*/
+ 	u16		udp_len;	/* Length of UDP packet		*/
+ 	u16		udp_xsum;	/* Checksum			*/
+-};
++} __attribute__((packed));
+ 
+ #define IP_UDP_HDR_SIZE		(sizeof(struct ip_udp_hdr))
+ #define UDP_HDR_SIZE		(IP_UDP_HDR_SIZE - IP_HDR_SIZE)
+@@ -400,7 +400,7 @@ struct arp_hdr {
+ 	u8		ar_tha[];	/* Target hardware address	*/
+ 	u8		ar_tpa[];	/* Target protocol address	*/
+ #endif /* 0 */
+-};
++} __attribute__((packed));
+ 
+ #define ARP_HDR_SIZE	(8+20)		/* Size assuming ethernet	*/
+ 
+@@ -435,7 +435,7 @@ struct icmp_hdr {
+ 		} frag;
+ 		u8 data[0];
+ 	} un;
+-};
++} __attribute__((packed));
+ 
+ #define ICMP_HDR_SIZE		(sizeof(struct icmp_hdr))
+ #define IP_ICMP_HDR_SIZE	(IP_HDR_SIZE + ICMP_HDR_SIZE)
+diff --git a/net/bootp.h b/net/bootp.h
+index fcb0a64..567340e 100644
+--- a/net/bootp.h
++++ b/net/bootp.h
+@@ -49,7 +49,7 @@ struct bootp_hdr {
+ 	char		bp_sname[64];	/* Server host name		*/
+ 	char		bp_file[128];	/* Boot file name		*/
+ 	char		bp_vend[OPT_FIELD_SIZE]; /* Vendor information	*/
+-};
++} __attribute__((packed));
+ 
+ #define BOOTP_HDR_SIZE	sizeof(struct bootp_hdr)
+ 
+diff --git a/net/dns.h b/net/dns.h
+index c4e96af..c55a5c1 100644
+--- a/net/dns.h
++++ b/net/dns.h
+@@ -29,7 +29,7 @@ struct header {
+ 	uint16_t	nauth;		/* Authority PRs */
+ 	uint16_t	nother;		/* Other PRs */
+ 	unsigned char	data[1];	/* Data, variable length */
+-};
++} __attribute__((packed));
+ 
+ void dns_start(void);		/* Begin DNS */
+ 
+diff --git a/net/nfs.h b/net/nfs.h
+index d69b422..09b387e 100644
+--- a/net/nfs.h
++++ b/net/nfs.h
+@@ -68,7 +68,7 @@ struct rpc_t {
+ 			uint32_t data[19];
+ 		} reply;
+ 	} u;
+-};
++} __attribute__((packed));
+ void nfs_start(void);	/* Begin NFS */
+ 
+ 
+diff --git a/net/sntp.h b/net/sntp.h
+index 6a9c6bb..c38bcee 100644
+--- a/net/sntp.h
++++ b/net/sntp.h
+@@ -51,7 +51,7 @@ struct sntp_pkt_t {
+ 	unsigned long long originate_timestamp;
+ 	unsigned long long receive_timestamp;
+ 	unsigned long long transmit_timestamp;
+-};
++} __attribute__((packed));
+ 
+ void sntp_start(void);	/* Begin SNTP */
+ 
+-- 
+2.7.4
+

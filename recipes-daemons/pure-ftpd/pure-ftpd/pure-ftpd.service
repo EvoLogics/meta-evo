@@ -1,0 +1,11 @@
+[Unit]
+Description=pure-ftpd daemon
+Documentation=https://download.pureftpd.org/pub/pure-ftpd/doc/README
+After=network.target
+
+[Service]
+EnvironmentFile=-/etc/default/pure-ftpd
+ExecStart=/usr/sbin/pure-ftpd $LISTEN $AUTH $OPTS
+
+[Install]
+WantedBy=multi-user.target

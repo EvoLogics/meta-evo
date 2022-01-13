@@ -1,0 +1,6 @@
+# pure-ftpd.
+check process pure-ftpd
+    with pidfile /var/run/pure-ftpd.pid
+    start program = "/etc/init.d/pure-ftpd start"
+    stop program  = "/etc/init.d/pure-ftpd stop"
+
