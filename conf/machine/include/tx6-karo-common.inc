@@ -15,6 +15,7 @@ PREFERRED_PROVIDER_u-boot-mfgtool ?= "u-boot-karo-mfgtool"
 PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-karo"
 
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-toradex"
+PREFERRED_PROVIDER_linux-mfgtool ?= "linux-toradex-mfgtool"
 
 MACHINE_FIRMWARE_append_mx6 = " linux-firmware-ath6k"
 MACHINE_FEATURES += " pci wifi bluetooth"
