@@ -11,6 +11,7 @@ PR = "r1"
 SRC_URI_mx6-evobb = " \
   file://init \
   file://se \
+  file://06-mount-boot.sh \
   file://07-sshd-dropbear-fix.sh \
   file://08-sshd-dropbear-keys.sh \
   file://09-monit-id.sh \
