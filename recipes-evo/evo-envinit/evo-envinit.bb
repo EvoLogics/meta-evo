@@ -64,6 +64,8 @@ SRC_URI_append_tegra194-evo = "                 \
         file://31-create-dune-dirs.sh           \
         file://32-create-soft-hwclock-dirs.sh   \
         file://33-create-sinaps-dirs.sh         \
+        file://34-create-docker-dirs.sh         \
+        file://35-create-detector-dirs.sh       \
         file://40-create-pure-ftpd-db.sh        \
         file://systemd-firstboot.sh             \
         file://se                               \
