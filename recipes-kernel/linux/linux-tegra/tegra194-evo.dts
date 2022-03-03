@@ -1,0 +1,59 @@
+/*
+ * Top level DTS file for CVM:P3668-0001 and CVB:P3509-0000.
+ *
+ * Copyright (c) 2019-2020, NVIDIA CORPORATION.  All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ */
+
+/dts-v1/;
+#include "common/tegra194-common.dtsi"
+#include "common/tegra194-base.dtsi"
+
+/ {
+  nvidia,dtsfilename = __FILE__;
+  nvidia,dtbbuildtime = __DATE__, __TIME__;
+
+  compatible = "nvidia,tegra194";
+
+  serial@3110000 {
+    status = "okay";
+  };
+
+  tachometer@39c0000 {
+    status = "okay";
+  };
+
+  pwm@3280000 {
+    status = "okay";
+  };
+
+  pwm@32c0000 {
+    status = "okay";
+  };
+
+  pwm@32d0000 {
+    status = "okay";
+  };
+
+  pwm@32f0000 {
+    status = "okay";
+  };
+
+  spi@c260000 {
+    status = "disabled";
+  };
+
+  spi@3300000 {
+    status = "disabled";
+  };
+};
+
+
