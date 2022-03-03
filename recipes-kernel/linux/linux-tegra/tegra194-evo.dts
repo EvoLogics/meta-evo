@@ -23,14 +23,24 @@
 
   compatible = "nvidia,tegra194";
 
+  /* Serial Ports */
   serial@3110000 {
     status = "okay";
+  };
+
+  serial@3100000 {
+    status = "disabled";
+  };
+
+  serial@3140000 {
+    status = "disabled";
   };
 
   tachometer@39c0000 {
     status = "okay";
   };
 
+  /* PWM */
   pwm@3280000 {
     status = "okay";
   };
@@ -47,12 +57,89 @@
     status = "okay";
   };
 
+  pwm@c340000 {
+    status = "okay";
+  };
+
   spi@c260000 {
     status = "disabled";
   };
 
   spi@3300000 {
     status = "disabled";
+  };
+
+  /* QSPI flash S25FS128SAGNFI103 is controlled by qspi0 */
+  spi@3270000 {
+    status = "okay";
+  };
+
+  soctherm-oc-event {
+    status = "okay";
+  };
+
+  leds {
+    status = "okay";
+  };
+
+  /* Ethernet */
+  ether_qos@2490000 {
+    status = "okay";
+  };
+
+
+  /* 4 Lanes - NVME SSD */
+  pcie@141a0000 {
+    status = "okay";
+  };
+
+  /* 1 Lane - Expansion Connector. Not needed right now */
+  pcie@14160000 {
+    status = "disabled";
+  };
+
+  mipical@3990000 {
+    status = "okay";
+  };
+
+  tegra-hsp@b950000 {
+    status = "okay";
+  };
+
+  /* EMMC on Production Jetson NX */
+  sdhci_emmc: sdhci@3460000 {
+    status = "okay";
+  };
+
+  /* CAN Interface */
+  mttcan@c310000 {
+    status = "okay";
+  };
+
+  /* Below node can be moved to cvb to make decision about enabling/disabling */
+  arm-pmu {
+    status = "okay";
+  };
+
+  power-domain {
+    status = "okay";
+  };
+
+  interrupt-controller {
+    status = "okay";
+  };
+
+  mods-simple-bus {
+    status = "okay";
+  };
+
+  cpuidle {
+    compatible = "nvidia,tegra19x-cpuidle";
+    status = "okay";
+  };
+
+  thermal-zones {
+    status = "okay";
   };
 };
 

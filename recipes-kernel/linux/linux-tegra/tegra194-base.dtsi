@@ -13,7 +13,6 @@
 #include <dt-bindings/gpio/tegra194-gpio.h>
 #include "dt-bindings/input/input.h"
 #include "tegra194-fixed-regulator-p3509-0000-a00.dtsi"
-#include "tegra194-camera-jakku-rbpcv2-imx219.dtsi"
 / {
   gpio-keys {
     compatible = "gpio-keys";

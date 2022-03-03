@@ -51,14 +51,14 @@
     nvidia,invert-interrupt;
   };
 
-        pmc@c360000 {
-                 iopad_defaults: iopad-defaults {
-                         sdmmc-io-pads {
-                                 pins = "sdmmc1-hv", "sdmmc3-hv";
-                                 nvidia,enable-voltage-switching;
-                         };
-                 };
-         };
+  pmc@c360000 {
+    iopad_defaults: iopad-defaults {
+    sdmmc-io-pads {
+      pins = "sdmmc1-hv", "sdmmc3-hv";
+      nvidia,enable-voltage-switching;
+    };
+  };
+};
 
 
   external-connection {
@@ -92,7 +92,7 @@
           };
           usb2-2 {
             nvidia,function = "xusb";
-            status = "disabled";
+            status = "okay";
           };
         };
       };
@@ -151,32 +151,6 @@
     status = "okay";
   };
 
-  /* Below node can be moved to cvb to make decision about enabling/disabling */
-  arm-pmu {
-    status = "okay";
-  };
-
-  power-domain {
-    status = "okay";
-  };
-
-  interrupt-controller {
-    status = "okay";
-  };
-
-  mods-simple-bus {
-    status = "okay";
-  };
-
-  cpuidle {
-    compatible = "nvidia,tegra19x-cpuidle";
-    status = "okay";
-  };
-
-  thermal-zones {
-    status = "okay";
-  };
-
   reserved-memory {
     ramoops_carveout {
       status = "okay";
@@ -184,7 +158,7 @@
   };
 
   mttcan@c310000 {
-    status = "okay";
+    status = "disabled";
     pll_source = "pllc";
     clocks = <&bpmp_clks TEGRA194_CLK_CAN1_CORE>,
       <&bpmp_clks TEGRA194_CLK_CAN1_HOST>,
@@ -195,20 +169,6 @@
 
   mttcan@c320000 {
     status = "disabled";
-  };
-
-  host1x {
-    dpaux@155F0000 {
-      status = "okay";
-      compatible = "nvidia,tegra194-dpaux3-padctl";
-      /delete-property/ power-domains;
-      dpaux_default: pinmux@0 {
-        dpaux3_pins {
-          pins = "dpaux3-3";
-          function = "i2c";
-        };
-      };
-    };
   };
 
   hardwood {
@@ -223,12 +183,12 @@
 
   serial@3100000 {
     compatible = "nvidia,tegra186-hsuart";
-    status = "okay";
+    status = "disabled";
   };
 
   serial@3140000 {
     compatible = "nvidia,tegra186-hsuart";
-    status = "okay";
+    status = "disabled";
   };
 
   combined-uart {
@@ -237,14 +197,10 @@
     status = "okay";
   };
 
-  pwm@c340000 {
-    status = "okay";
-  };
-
   sdhci_emmc: sdhci@3460000 {
     uhs-mask = <0x0>;
     nvidia,enable-hwcq;
-    status = "okay";
+    status = "disabled";
   };
 
   sdhci_sd: sdhci@3400000 {
@@ -255,14 +211,6 @@
     mmc-ocr-mask = <0>;
     cd-inverted;
     vmmc-supply = <&p3668_vdd_sdmmc1_sw>;
-    status = "okay";
-  };
-
-  mipical@3990000 {
-    status = "okay";
-  };
-
-  tegra-hsp@b950000 {
     status = "okay";
   };
 
@@ -287,34 +235,10 @@
       label = "pex_refclk_sel_high";
       status = "disabled";
     };
-    w-disable1 {
-      gpio-hog;
-      output-high;
-      gpios = <TEGRA194_AON_GPIO(CC, 2) GPIO_ACTIVE_LOW>;
-      label = "w-disable1";
-      status = "okay";
-    };
-    w-disable2 {
-      gpio-hog;
-      output-high;
-      gpios = <TEGRA194_AON_GPIO(CC, 0) GPIO_ACTIVE_LOW>;
-      label = "w-disable2";
-      status = "okay";
-    };
-    suspend_gpio: suspend-led-gpio {
-      gpio-hog;
-      output-high;
-      gpio-suspend;
-      suspend-output-low;
-      gpios = <TEGRA194_AON_GPIO(CC, 1) GPIO_ACTIVE_HIGH>;
-      label = "suspend-led-gpio";
-      status = "okay";
-    };
   };
 
   pcie@14160000 {
-    status = "okay";
-
+    status = "disabled";
     nvidia,pex-wake = <&tegra_main_gpio TEGRA194_MAIN_GPIO(L, 2)
           GPIO_ACTIVE_HIGH>;
     vddio-pex-ctl-supply = <&p3668_spmic_sd3>;
@@ -328,13 +252,11 @@
   };
 
   pcie@141a0000 {
-    status = "okay";
-
+    status = "disabled";
     vddio-pex-ctl-supply = <&p3668_spmic_sd3>;
     nvidia,disable-aspm-states = <0xf>;
     nvidia,enable-power-down;
     nvidia,max-speed = <4>;
-
     phys = <&p2u_12>,
            <&p2u_13>,
            <&p2u_14>,
@@ -375,29 +297,7 @@
     };
   };
 
-  hdr40_i2c1: i2c@31e0000 {
-    pinctrl-names = "default";
-    pinctrl-0 = <&dpaux_default>;
-  };
-
-  host1x {
-    dpaux@155F0000 {
-      status = "okay";
-      compatible = "nvidia,tegra194-dpaux3-padctl";
-      dpaux_default: pinmux@0 {
-        dpaux3_pins {
-          pins = "dpaux3-3";
-          function = "i2c";
-        };
-      };
-    };
-  };
-
-  dpaux3 {
-    compatible = "nvidia,tegra194-dpaux3-pinctrl";
-    status = "okay";
-  };
-
+  /* FIX ME. Check Which one is needed */
   spi@3210000{ /* SPI1 in 40 pin conn */
     status = "okay";
     spi@0 { /* chip select 0 */
@@ -434,6 +334,7 @@
         nvidia,tx-clk-tap-delay = <0x0>;
       };
     };
+
     spi@1 { /* chips select 1 */
       compatible = "spidev";
       reg = <0x1>;
@@ -450,6 +351,7 @@
     nvidia,phy-reset-gpio = <&tegra_main_gpio TEGRA194_MAIN_GPIO(R, 1) 0>;
     nvidia,phy-reset-post-delay = <224>;
     nvidia,phy-reset-duration = <10000>;
+    status = "okay";
     mdio {
       compatible = "nvidia,eqos-mdio";
       #address-cells = <1>;
@@ -462,7 +364,7 @@
 
   leds {
     compatible = "gpio-leds";
-    status = "okay";
+    status = "disabled";
     pwr {
       gpios = <&tegra_aon_gpio TEGRA194_AON_GPIO(CC, 1) GPIO_ACTIVE_HIGH>;
       default-state = "on";
@@ -473,7 +375,7 @@
   /* QSPI flash S25FS128SAGNFI103 is controlled by qspi0 */
   spi@3270000 {
     spi-max-frequency = <136000000>;
-    status = "okay";
+    status = "disabled";
     prod-settings {
       #prod-cells = <3>;
       prod {
@@ -510,10 +412,6 @@
         <&bpmp_clks TEGRA194_CLK_CAN1>,
         <&bpmp_clks TEGRA194_CLK_CAN2>;
     };
-  };
-
-  soctherm-oc-event {
-    status = "okay";
   };
 };
 
