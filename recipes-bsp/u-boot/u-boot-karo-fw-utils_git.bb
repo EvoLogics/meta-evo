@@ -17,7 +17,11 @@ EXTRA_OEMAKE_class-cross = 'ARCH=${TARGET_ARCH} CC="${CC} ${CFLAGS} ${LDFLAGS}" 
 inherit uboot-config
 
 do_compile () {
-    oe_runmake ${UBOOT_MACHINE}
+    if [ -z "${UBOOT_CONFIG}" ]; then
+      oe_runmake ${UBOOT_MACHINE}
+    else
+      oe_runmake ${UBOOT_CONFIG}
+    fi
     oe_runmake env
 }
 
