@@ -1,0 +1,87 @@
+#!/bin/sh
+
+# Show help if requsted
+help()
+{
+  echo "help?"
+}
+
+whereami()
+{
+  bootfs_c=$(cat /boot/id)
+  rootfs_c=$(cat /etc/rootid)
+  echo "current: bootfs=${bootfs_c} rootfs=${rootfs_c}"
+
+  if [ ${bootfs_c} != ${rootfs_c} ]; then
+    echo "WARNING: ids do not match!"
+    next=x
+  elif [ ${bootfs_c} == 'a' ]; then
+    next=b
+  elif [ ${bootfs_c} == 'b' ]; then
+    next=a
+  else
+    next=x
+  fi
+
+  bootfs_u=$(printf "\x$((60+0$(fw_printenv -n bootpart_id)))")
+  rootpart_uuid=$(fw_printenv -n rootpart_uuid)
+  mmc_uuid=$(echo ${rootpart_uuid} | cut -d'-' -f1)
+  rootfs_u=$(printf "\x$((58+0$(echo ${rootpart_uuid} | cut -d'-' -f2)))")
+  echo " u-boot: bootfs=${bootfs_u} rootfs=${rootfs_u}"
+
+  if [ ${bootfs_u} != ${rootfs_u} ]; then
+    echo "WARNING: ids do not match!"
+  fi
+
+  echo "   next: ${next}"
+}
+
+getnext()
+{
+  whereami >> /dev/null
+  echo ${next}
+}
+
+switch()
+{
+  whereami >> /dev/null
+  if [ ${next} == 'a' ]; then
+    bootid=01
+    rootid=03
+  elif [ ${next} == 'b' ]; then
+    bootid=02
+    rootid=04
+  else
+    exit 1
+  fi
+ 
+  if [ -b /dev/mmcblk3boot0 ]; then
+    echo 0 > /sys/block/mmcblk3boot0/force_ro
+    (echo "bootpart_id ${bootid}"; echo "rootpart_uuid ${mmc_uuid}-${rootid}") | tee /tmp/setenv
+      fw_setenv -s /tmp/setenv
+    echo 1 > /sys/block/mmcblk3boot0/force_ro
+  fi
+}
+
+# Parse passed options
+while getopts "h?wxs" opt; do
+  case "$opt" in
+    h|\?)
+      help
+      exit 0
+      ;;
+    w)
+      whereami
+      ;;
+    x)
+      getnext
+      ;;
+    s)
+      switch
+      ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+[ "${1:-}" = "--" ] && shift
