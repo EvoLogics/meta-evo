@@ -3,7 +3,14 @@
 # Show help if requsted
 help()
 {
-  echo "help?"
+  echo "Usage: abtool [OPTIONS]"
+  echo
+  echo "Options:"
+  echo "  -g  Mark current partition scheme as good"
+  echo "  -h  Display this help and exit"
+  echo "  -s  Switch to another partition scheme"
+  echo "  -w  Display current scheme (where am I?)"
+  echo "  -x  Get next partition scheme (a/b)"
 }
 
 whereami()
@@ -57,14 +64,28 @@ switch()
  
   if [ -b /dev/mmcblk3boot0 ]; then
     echo 0 > /sys/block/mmcblk3boot0/force_ro
-    (echo "bootpart_id ${bootid}"; echo "rootpart_uuid ${mmc_uuid}-${rootid}") | tee /tmp/setenv
+    (\
+      echo "bootpart_id ${bootid}";\
+      echo "rootpart_uuid ${mmc_uuid}-${rootid}";\
+      echo "ab_fails 1"\
+      ) | tee /tmp/setenv
+      fw_setenv -s /tmp/setenv
+    echo 1 > /sys/block/mmcblk3boot0/force_ro
+  fi
+}
+
+markgood()
+{
+  if [ -b /dev/mmcblk3boot0 ]; then
+    echo 0 > /sys/block/mmcblk3boot0/force_ro
+    (echo "ab_fails 0") | tee /tmp/setenv
       fw_setenv -s /tmp/setenv
     echo 1 > /sys/block/mmcblk3boot0/force_ro
   fi
 }
 
 # Parse passed options
-while getopts "h?wxs" opt; do
+while getopts "h?wxsg" opt; do
   case "$opt" in
     h|\?)
       help
@@ -78,6 +99,9 @@ while getopts "h?wxs" opt; do
       ;;
     s)
       switch
+      ;;
+    g)
+      markgood
       ;;
   esac
 done

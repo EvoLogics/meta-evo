@@ -11,6 +11,7 @@ PR = "r1"
 SRC_URI_mx6-evobb = " \
   file://init \
   file://se \
+  file://abtool \
   file://06-mount-boot.sh \
   file://07-sshd-dropbear-fix.sh \
   file://08-sshd-dropbear-keys.sh \
@@ -24,6 +25,7 @@ SRC_URI_mx6-evobb = " \
   file://32-create-soft-hwclock-dirs.sh \
   file://33-create-sinaps-dirs.sh \
   file://40-create-pure-ftpd-db.sh \
+  file://99-mark-root-good.sh \
   "
 
 SRC_URI_append_sonobot-r5 = " \
