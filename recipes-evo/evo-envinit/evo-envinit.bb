@@ -75,6 +75,7 @@ do_compile() {
 do_install_mx6-evobb() {
     install -d ${D}${base_sbindir}/evo-envinit
     install -m 0755 ${WORKDIR}/se ${D}${base_sbindir}/
+    install -m 0755 ${WORKDIR}/abtool ${D}${base_sbindir}/
     install -m 0755 ${WORKDIR}/*-*.sh ${D}${base_sbindir}/evo-envinit/
 
     install -d ${D}${sysconfdir}/init.d/
