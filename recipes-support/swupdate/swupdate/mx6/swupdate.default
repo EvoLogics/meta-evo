@@ -1,2 +1,3 @@
-export SWUPDATE_EXTRA_ARGS=" -k /etc/ca-certificates/swu-pub.pem -e sonobot,stable "
+SWUPDATE_NEXT=$(/sbin/abtool -x 2>/dev/null)
+export SWUPDATE_EXTRA_ARGS=" -k /etc/ca-certificates/swu-pub.pem -e sonobot,${SWUPDATE_NEXT} "
 export SWUPDATE_MONGOOSE_EXTRA_ARGS="-p 1234"
