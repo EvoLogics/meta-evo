@@ -63,7 +63,7 @@ switch()
   fi
  
   if [ -b /dev/mmcblk3boot0 ]; then
-    echo 0 > /sys/block/mmcblk3boot0/force_ro
+    echo 0 > /sys/block/mmcblk3boot0/force_ro && sleep 0.2
     (\
       echo "bootpart_id ${bootid}";\
       echo "rootpart_uuid ${mmc_uuid}-${rootid}";\
@@ -77,7 +77,7 @@ switch()
 markgood()
 {
   if [ -b /dev/mmcblk3boot0 ]; then
-    echo 0 > /sys/block/mmcblk3boot0/force_ro
+    echo 0 > /sys/block/mmcblk3boot0/force_ro && sleep 0.2
     (echo "ab_fails 0") | tee /tmp/setenv
       fw_setenv -s /tmp/setenv
     echo 1 > /sys/block/mmcblk3boot0/force_ro
