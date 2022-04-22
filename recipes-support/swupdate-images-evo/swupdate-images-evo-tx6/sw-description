@@ -1,0 +1,75 @@
+software =
+{
+  version = "@@DISTRO_VERSION@@";
+  description = "SWUpdate image for TX6 Modules";
+  hardware-compatibility = ["1.0"];
+
+  @@MACHINE@@ =
+  {
+    @@EVOHW@@-@@EVOSN@@ =
+    {
+      commonfiles: (
+      {
+        filename = "core-image-minimal-@@MACHINE@@.tar.bz2";
+        type = "archive";
+        device = "/dev/new_root";
+        filesystem = "ext4";
+        path = "/";
+        sha256 = "@core-image-minimal-@@MACHINE@@.tar.bz2";
+      },
+      {
+        filename = "modules-@@MACHINE@@.tgz";
+        type = "archive";
+        device = "/dev/new_root";
+        filesystem = "ext4";
+        path = "/";
+        sha256 = "@modules-@@MACHINE@@.tgz";
+      },
+      {
+        filename = "uImage";
+        path = "/uImage";
+        device = "/dev/new_boot";
+        filesystem = "vfat"
+        sha256 = "@uImage"
+      },
+      {
+        filename = "imx6-@@MACHINE@@.dtb";
+        path = "/fdt.dtb";
+        device = "/dev/new_boot";
+        filesystem = "vfat"
+        sha256 = "@imx6-@@MACHINE@@.dtb"
+      }
+      );
+
+      a:
+      {
+        files = { ref = "#./../commonfiles"; };
+        scripts: (
+        {
+          filename = "swu-a.sh";
+          type = "shellscript";
+          sha256 = "@swu-a.sh";
+        }
+        );
+      }
+      b:
+      {
+        files = { ref = "#./../commonfiles"; };
+        scripts: (
+        {
+          filename = "swu-b.sh";
+          type = "shellscript";
+          sha256 = "@swu-b.sh";
+        }
+        );
+      }
+    }
+    generic =
+    {
+      a = { ref = "#./../@@EVOHW@@-@@EVOSN@@/a"; }
+      b = { ref = "#./../@@EVOHW@@-@@EVOSN@@/b"; }
+    }
+  }
+}
+
+
