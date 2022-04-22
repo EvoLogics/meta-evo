@@ -15,16 +15,24 @@ help()
 
 whereami()
 {
-  bootfs_c=$(cat /boot/id)
-  rootfs_c=$(cat /etc/rootid)
+  bootpart_uuid=$(findmnt -fn -o PARTUUID /boot/)
+  if [ -n "${bootpart_uuid}" ]; then
+    bootfs_c=$(printf "\x$((60+0$(echo ${bootpart_uuid} | cut -d'-' -f2)))")
+  else
+    bootfs_c=x
+  fi
+  rootpart_uuid=$(findmnt -fn -o PARTUUID /)
+  mmc_uuid=$(echo ${rootpart_uuid} | cut -d'-' -f1)
+  rootfs_c=$(printf "\x$((58+0$(echo ${rootpart_uuid} | cut -d'-' -f2)))")
   echo "current: bootfs=${bootfs_c} rootfs=${rootfs_c}"
 
   if [ ${bootfs_c} != ${rootfs_c} ]; then
     echo "WARNING: ids do not match!"
-    next=x
-  elif [ ${bootfs_c} == 'a' ]; then
+  fi
+
+  if [ ${rootfs_c} == 'a' ]; then
     next=b
-  elif [ ${bootfs_c} == 'b' ]; then
+  elif [ ${rootfs_c} == 'b' ]; then
     next=a
   else
     next=x
