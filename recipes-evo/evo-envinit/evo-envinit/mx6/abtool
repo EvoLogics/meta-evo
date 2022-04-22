@@ -100,16 +100,16 @@ while getopts "h?wxsg" opt; do
       exit 0
       ;;
     w)
-      whereami
+      whereami && exit 0
       ;;
     x)
-      getnext
+      getnext && exit 0
       ;;
     s)
-      switch
+      switch && exit 0
       ;;
     g)
-      markgood
+      markgood && exit 0
       ;;
   esac
 done
