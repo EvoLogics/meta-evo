@@ -22,6 +22,9 @@ SWUPDATE_IMAGES = " \
   imx6 \
 "
 
+EVOHW ?= "generic"
+EVOSN ?= "0"
+
 # images to build before building swupdate image
 IMAGE_DEPENDS = "core-image-minimal virtual/kernel"
 
