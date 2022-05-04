@@ -11,8 +11,9 @@ SWUPDATE_PASSWORD_FILE = "${HOME}/swu-pss.txt"
 
 SRC_URI_append_tx6 = " \
   file://sw-description \
-  file://swu-a.sh \
-  file://swu-b.sh \
+  file://swu-ab.sh \
+  file://a-set.sh \
+  file://b-set.sh \
 "
 
 SWUPDATE_IMAGES = " \

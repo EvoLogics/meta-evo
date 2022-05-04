@@ -46,9 +46,14 @@ software =
         files = { ref = "#./../commonfiles"; };
         scripts: (
         {
-          filename = "swu-a.sh";
+          filename = "a-set.sh";
           type = "shellscript";
-          sha256 = "@swu-a.sh";
+          sha256 = "@a-set.sh";
+        },
+        {
+          filename = "swu-ab.sh";
+          type = "shellscript";
+          sha256 = "@swu-ab.sh";
         }
         );
       }
@@ -57,9 +62,14 @@ software =
         files = { ref = "#./../commonfiles"; };
         scripts: (
         {
-          filename = "swu-b.sh";
+          filename = "b-set.sh";
           type = "shellscript";
-          sha256 = "@swu-b.sh";
+          sha256 = "@b-set.sh";
+        },
+        {
+          filename = "swu-ab.sh";
+          type = "shellscript";
+          sha256 = "@swu-ab.sh";
         }
         );
       }
