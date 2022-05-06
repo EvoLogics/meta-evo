@@ -18,6 +18,7 @@ SRC_URI_mx6-evobb = " \
   file://09-monit-id.sh \
   file://10-add-eth0-sn.sh \
   file://11-add-kvm-group.sh \
+  file://13-format-storage.sh \
   file://15-mount-storage.sh \
   file://20-cp-from-skel.sh \
   file://30-add-dune-cfg.sh \
@@ -26,10 +27,6 @@ SRC_URI_mx6-evobb = " \
   file://33-create-sinaps-dirs.sh \
   file://40-create-pure-ftpd-db.sh \
   file://99-mark-root-good.sh \
-  "
-
-SRC_URI_append_sonobot-r5 = " \
-  file://13-format-storage.sh \
   "
 
 SRC_URI_append_mx6ul-comm-module = "            \
