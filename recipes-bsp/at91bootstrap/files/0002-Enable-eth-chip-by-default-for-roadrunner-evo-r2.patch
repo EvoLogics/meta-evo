@@ -1,0 +1,35 @@
+From 298295b07a1dd28cb04bfa5e42e8c4d8d117b572 Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Thu, 17 Sep 2020 09:47:01 +0200
+Subject: [PATCH] Enable eth chip by default for roadrunner-evo-r2
+
+Also push down TxD for UART2
+---
+ .../acme/sama5d2_roadrunner/sama5d2_roadrunner.c      | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/contrib/board/acme/sama5d2_roadrunner/sama5d2_roadrunner.c b/contrib/board/acme/sama5d2_roadrunner/sama5d2_roadrunner.c
+index 3b6ccad0..9e716030 100644
+--- a/contrib/board/acme/sama5d2_roadrunner/sama5d2_roadrunner.c
++++ b/contrib/board/acme/sama5d2_roadrunner/sama5d2_roadrunner.c
+@@ -589,6 +589,17 @@ void at91_init_can_message_ram(void)
+ #ifdef CONFIG_HW_INIT
+ void hw_init(void)
+ {
++	/* Enable (inverse logic) ethernet chip by default for roadrunner-evo-r2 */
++	/* In order to fix 10Mb speed support */
++	pio_set_gpio_output(AT91C_PIN_PC(17), 0);
++
++	/* UART2.TxD pull down (inverse logic) */
++	pio_set_gpio_output(AT91C_PIN_PD(5), 1);
++
++	/* UART4.TxD pull down (inverse logic) */
++	/* Fixed in hardware level */
++	/* pio_set_gpio_output(AT91C_PIN_PB(4), 1); */
++
+ 	/* Disable watchdog */
+ 	at91_disable_wdt();
+ 
+-- 
+2.30.2
+

@@ -4,8 +4,8 @@ COMPATIBLE_MACHINE := "(sama5d2-roadrunner-.*)"
 
 SRC_URI += "\
     file://${MACHINE}_defconfig \
-    file://fix-sdmmc0-pins-to-work-with-qspi-flash.patch \
-    file://0002-Disable-ethernet-chip-by-default-for-roadrunner-evo-.patch \
+    file://0001-Fix-sdmmc0-pins-to-work-with-QSPI-flash.patch \
+    file://0002-Enable-eth-chip-by-default-for-roadrunner-evo-r2.patch \
 "
 
 # fixed problem with gcc 8
