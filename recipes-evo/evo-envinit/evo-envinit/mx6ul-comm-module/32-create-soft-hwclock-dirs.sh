@@ -23,7 +23,7 @@ if [ $? -eq 0 ]; then
   grep -iq "/mnt/storage/soft-hwclock-data" /etc/fstab || cat >> /etc/fstab << EOF
 
 # uncomment this for soft-hwclock-data bind
-/mnt/storage/soft-hwclock-data  /opt/soft-hwclock/data   none   defaults,bind   0   0
+/mnt/storage/soft-hwclock-data  /opt/soft-hwclock/data   none   defaults,bind,nofail   0   0
 EOF
 
   mount -a
