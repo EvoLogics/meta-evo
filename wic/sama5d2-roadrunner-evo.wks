@@ -1,0 +1,16 @@
+# short-description: Create SD card image with crypted rootfs and data partitions
+# long-description:
+# Create an image that can be written onto a SD card using dd for use
+# with family.
+# It uses SPL and u-boot
+#
+# The disk layout used is:
+#  ------ --------- --------------
+# | data |    rootfs              |
+#  ------ --------- --------------
+# ^      ^         ^              
+# |      |         |              
+# 0     28GiB     28GiB + rootfs + IMAGE_EXTRA_SPACE (default 4GiB)
+#
+part /data --ondisk mmcblk --fstype=ext4 --label sama5d2-roadrunner-evo-data --fixed-size 25400M
+part rootfs --source rawcopy --sourceparams="file=evologics-base-luks-image-sama5d2-roadrunner-evo.ext4.luks" --ondisk mmcblk
