@@ -102,7 +102,9 @@ RRECOMMENDS_${PN}_class-target = " \
 "
 
 do_install_append () {
-    rmdir ${D}/usr/lib/cryptsetup
+    if [ -d ${D}/usr/lib/cryptsetup ]; then
+        rmdir ${D}/usr/lib/cryptsetup
+    fi
 }
 
 BBCLASSEXTEND = "native nativesdk"
