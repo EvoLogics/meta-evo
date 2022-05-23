@@ -43,7 +43,7 @@ echo "Extracted from hostname: ${EVOHW} with SN: ${EVOSN}"
 
 # Vehicle and serial number defined
 if [ -n ${EVOSN} -a ${EVOSN} -ne 0 ]; then
-  execsripts
+  execscripts
   exit 0
 fi
 
