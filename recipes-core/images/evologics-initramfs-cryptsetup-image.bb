@@ -16,7 +16,7 @@ KERNELDEPMODDEPEND = ""
 # NOTE: working version with original cryptsetup
 #PACKAGE_INSTALL = "busybox-initramfs cryptsetup libdevmapper initramfs-sd-rootfs-cryptsetup"
 
-PACKAGE_INSTALL = "busybox-initramfs crypt-open-plain-initramfs initramfs-sd-rootfs-cryptsetup"
+PACKAGE_INSTALL = "busybox-initramfs cryptsetup-plain-static initramfs-sd-rootfs-cryptsetup"
 
 #FEATURE_PACKAGES_package-management = ""
 
@@ -47,7 +47,7 @@ prepare_rootfs () {
     mknod -m 622 ${IMAGE_ROOTFS}/dev/console c 5 1
 
     # FIXME: Find a way do not install alternatives
-    # setup with crypt-open-plain-initramfs
+    # setup with cryptsetup-plain-static
     rm -rf ${IMAGE_ROOTFS}/etc \
            ${IMAGE_ROOTFS}/var \
            ${IMAGE_ROOTFS}/run \

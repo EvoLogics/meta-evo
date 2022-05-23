@@ -14,7 +14,7 @@ int main(int argc, char **argv)
 		errx(1, "Need root");
 
 	if (argc != 4)
-		errx(2, "Usage: crypt-open-plain-initramfs pass-file block-dev dm-name\n");
+		errx(2, "Usage: %s pass-file block-dev dm-name", argv[0]);
 
     if ((rc = crypt_init(&cd, argv[2])))
         errx(-rc, "crypt_init():");

@@ -6,7 +6,7 @@
 
 if [ -f /sys/firmware/devicetree/base/sd-rootfs ]; then
     #/usr/sbin/cryptsetup open --type=plain --key-file=/rootfs.pass /dev/mmcblk0p1 sd-rootfs
-    /sbin/crypt-open-plain-initramfs /rootfs.pass /dev/mmcblk0p2 sd-rootfs && \
+    /sbin/cryptsetup-plain-static /rootfs.pass /dev/mmcblk0p2 sd-rootfs && \
         /bin/mount -o ro /dev/mapper/sd-rootfs /mnt && \
             SD_BOOT=1
 fi
