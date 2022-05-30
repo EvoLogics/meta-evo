@@ -5,12 +5,19 @@
 # It uses SPL and u-boot
 #
 # The disk layout used is:
-#  ------ --------- --------------
-# | data |    rootfs              |
-#  ------ --------- --------------
-# ^      ^         ^              
-# |      |         |              
-# 0     28GiB     28GiB + rootfs + IMAGE_EXTRA_SPACE (default 4GiB)
+#  -------------------- ------------------------------------------- 
+# |       data         | rootfs + IMAGE_EXTRA_SPACE (default 1GiB) |
+#  -------------------- ------------------------------------------- 
+# ^                    ^
+# |                    |
+# 0                 28.5 GiB
 #
-part /data --ondisk mmcblk --fstype=ext4 --label sama5d2-roadrunner-evo-data --fixed-size 25400M
+# TIPS:
+# To flash use ssh://lab.evologics.de/var/lib/git/evoboard-programmator.git
+# ./flash-sd-sandbox
+#
+# Possible to use it only if know what you are doing.. :)
+# sudo bmaptool copy evologics-base-sd-image-sama5d2-roadrunner-evo.wic.xz /dev/sdd
+#
+part /data --ondisk mmcblk --fstype=ext4 --label sama5d2-roadrunner-evo-data --fixed-size 28500M
 part rootfs --source rawcopy --sourceparams="file=evologics-base-luks-image-sama5d2-roadrunner-evo.ext4.luks" --ondisk mmcblk

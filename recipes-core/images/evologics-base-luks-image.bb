@@ -3,7 +3,7 @@ LICENSE = "MIT"
 AUTHOR = "Maksym Komar <komar@evologics.de>"
 
 IMAGE_FSTYPES = "ext4.luks.xz"
-LUKS_IMAGE_SIZE = "4000000"
+LUKS_IMAGE_SIZE = "1000000"
 
 require evologics-base-image.inc
 inherit core-image

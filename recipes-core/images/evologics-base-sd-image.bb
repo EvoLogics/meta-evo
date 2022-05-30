@@ -4,7 +4,7 @@ AUTHOR = "Maksym Komar <komar@evologics.de>"
 
 inherit core-image
 
-IMAGE_FSTYPES = "wic.xz"
+IMAGE_FSTYPES = "wic.xz wic.bmap"
 
 DEPENDS += "evologics-base-luks-image"
 do_image_wic[depends] += "evologics-base-luks-image:do_image_complete"
