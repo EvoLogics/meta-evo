@@ -7,5 +7,5 @@ do_compile () {
 
     # build statically only libcryptsetup, libpopt and libdevmapper
     ${CC} ${LDFLAGS} -o ${PN} cryptsetup-plain.c \
-         -Wl,-Bstatic -lcryptsetup -lpopt -ldevmapper -Wl,-Bdynamic -lc -ljson-c -luuid
+         -Wl,-Bstatic -lcryptsetup -ldevmapper -Wl,-Bdynamic -lc -lpopt -ljson-c -luuid
 }
