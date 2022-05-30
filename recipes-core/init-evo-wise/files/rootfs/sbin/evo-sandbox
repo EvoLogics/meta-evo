@@ -832,7 +832,7 @@ Usage: $(basename $0) [-h] [-q] [-v] [-n] [command]
     mount    - mount sandbox partition
     umount   - unmount sandbox partition
 
-    init-sd  - init system in SD card (password, hostname, IP, etc)
+    init-sd  - init sandbox system in SD card (password, hostname, IP, etc)
     chroot   - chroot to sandbox
 END
     exit $1

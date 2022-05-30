@@ -4,7 +4,7 @@
     LC_TYPE=C exec expect -f "$0" -- "$@"
 
 array set ::opt {
-    loglevel {err warn note info norm pass stage}
+    loglevel {err warn note info norm pass stage tips}
     force 0
     noheader 0
 
@@ -49,6 +49,12 @@ namespace eval ::dt {
             type reset
             protected 0
         }
+        rootfs_type {
+            name rootfs-type
+            path /
+            type s
+            protected 1
+        }
     }
 }
 
@@ -85,6 +91,7 @@ proc msg {type msg {out stdout}} {
         info    {set col $::c(white)}
         dbg     {set col $::c(cyan)}
         pass    {set col $::c(lgrn)}
+        tips    {set col $::c(lgrn)}
         norm    {set col {}}
         stage   {
             set col $::c(yel)
@@ -309,6 +316,16 @@ proc set_envs {args} {
 
     foreach {var val} $args {
         array set param $::dt::evo_vars($var)
+
+        if {$param(name) == {rootfs-type}} {
+            switch -re $val {
+                {^(ubi|sd)$} {}
+                default {
+                    die "wrong value of parameter $param(name): $val. Should be 'ubi' or 'sd'"
+                }
+            }
+        }
+
         if {$param(type) == {mac}} {
             set type bx
             set val "[split $val :]"
@@ -341,6 +358,11 @@ proc set_envs {args} {
             ::util::exec "fdtput -t $type $cfg_tmp $param(path) $param(name) $val"
         } else {
             ::util::exec "fdtput -t $type $::opt(config_file) $param(path) $param(name) $val"
+        }
+
+        if {$param(name) == {rootfs-type}} {
+            msg tips "Do not forget sync rootfs:\n"
+            msg tips "$ evo-update sync-rootfs $val\n"
         }
     }
 

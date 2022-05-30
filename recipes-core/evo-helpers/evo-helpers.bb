@@ -14,6 +14,15 @@ SRC_URI = "file://evo-hw \
            file://evo-update \
 "
 
+RDEPENDS_${PN} = "\
+    expect \
+    libgpiod-tools \
+    dtc \
+    dtc-misc \
+    cryptsetup-plain\
+    rsync \
+    "
+
 S = "${WORKDIR}"
 
 do_configure() {

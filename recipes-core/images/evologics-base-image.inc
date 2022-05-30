@@ -107,6 +107,8 @@ IMAGE_INSTALL = "\
     liblxc-bin-lxc-attach  \
     liblxc-bin-lxc-console  \
     ppp \
+    \
+    cryptsetup-plain \
     "
 
 DEPENDS += "\
