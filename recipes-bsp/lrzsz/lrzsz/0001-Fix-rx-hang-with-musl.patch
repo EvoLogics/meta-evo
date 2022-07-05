@@ -1,0 +1,33 @@
+From adb9bcbef2d818dfac234f97a5544bf601f457f4 Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Thu, 23 Jun 2022 18:00:24 +0200
+Subject: [PATCH] Fix rx hang with musl
+
+There is a pretty straightforward implementation of signal() and
+siginterrupt(). And you need use siginterrupt() after signal().
+
+https://git.musl-libc.org/cgit/musl/tree/src/signal/signal.c
+https://git.musl-libc.org/cgit/musl/tree/src/signal/siginterrupt.c
+
+In glibc siginterrupt() store state in internal structures and used in
+signal(), so it was working in glibc -_-
+---
+ src/zreadline.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/zreadline.c b/src/zreadline.c
+index aeda95c..9b29049 100644
+--- a/src/zreadline.c
++++ b/src/zreadline.c
+@@ -71,6 +71,11 @@ readline_internal(unsigned int timeout)
+ 			vstringf("Calling read: alarm=%d  Readnum=%d ",
+ 			  n, readline_readnum);
+ 		signal(SIGALRM, zreadline_alarm_handler); 
++#ifdef HAVE_SIGINTERRUPT
++		/* we want interrupted system calls to fail and not to be restarted. */
++		/* NOTE: in musl siginterrupt should be called after each signal() calling */
++		siginterrupt(SIGALRM,1);
++#endif
+ 		alarm(n);
+ 	}
+ 	else if (Verbose > 5)
