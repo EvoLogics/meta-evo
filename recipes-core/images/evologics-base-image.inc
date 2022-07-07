@@ -118,6 +118,8 @@ DEPENDS += "\
     setserial \
     minicom\
     ckermit \
+    ekermit \
+    lgpio \
     \
     pps-tools \
     rng-tools \
