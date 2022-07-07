@@ -27,7 +27,7 @@ EXTRA_OECONF = "--enable-tools"
 
 DEPENDS += "autoconf-archive-native"
 
-PACKAGES =+ "${PN}-tools libgpiodcxx ${PN}-python"
+PACKAGES =+ "${PN}-tools libgpiodcxx ${PN}-python ${PN}-daemon"
 FILES_${PN}-tools = " \
     ${bindir}/gpiodetect \
     ${bindir}/gpioinfo \
