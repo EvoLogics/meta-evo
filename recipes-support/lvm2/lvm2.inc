@@ -68,10 +68,3 @@ EXTRA_OECONF = "--with-user= \
 "
 
 DISABLE_STATIC = ""
-
-# FIXME: not yet work complile libdevmapper statically
-# https://gitlab.com/cryptsetup/cryptsetup/-/issues/386
-#                \
-#                --disable-selinux \
-#                --disable-dmeventd \
-#

@@ -47,15 +47,7 @@ LVM2_PACKAGECONFIG_append_class-target = " \
 "
 PACKAGECONFIG[udev] = "--enable-udev_sync --enable-udev_rules --with-udevdir=${nonarch_base_libdir}/udev/rules.d,--disable-udev_sync --disable-udev_rules,udev,${PN}-udevrules"
 
-PACKAGES =+ "libdevmapper"
-FILES_libdevmapper = " \
-    ${libdir}/libdevmapper.so.* \
-"
-
-FILES_libdevmapper-bin = " \
-    ${sbindir}/dmsetup \
-    ${sbindir}/dmstats \
-"
+DEPENDS =+ "libdevmapper"
 
 FILES_${PN} += " \
     ${libdir}/device-mapper/*.so \
@@ -81,20 +73,21 @@ RDEPENDS_${PN}-scripts = "${PN} (= ${EXTENDPKGV}) \
                           coreutils \
 "
 
-# FIXME: ERROR: lvm2-2.03.14-r0 do_package_qa: QA Issue: /usr/sbin/lvm_import_vdo contained in package lvm2 requires /bin/bash, but no providers found in RDEPENDS_lvm2? [file-rdeps]
+# FIXME: ERROR: lvm2-2.03.14-r0 do_package_qa: QA Issue: /usr/sbin/lvm_import_vdo \
+#  contained in package lvm2 requires /bin/bash, but no providers found in RDEPENDS_lvm2? [file-rdeps]
 RDEPENDS_${PN} = "bash"
 
 RRECOMMENDS_${PN}_class-target = "${PN}-scripts (= ${EXTENDPKGV})"
 
 CONFFILES_${PN} += "${sysconfdir}/lvm/lvm.conf"
 
-SYSROOT_PREPROCESS_FUNCS_append = " remove_libdevmapper_sysroot_preprocess"
-remove_libdevmapper_sysroot_preprocess() {
-    rm -f ${SYSROOT_DESTDIR}${libdir}/libdevmapper.so* \
-       ${SYSROOT_DESTDIR}${sbindir}/dmsetup \
-       ${SYSROOT_DESTDIR}${sbindir}/dmstats \
-       ${SYSROOT_DESTDIR}${includedir}/libdevmapper.h \
-       ${SYSROOT_DESTDIR}${libdir}/pkgconfig/devmapper.pc
+do_install_append() {
+    rm -f ${D}${libdir}/libdevmapper.so* \
+       ${D}${libdir}/libdevmapper.a \
+       ${D}${sbindir}/dmsetup* \
+       ${D}${sbindir}/dmstats* \
+       ${D}${includedir}/libdevmapper.h \
+       ${D}${libdir}/pkgconfig/devmapper.pc
 }
 
 BBCLASSEXTEND = "native nativesdk"
