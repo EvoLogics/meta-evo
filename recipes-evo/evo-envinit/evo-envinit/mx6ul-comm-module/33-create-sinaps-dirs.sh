@@ -23,7 +23,7 @@ if [ $? -eq 0 ]; then
     grep -iq "/mnt/storage/sinaps/${dir}" /etc/fstab || cat >> /etc/fstab << EOF
 
 # uncomment this for sinaps/${dir} bind
-/mnt/storage/sinaps/${dir}   /opt/sinaps/${dir}   none   defaults,bind   0   0
+/mnt/storage/sinaps/${dir}   /opt/sinaps/${dir}   none   defaults,bind,nofail   0   0
 EOF
   done
 

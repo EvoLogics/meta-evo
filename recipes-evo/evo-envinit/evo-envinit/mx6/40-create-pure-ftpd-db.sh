@@ -1,3 +1,5 @@
+#!/bin/sh
+
 DBFILE=/etc/pureftpd.pdb
 
 echo -n "Check if pure-ftpd db is needed... "

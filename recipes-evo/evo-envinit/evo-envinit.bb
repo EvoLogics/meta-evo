@@ -4,18 +4,21 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
 FILESEXTRAPATHS_prepend_mx6-evobb := "${THISDIR}/${PN}/mx6:"
-FILESEXTRAPATHS_prepend_sonobot-r5 := "${THISDIR}/${PN}/sonobot-r5:"
 
 PR = "r1"
 
 SRC_URI_mx6-evobb = " \
   file://init \
   file://se \
+  file://abtool \
+  file://evohw-config \
+  file://06-mount-boot.sh \
   file://07-sshd-dropbear-fix.sh \
   file://08-sshd-dropbear-keys.sh \
   file://09-monit-id.sh \
   file://10-add-eth0-sn.sh \
   file://11-add-kvm-group.sh \
+  file://13-format-storage.sh \
   file://15-mount-storage.sh \
   file://20-cp-from-skel.sh \
   file://30-add-dune-cfg.sh \
@@ -23,11 +26,7 @@ SRC_URI_mx6-evobb = " \
   file://32-create-soft-hwclock-dirs.sh \
   file://33-create-sinaps-dirs.sh \
   file://40-create-pure-ftpd-db.sh \
-  "
-
-SRC_URI_append_sonobot-r5 = " \
-  file://sonobot-r5-config \
-  file://13-format-storage.sh \
+  file://99-mark-root-good.sh \
   "
 
 SRC_URI_append_mx6ul-comm-module = "            \
@@ -72,14 +71,12 @@ do_compile() {
 do_install_mx6-evobb() {
     install -d ${D}${base_sbindir}/evo-envinit
     install -m 0755 ${WORKDIR}/se ${D}${base_sbindir}/
+    install -m 0755 ${WORKDIR}/abtool ${D}${base_sbindir}/
+    install -m 0755 ${WORKDIR}/evohw-config ${D}${base_sbindir}/
     install -m 0755 ${WORKDIR}/*-*.sh ${D}${base_sbindir}/evo-envinit/
 
     install -d ${D}${sysconfdir}/init.d/
     install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/evo-envinit
-}
-
-do_install_append_sonobot-r5() {
-    install -m 0755 ${WORKDIR}/sonobot-r5-config ${D}${base_sbindir}/
 }
 
 SYSTEMD_SERVICE_${PN}_mx6ul-comm-module += "     \

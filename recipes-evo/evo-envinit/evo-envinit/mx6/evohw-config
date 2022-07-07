@@ -1,0 +1,83 @@
+#!/bin/sh
+
+ENVINIT_PATH="/sbin/evo-envinit"
+HWID_FILE="/etc/evohw"
+
+EVOHW=$(cat /etc/hostname | sed -E 's/(.+)-([0-9]+)/\1/')
+EVOSN=$(cat /etc/hostname | sed -E 's/(.+)-([0-9]+)/\2/')
+
+execscripts()
+{
+  mount -o remount,rw /
+
+  [ -d ${ENVINIT_PATH} ] || exit
+  for script in ${ENVINIT_PATH}/*-*.sh; do
+    ${script}
+  done
+
+  sync && mount -o remount,ro /
+}
+
+hostconfig()
+{
+  mount -o remount,rw /
+
+  echo "Reconfiguring from ${EVOHW}-${EVOSN} to ${1}-${2}..."
+  ( sed -i "s/${EVOHW}-${EVOSN}/${1}-${2}/" /etc/hostname && \
+    sed -i "s/${EVOHW}-${EVOSN}/${1}-${2}/" /etc/hosts ) && \
+  echo ok || echo failed!
+
+  sync && mount -o remount,ro /
+}
+
+sonobot_ipconfig()
+{
+  IP=$(( ( (${SN} % 5000) + 29 ) % 254 + 1 ))
+  echo "IP address range is 172.16.${IP}.0/24"
+
+  echo "Applying configuration..."
+  sed -i "s/172\.16\.0\./172\.16\.${IP}\./g" /etc/network/interfaces
+}
+
+echo "Extracted from hostname: ${EVOHW} with SN: ${EVOSN}"
+
+# Vehicle and serial number defined
+if [ -n ${EVOSN} -a ${EVOSN} -ne 0 ]; then
+  execscripts
+  exit 0
+fi
+
+# Vehicle with undefinde (null) serial number
+# Try to look in HWID_FILE
+if [ -n ${EVOSN} -a ${EVOSN} -eq 0 ]; then
+  if [ -e ${HWID_FILE} ]; then
+    EVOHW_ID=$(cat ${HWID_FILE} | sed -E 's/(.+)-([0-9]+)/\1/')
+    EVOSN_ID=$(cat ${HWID_FILE} | sed -E 's/(.+)-([0-9]+)/\2/')
+
+    if [ -n ${EVOHW_ID} -a -n ${EVOSN_ID} ]; then
+      hostconfig ${EVOHW_ID} ${EVOSN_ID}
+      execscripts
+      exit 0
+    fi
+  fi
+fi
+
+# Warn that manual configuration is required if not in a shell
+if [ ! -t 0 ]; then
+  echo -e "Manual configuration with \e[32mevohw-config\e[0m is required"
+  exit 0
+fi
+
+# Ask user for a serial number
+while true; do
+  echo "Please enter vehicle serial number:"
+  read SN
+  test "${SN}" -eq "${SN}" 2>/dev/null && break || echo "It is not a number!"
+done
+
+mount -o remount,rw /
+echo "${EVOHW}-${SN}" | tee ${HWID_FILE}
+hostconfig ${EVOHW} ${SN}
+execscripts
+sync && mount -o remount,ro /
+

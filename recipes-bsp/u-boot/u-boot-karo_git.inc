@@ -4,15 +4,12 @@ LIC_FILES_CHKSUM = "file://Licenses/README;md5=0507cd7da8e7ad6d6701926ec9b84c95"
 
 PV = "v2015.10-rc2+git${SRCPV}"
 
-SRCREV = "15e7c9962827c2474ba655567cf644831d746501"
+SRCREV = "20bdf53cb7ed384fc831a38370143afe58fb037d"
 SRCBRANCH = "master"
 SRC_URI = " \
   git://github.com/karo-electronics/karo-tx-uboot.git;branch=${SRCBRANCH} \
   file://mx6-soc-l2en.patch \
 	file://mx6-clock-div.patch \
-  file://0001-duplicate-const.patch \
-  file://0002-gcc6plus-fix.patch \
-  file://0003-net-Use-packed-structures.patch \
   file://0004-tools-env-include-compiler.h.patch \
   file://0005-tools-fix-cross-compiling-tools-when-HOSTCC-is-overr.patch \
 	"

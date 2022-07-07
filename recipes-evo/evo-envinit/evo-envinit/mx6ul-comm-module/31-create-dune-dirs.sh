@@ -29,7 +29,7 @@ if [ $? -eq 0 ]; then
     grep -iq "/mnt/storage/dune-${dir}" /etc/fstab || cat >> /etc/fstab << EOF
 
 # uncomment this for dune-${dir} bind
-/mnt/storage/dune-${dir}   /opt/dune/${dir}   none   defaults,bind   0   0
+/mnt/storage/dune-${dir}   /opt/dune/${dir}   none   defaults,bind,nofail   0   0
 EOF
   done
 

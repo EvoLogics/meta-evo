@@ -15,14 +15,8 @@ case "$1" in
       exit 0
     fi
 
-    mount -o remount,rw /
+    /sbin/evohw-config
 
-    [ -d ${ENVINIT_PATH} ] || exit
-    for script in ${ENVINIT_PATH}/*-*.sh; do
-      ${script}
-    done
-
-    sync && mount -o remount,ro /
     ;;
   stop)
     echo "."

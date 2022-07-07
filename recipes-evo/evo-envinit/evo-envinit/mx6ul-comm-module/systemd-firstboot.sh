@@ -22,3 +22,5 @@ done
 systemctl disable systemd-firstboot.service
 
 sync && mount -o remount,ro /
+
+reboot
