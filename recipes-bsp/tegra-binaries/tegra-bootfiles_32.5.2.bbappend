@@ -1,0 +1,5 @@
+EXTRADEPS = "bootfiles"
+EXTRADEPS_append_tegra194-evo = " custom-flash-layout"
+DEPENDS += "${EXTRADEPS}"
+PARTITION_FILE_tegra194-evo = "${STAGING_DATADIR}/custom-flash-layout/${PARTITION_LAYOUT_TEMPLATE}"
+CBOOTOPTION_FILE = "${STAGING_DATADIR}/bootfiles/cbo.dts"
