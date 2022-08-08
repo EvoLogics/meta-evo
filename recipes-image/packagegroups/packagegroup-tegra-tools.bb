@@ -10,4 +10,4 @@ RDEPENDS_${PN} = "               \
     tegra-boot-tools             \
 "
 
-COMPATIBLE_MACHINE = "(tegra)"
+COMPATIBLE_MACHINE = "tegra194-evo"
