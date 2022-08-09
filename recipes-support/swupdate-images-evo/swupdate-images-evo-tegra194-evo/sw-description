@@ -10,12 +10,22 @@ software =
 		{
 			slot_a:
 			{
+				partitions: (
+				{
+					type = "diskformat";
+					device = "@@ROOTFS_DEVICE_PATH@@/APP_b";
+					properties: {
+						fstype = "ext4";
+						force = "true";
+					}
+				});
 				images: (
 				{
 					filename = "core-image-minimal-@@MACHINE@@.tar.gz";
-					type = "raw";
-					compressed = "zlib";
-					sha256 = "@core-image-minimal-@@MACHINE@@.tar.gz";
+					type = "archive";
+					sha256 = "$swupdate_get_sha256(core-image-minimal-@@MACHINE@@.tar.gz)";
+					filesystem = "ext4";
+					path = "/"
 					device = "@@ROOTFS_DEVICE_PATH@@/APP_b";
 					installed-directly = true;
 				});
@@ -23,18 +33,28 @@ software =
 				{
 					filename = "swupdate-bl-update.sh";
 					type = "postinstall";
-					sha256 = "@swupdate-bl-update.sh";
+					sha256 = "$swupdate_get_sha256(swupdate-bl-update.sh)";
 					data = "@@ROOTFS_DEVICE_PATH@@/APP_b";
 				});
 			}
 			slot_b:
 			{
+				partitions: (
+				{
+					type = "diskformat";
+					device = "@@ROOTFS_DEVICE_PATH@@/APP";
+					properties: {
+						fstype = "ext4";
+						force = "true";
+					}
+				});
 				images: (
 				{
 					filename = "core-image-minimal-@@MACHINE@@.tar.gz";
-					type = "raw";
-					compressed = "zlib";
-					sha256 = "@core-image-minimal-@@MACHINE@@.tar.gz";
+					type = "archive";
+					sha256 = "$swupdate_get_sha256(core-image-minimal-@@MACHINE@@.tar.gz)";
+					filesystem = "ext4";
+                                        path = "/"
 					device = "@@ROOTFS_DEVICE_PATH@@/APP";
 					installed-directly = true;
 				});
@@ -42,7 +62,7 @@ software =
 				{
 					filename = "swupdate-bl-update.sh";
 					type = "postinstall";
-					sha256 = "@swupdate-bl-update.sh";
+					sha256 = "$swupdate_get_sha256(swupdate-bl-update.sh)";
 					data = "@@ROOTFS_DEVICE_PATH@@/APP";
 				});
 			}
