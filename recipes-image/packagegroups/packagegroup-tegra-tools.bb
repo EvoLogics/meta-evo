@@ -8,6 +8,10 @@ RDEPENDS_${PN} = "               \
     tegra-redundant-boot         \
     tegra-nv-boot-control-config \
     tegra-boot-tools             \
+    tegra-boot-tools-updater	 \
+    tegra-sysinstall-tools       \
+    tegra-fuse-tool              \
+    tegra-eeprom-tool            \
 "
 
 COMPATIBLE_MACHINE = "tegra194-evo"
