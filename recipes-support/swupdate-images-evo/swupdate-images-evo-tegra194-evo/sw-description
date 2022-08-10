@@ -27,7 +27,6 @@ software =
 					filesystem = "ext4";
 					path = "/"
 					device = "@@ROOTFS_DEVICE_PATH@@/APP_b";
-					installed-directly = true;
 				});
 				scripts: (
 				{
@@ -56,7 +55,6 @@ software =
 					filesystem = "ext4";
                                         path = "/"
 					device = "@@ROOTFS_DEVICE_PATH@@/APP";
-					installed-directly = true;
 				});
 				scripts: (
 				{
