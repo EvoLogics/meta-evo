@@ -4,16 +4,19 @@ AUTHOR = "Maksym Komar <komar@evologics.de>"
 
 IMAGE_FSTYPES = "tar.xz ubi"
 
-# evologics-base-image (.ubi) =>               # rootfs, vol1, vol2, data partitions
-#   evologics-base-sd-image (.wic) =>          # rootfs with sandbox
-#       evologics-base-luks-image (.ext4.luks) # only rootfs, used in .wic
+# evologics-base-image (.ubi) =>                   # rootfs, vol1, vol2, data partitions
+#   evologics-base-sd-image (.wic) =>              # meta package for SD Card images
+#       evologics-base-sd-image-4g  (.wic) =>      # rootfs with sandbox for 4G SD Card
+#       evologics-base-sd-image-32g (.wic) =>      # rootfs with sandbox for 32G SD Card
+#           evologics-base-luks-image (.ext4.luks) # only rootfs, used in .wic
 # 
 # evologics-data-image (.ubi) # no rootfs for 16MB model.
 #                             # only vol1, vol2, data partition
 
 DEPENDS += "evologics-base-sd-image evologics-data-image"
 
-do_image_complete[depends] += "evologics-base-sd-image:do_image_complete"
+# NOTE: evologics-base-sd-image is meta package and has only do_build
+do_image_complete[depends] += "evologics-base-sd-image:do_build"
 do_image_complete[depends] += "evologics-data-image:do_image_complete"
 do_clean[depends]          += "evologics-base-sd-image:do_clean"
 do_clean[depends]          += "evologics-data-image:do_clean"

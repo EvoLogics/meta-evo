@@ -1,16 +1,16 @@
-# short-description: Create SD card image with crypted rootfs and data partitions
+# short-description: Create 32G SD card image with crypted rootfs and data partitions
 # long-description:
 # Create an image that can be written onto a SD card using dd for use
 # with family.
 # It uses SPL and u-boot
 #
 # The disk layout used is:
-#  -------------------- ------------------------------------------- 
-# |       data         | rootfs + IMAGE_EXTRA_SPACE (default 1GiB) |
-#  -------------------- ------------------------------------------- 
+#  -------------------- ---------------------------------------------
+# |       data         | rootfs + IMAGE_EXTRA_SPACE (default 300MiB) |
+#  -------------------- ---------------------------------------------
 # ^                    ^
 # |                    |
-# 0                 28.5 GiB
+# 0                 3.2 GiB
 #
 # TIPS:
 # To flash use ssh://lab.evologics.de/var/lib/git/evoboard-programmator.git
@@ -19,5 +19,5 @@
 # Possible to use it only if know what you are doing.. :)
 # sudo bmaptool copy evologics-base-sd-image-sama5d2-roadrunner-evo.wic.xz /dev/sdd
 #
-part /data --ondisk mmcblk --fstype=ext4 --label sama5d2-roadrunner-evo-data --fixed-size 28500M
+part /data --ondisk mmcblk --fstype=ext4 --label sama5d2-roadrunner-evo-data --fixed-size 3200M
 part rootfs --source rawcopy --sourceparams="file=evologics-base-luks-image-sama5d2-roadrunner-evo.ext4.luks" --ondisk mmcblk
