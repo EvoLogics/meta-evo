@@ -15,16 +15,10 @@ echo -n "Checking if storage mounted... "
 mount | grep -qi '/mnt/storage'
 
 if [ $? -eq 0 ]; then
-  echo "found!"
-
-  mkdir -p /mnt/storage/detector-logs
-
-  grep -iq "/mnt/storage/docker" /etc/fstab || cat >> /etc/fstab << EOF
-
-#uncomment this for docker bind
-/mnt/storage/detector-logs         /opt/detector/logs             none    defaults,bind,nofail    0   0
-EOF
-  mount -a
+  echo "Storage Mounted !"
+  [ ! -d "/mnt/storage/detector/logs" ] &&  mkdir -p /mnt/storage/detector/logs
+  [ ! -d "/mnt/storage/detector/updates" ] &&  install -d -m 0755 -o neptus -g neptus /mnt/storage/detector/updates
+  chown
 else
-  echo "not found!"
+  echo "Storage not found!"
 fi

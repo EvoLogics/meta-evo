@@ -5,9 +5,9 @@ DOCKER_BASE="/usr/bin/docker"
 echo -n "Checking if docker exits... "
 
 if [ -e ${DOCKER_BASE} ]; then
-  echo "found!"
+  echo "Docker Found !!"
 else
-  echo "not found, exiting!"
+  echo "Docker not Found"
   exit 0
 fi
 
@@ -15,20 +15,20 @@ echo -n "Checking if storage mounted... "
 mount | grep -qi '/mnt/storage'
 
 if [ $? -eq 0 ]; then
-  echo "found!"
-  systemctl stop docker
+  echo "Storage Mounted !!"
+  # Check if Directory exits. If not create it
+  [ ! -d "/mnt/storage/docker/var" ] &&  mkdir -p /mnt/storage/docker/var
+  [ ! -d "/mnt/storage/docker/etc" ] &&  mkdir -p /mnt/storage/docker/etc
+  # Copy contents of /etc/docker to new location
+  cp /etc/docker/* /mnt/storage/docker/etc/
 
-  mkdir -p /var/lib/docker
-  mkdir -p /mnt/storage/docker/etc
+  #Bind /etc/docker
+  grep -iq "/mnt/storage/docker/etc" /etc/fstab || cat >> /etc/fstab << EOF
 
-  grep -iq "/mnt/storage/docker" /etc/fstab || cat >> /etc/fstab << EOF
-
-#uncomment this for docker bind
-/mnt/storage/docker/etc         /etc/docker             none    defaults,bind,nofail    0   0
-/mnt/storage/docker/var         /var/lib/docker         none    defaults,bind,nofail    0   0
+# uncomment this for /etc/docker bind
+/mnt/storage/docker/etc        /etc/docker             none    defaults,bind,nofail    0   0
 EOF
   mount -a
-  systemctl start docker
 else
-  echo "not found!"
+  echo "Storage Not Mounted !!"
 fi
