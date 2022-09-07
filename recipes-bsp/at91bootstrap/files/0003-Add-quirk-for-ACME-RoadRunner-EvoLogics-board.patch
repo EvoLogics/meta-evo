@@ -1,0 +1,136 @@
+From 16f34eae92deec69951289d06fa48278d6a23b7b Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Sun, 17 Jul 2022 03:03:01 +0200
+Subject: [PATCH] Add quirk for ACME RoadRunner EvoLogics board
+
+---
+ Kconfig                                       |  3 ++
+ ...ama5d2_roadrunner_evo_qspi_linux_defconfig | 41 +++++++++++++++++++
+ device/sama5d2/sama5d2.c                      | 13 +++++-
+ driver/ddramc.c                               |  2 +-
+ 4 files changed, 56 insertions(+), 3 deletions(-)
+ create mode 100644 configs/sama5d2_roadrunner_evo_qspi_linux_defconfig
+
+diff --git a/Kconfig b/Kconfig
+index f7c64d0e..5844c1a5 100644
+--- a/Kconfig
++++ b/Kconfig
+@@ -390,6 +390,9 @@ config BOARD_QUIRK_SAMA5D2_SIP
+ config BOARD_QUIRK_SAMA5D2_ROADRUNNER
+ 	bool "Quirks for ACME RoadRunner Berta D2 board"
+ 
++config BOARD_QUIRK_SAMA5D2_ROADRUNNER_EVO
++	bool "Quirks for ACME RoadRunner EvoLogics board"
++
+ config BOARD_QUIRK_SAM9X60_EK
+ 	bool "Quirks for SAM9X60-EK board"
+ 
+diff --git a/configs/sama5d2_roadrunner_evo_qspi_linux_defconfig b/configs/sama5d2_roadrunner_evo_qspi_linux_defconfig
+new file mode 100644
+index 00000000..1db68176
+--- /dev/null
++++ b/configs/sama5d2_roadrunner_evo_qspi_linux_defconfig
+@@ -0,0 +1,41 @@
++# Copyright (C) 2006 Microchip Technology Inc. and its subsidiaries
++#
++# SPDX-License-Identifier: MIT
++
++CONFIG_LOAD_AND_JUMP=y
++CONFIG_LOAD_SW=y
++CONFIG_JUMP_TO_SW=y
++CONFIG_SAMA5D2=y
++CONFIG_CRYSTAL_12_000MHZ=y
++# CONFIG_TWI is not set
++# CONFIG_LOAD_HW_INFO is not set
++CONFIG_BUS_SPEED_166MHZ=y
++CONFIG_DDR_SET_BY_DEVICE=y
++CONFIG_DDR_MT41K128M16_D2=y
++CONFIG_DATAFLASH=y
++CONFIG_SPI_FLASH=y
++CONFIG_SPI_CLK=132000000
++CONFIG_QSPI=y
++CONFIG_QSPI_BUS=0
++CONFIG_QSPI_IOSET=3
++CONFIG_QSPI_4B_OPCODES=y
++CONFIG_LOAD_LINUX=y
++CONFIG_LINUX_IMAGE=y
++CONFIG_IMG_ADDRESS="0x00020000"
++CONFIG_JUMP_ADDR="0x22000000"
++CONFIG_OF_LIBFDT=y
++CONFIG_OF_OFFSET="0x00010000"
++CONFIG_OF_ADDRESS="0x21000000"
++CONFIG_MACH_TYPE="9999"
++# CONFIG_DISABLE_WATCHDOG is not set
++# CONFIG_ENTER_NWD is not set
++CONFIG_BOARD_QUIRK_SAMA5D2_ROADRUNNER_EVO=y
++CONFIG_TWI0=y
++CONFIG_TWI0_IOSET=4
++CONFIG_TWI1=y
++CONFIG_TWI1_IOSET=2
++# CONFIG_ACT8865 is not set
++# CONFIG_DISABLE_ACT8865_I2C is not set
++# CONFIG_SUSPEND_ACT8945A_CHARGER is not set
++# CONFIG_LOAD_EEPROM is not set
++# CONFIG_LED_ON_BOARD is not set
+diff --git a/device/sama5d2/sama5d2.c b/device/sama5d2/sama5d2.c
+index ae71a6f9..0817f656 100644
+--- a/device/sama5d2/sama5d2.c
++++ b/device/sama5d2/sama5d2.c
+@@ -485,6 +485,11 @@ void twi_init()
+ 
+ void hw_init(void)
+ {
++#ifdef CONFIG_BOARD_QUIRK_SAMA5D2_ROADRUNNER_EVO
++    /* Disable ethernet chip by default for roadrunner-evo-r2 */
++    pio_set_gpio_output(AT91C_PIN_PC(17), 1);
++#endif
++
+ 	/* Switch backup area to VDDIN33. */
+ 	sfrbu_select_ba_power_source(true);
+ 
+@@ -502,7 +507,7 @@ void hw_init(void)
+ 	 * Even if its default value is 0, it is wrongly re-written to 0x3
+ 	 * by the ROMCode.
+ 	 */
+-#ifndef CONFIG_BOARD_QUIRK_SAMA5D2_ROADRUNNER
++#if !defined(CONFIG_BOARD_QUIRK_SAMA5D2_ROADRUNNER) && !defined(CONFIG_BOARD_QUIRK_SAMA5D2_ROADRUNNER_EVO)
+     /* for roadrunner no need: we keep what is set in ROM code */
+     pmc_init_pll(AT91C_PMC_ICPPLLA_0);
+ #endif
+@@ -532,7 +537,7 @@ void hw_init(void)
+ 
+ 	at91_init_can_message_ram();
+ 
+-#ifdef CONFIG_BOARD_QUIRK_SAMA5D2_ROADRUNNER
++#if !defined(CONFIG_BOARD_QUIRK_SAMA5D2_ROADRUNNER) && !defined(CONFIG_BOARD_QUIRK_SAMA5D2_ROADRUNNER_EVO)
+     /* Acme RoadRunner
+      * This setting is to turn-off the DDR3 power-supply
+      * at the shutdown. If not set the VBATT pin will draw
+@@ -809,7 +814,11 @@ void at91_sdhc_hw_init(void)
+ #ifndef CONFIG_BOARD_QUIRK_SAMA5D2_XULT
+ 		{"SDMMC0_WP",   AT91C_PIN_PA(12), 1, PIO_DEFAULT, PIO_PERIPH_A},
+ #endif
++#ifdef CONFIG_BOARD_QUIRK_SAMA5D2_ROADRUNNER_EVO
++		{"SDMMC0_CD",   AT91C_PIN_PA(13), 0, PIO_PULLDOWN, PIO_PERIPH_A},
++#else
+ 		{"SDMMC0_CD",   AT91C_PIN_PA(13), 0, PIO_DEFAULT, PIO_PERIPH_A},
++#endif
+ 		{(char *)0, 0, 0, PIO_DEFAULT, PIO_PERIPH_A},
+ 	};
+ #endif
+diff --git a/driver/ddramc.c b/driver/ddramc.c
+index 34b6a23d..141646ae 100644
+--- a/driver/ddramc.c
++++ b/driver/ddramc.c
+@@ -34,7 +34,7 @@ static void ddram_reg_config(struct ddramc_register *ddramc_config)
+ #if defined(CONFIG_DDR_MT41K128M16_D2)
+ /* Two DDR3L(MT41H128M16JT-125-K = 16 Mbit x 16 x 8 banks), total 4Gbit on SAMA5D2 Xplained Ultra Evaluation Kit*/
+ 	type = AT91C_DDRC2_MD_DDR3_SDRAM;
+-#ifdef CONFIG_BOARD_QUIRK_SAMA5D2_ROADRUNNER
++#if defined(CONFIG_BOARD_QUIRK_SAMA5D2_ROADRUNNER) || defined(CONFIG_BOARD_QUIRK_SAMA5D2_ROADRUNNER_EVO)
+ 	dbw = AT91C_DDRC2_DBW_16_BITS;
+ #else
+ 	dbw = AT91C_DDRC2_DBW_32_BITS;
+-- 
+2.30.2
+
