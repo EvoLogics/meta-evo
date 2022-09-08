@@ -33,7 +33,7 @@ if [ $? -eq 0 ]; then
 # uncomment this for image-generator bind
 /mnt/storage/image-generator/log             /opt/image-generator/log             none    defaults,bind,nofail    0   0
 /mnt/storage/image-generator/images          /opt/image-generator/images          none    defaults,bind,nofail    0   0
-/mnt/storage/image-generator/conf-plugins    /opt/image-generator/conf/plugins    nonde   defaults,bind,nofail    0   0
+/mnt/storage/image-generator/conf-plugins    /opt/image-generator/conf/plugins    none   defaults,bind,nofail    0   0
 EOF
   mount -a
 

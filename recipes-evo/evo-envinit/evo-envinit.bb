@@ -69,6 +69,7 @@ SRC_URI_append_tegra194-evo = "                 \
         file://36-create-swupdate-env.sh        \
         file://37-create-image-generator-dirs.sh \
         file://38-configure-vsftpd.sh           \
+        file://39-create-dbagent-dirs.sh        \
         file://systemd-firstboot.sh             \
         file://se                               \
         file://systemd-firstboot.service        \

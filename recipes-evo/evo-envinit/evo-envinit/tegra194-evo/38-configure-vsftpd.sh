@@ -23,5 +23,3 @@ for entry in "/etc/vsftpd/user_config_dir/"*
 do
   echo "$(basename "${entry}")" >> ${VSFTPD_USER_LIST}
 done
-
-echo "/bin/false" >> /etc/shells
