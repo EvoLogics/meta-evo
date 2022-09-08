@@ -23,10 +23,11 @@ SRC_URI_append_mx6ul-comm-module = "  \
     ${@bb.utils.contains("IMAGE_CONFIGS", "can", "file://can0.service", "", d)} \
 "
 
-SRC_URI_append_tegra194-evo = " \
-    file://10-watchdog.conf \
-    file://10-eth0.network \
-    file://90-dhcp-default.network \
+SRC_URI_append_tegra194-evo = "     \
+    file://10-watchdog.conf         \
+    file://10-eth0.network          \
+    file://90-dhcp-default.network  \
+    file://system.conf              \
     ${@bb.utils.contains("IMAGE_CONFIGS", "can", "file://can0.service", "", d)} \
 "
 
@@ -60,6 +61,9 @@ do_install_mx6ul-comm-module(){
 
 do_install_append_tegra194-evo() {
     install -d ${D}${sysconfdir}/systemd/network
+
+    install -m 0644 ../system.conf ${D}${sysconfdir}/systemd/system.conf
+
     for file in $(find ${WORKDIR} -maxdepth 1 -type f -name *.network); do
         install -m 0644 "$file" ${D}${sysconfdir}/systemd/network/
     done
@@ -73,6 +77,11 @@ do_install_append_tegra194-evo() {
 
     rm -rf ${D}${systemd_unitdir}/network/wired.network
     rm -rf ${D}${systemd_unitdir}/network/80-wired.network
+
+    if [ -n "${IP_ALIAS}" ]
+    then
+      echo "\n\n[Address]\nLabel=eth0:evo\nAddress=${IP_ALIAS}" >> ${D}${sysconfdir}/systemd/network/10-eth0.network
+    fi
 }
 
 FILES_${PN} += "\

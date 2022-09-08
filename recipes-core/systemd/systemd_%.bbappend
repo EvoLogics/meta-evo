@@ -19,6 +19,8 @@ PACKAGECONFIG[apparmor] = "-Dapparmor=true,-Dapparmor=false,"
 PACKAGECONFIG[gnutls] = "-Dgnutls=true,-Dgnutls=false,gnutls"
 PACKAGECONFIG[gnuefi] = "-Dgnu-efi=true,-Dgnu-efi=false,"
 PACKAGECONFIG[udev-hwdb] = "-Dhwdb=true,-Dhwdb=false,"
+PACKAGECONFIG[cryptsetup] = "-Dlibcryptsetup=true"
+
 
 RRECOMMENDS_${PN}_remove = "systemd-compat-units"
 RDEPENDS_${PN} += "systemd-conf"
