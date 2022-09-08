@@ -16,8 +16,7 @@ SRC_URI_append_tegra194-evo = "   \
 DEPENDS = ""
 
 SWUPDATE_SIGNING = "RSA"
-SWUPDATE_PRIVATE_KEY = "/work/private/evo-updater.pem"
-SWUPDATE_PASSWORD_FILE = "/work/private/evo-updater.pass"
+SWUPDATE_PRIVATE_KEY = "/work/private/evologics-tegra194-evo-priv.pem"
 
 ROOTFS_DEVICE_PATH = "/dev/disk/by-partlabel"
 
