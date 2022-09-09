@@ -11,7 +11,7 @@ RDEPENDS_${PN} = "busybox expect lxc-login-sh liblxc evo-configs ppp"
 # need satisfy QA for ssh-proxy-sh, but actually don't need it
 RDEPENDS_${PN} += "bash"
 
-DEPENDS_${PN} += "xz-native"
+DEPENDS += "xz-native"
 
 ALLOW_EMPTY_${PN}-dbg = "0"
 ALLOW_EMPTY_${PN}-dev = "0"
