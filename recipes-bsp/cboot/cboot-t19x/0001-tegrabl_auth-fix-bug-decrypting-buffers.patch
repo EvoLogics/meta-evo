@@ -1,0 +1,45 @@
+From 0af786791dccf39c9fe24be717caa338cde81d14 Mon Sep 17 00:00:00 2001
+From: llewellyn <llewellyn.fernandes@evologics.de>
+Date: Tue, 13 Sep 2022 16:10:37 +0200
+Subject: [PATCH] tegrabl_auth fix bug decrypting buffers
+
+---
+ .../t19x/common/lib/tegrabl_auth/tegrabl_auth_binary.c    | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/bootloader/partner/t19x/common/lib/tegrabl_auth/tegrabl_auth_binary.c b/bootloader/partner/t19x/common/lib/tegrabl_auth/tegrabl_auth_binary.c
+index f15f337..9763b62 100644
+--- a/bootloader/partner/t19x/common/lib/tegrabl_auth/tegrabl_auth_binary.c
++++ b/bootloader/partner/t19x/common/lib/tegrabl_auth/tegrabl_auth_binary.c
+@@ -225,6 +225,8 @@ static tegrabl_error_t authenticate_oem_payload(void *payload)
+ 	uint8_t *src;
+ 	uint32_t total_len, len;
+ 	uint32_t chunk = 0x800000;
++  uint8_t iv[SE_AES_BLOCK_LENGTH];
++  uint8_t next_iv[SE_AES_BLOCK_LENGTH];
+ 
+ 	NvBootComponentHeader *header = (NvBootComponentHeader *)payload;
+ 
+@@ -269,17 +271,21 @@ static tegrabl_error_t authenticate_oem_payload(void *payload)
+ 
+ 	/* Decrypt the binary */
+ 	pr_info("%s: Decrypt the binary\n", __func__);
++  memcpy(iv, header->Salt2, SE_AES_BLOCK_LENGTH);
+ 	src = (uint8_t *)header + sizeof(*header);
+ 	total_len = header->Stage2Components[0].BinaryLen;
+ 	while (total_len) {
+ 		len = (total_len > chunk) ? chunk : total_len;
++    /* save the next IV */
++    memcpy(next_iv, (src + len - SE_AES_BLOCK_LENGTH), SE_AES_BLOCK_LENGTH);
+ 		err = tegrabl_crypto_decrypt_buffer(src, len, src,
+ 							AES_KEYSLOT_SBK, SBK_KEY_SIZE_BYTES,
+-							header->Salt2);
++							iv);
+ 		if (err != TEGRABL_NO_ERROR) {
+ 			pr_error("Binary decryption failed\n");
+ 			goto fail;
+ 		}
++    memcpy(iv, next_iv, SE_AES_BLOCK_LENGTH);
+ 		src += len;
+ 		total_len -= len;
+ 	}
