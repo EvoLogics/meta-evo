@@ -5,6 +5,7 @@ SRC_URI_append_tegra194-evo = "  \
     file://tegra194-evo.dts      \
     file://tegra194-common.dtsi  \
     file://tegra194-base.dtsi    \
+    file://dm-crypt.cfg          \
 "
 
 do_configure_prepend_tegra194-evo() {
