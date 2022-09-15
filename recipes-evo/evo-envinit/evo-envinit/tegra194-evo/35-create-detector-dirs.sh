@@ -22,7 +22,7 @@ if [ $? -eq 0 ]; then
   cp /opt/detector/models/* /mnt/storage/detector/models/
   [ ! -d "/mnt/storage/detector/updates" ] &&  install -d -m 0755 -o neptus -g neptus /mnt/storage/detector/updates
 
-  Bind /etc/docker
+  # Bind /etc/docker
   grep -iq "/mnt/storage/detector/models" /etc/fstab || cat >> /etc/fstab << EOF
 
 # uncomment this for /opt/detector/models bind
