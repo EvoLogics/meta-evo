@@ -18,9 +18,7 @@ if [ $? -eq 0 ]; then
   echo "Storage Mounted !!"
   # Check if Directory exits. If not create it
   [ ! -d "/mnt/storage/db-agent/logs" ] &&  mkdir -p /mnt/storage/db-agent/logs
-  # [ ! -d "/mnt/storage/db-agent/detections" ] &&  mkdir -p /mnt/storage/db-agent/detections
   [ ! -d "/mnt/storage/db-agent/config" ] &&  mkdir -p /mnt/storage/db-agent/config
-  [ ! -d "/mnt/storage/db-agent/tmp" ] &&  mkdir -p /mnt/storage/db-agent/tmp
 
 
   # Copy Contents of config to /mnt/storage/db-agent/config
@@ -31,7 +29,6 @@ if [ $? -eq 0 ]; then
 
 # uncomment this for /mnt/storage/db-agent bind
 /mnt/storage/db-agent/logs            /opt/db-agent/logs             none    defaults,bind,nofail    0   0
-/mnt/storage/db-agent/tmp             /opt/db-agent/tmp              none    defaults,bind,nofail    0   0
 /mnt/storage/db-agent/config          /opt/db-agent/config           none    defaults,bind,nofail    0   0
 EOF
   mount -a
