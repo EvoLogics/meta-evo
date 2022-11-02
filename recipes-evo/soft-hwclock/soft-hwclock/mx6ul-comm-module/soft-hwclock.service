@@ -8,6 +8,7 @@
 Description=Fake Hardware Clock
 DefaultDependencies=No
 Requires=local-fs.target
+RequiresMountsFor=/opt/soft-hwclock/data/soft-hwclock.data
 After=local-fs.target
 Wants=time-sync.target
 Conflicts=shutdown.target
