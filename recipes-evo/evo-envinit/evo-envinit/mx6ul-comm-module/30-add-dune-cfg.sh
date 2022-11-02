@@ -35,11 +35,21 @@ if [ -e ${DUNE_BASE}/etc/config.ini ]; then
   echo "found!"
 else
   echo -n "not found, creating... "
-  cat >> ${DUNE_BASE}/etc/config.ini << EOF && echo "OK."
+  if [[ "${SYSNAME}" == *"usbl-buoy-sn-"* ]]; then
+    cat >> ${DUNE_BASE}/etc/config.ini << EOF && echo "OK."
+# Automatically generated file, do not edit it. If you need some local
+# configuration tuning, use local.ini for this purpose.
+
+[Require usbl-buoy.ini]
+[Include local.ini]
+EOF
+  else
+    cat >> ${DUNE_BASE}/etc/config.ini << EOF && echo "OK."
 # Automatically generated file, do not edit it. If you need some local
 # configuration tuning, use local.ini for this purpose.
 
 [Require ${SYSNAME}.ini]
 [Include local.ini]
 EOF
+fi
 fi
