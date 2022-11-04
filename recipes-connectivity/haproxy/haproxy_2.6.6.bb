@@ -34,7 +34,7 @@ EXTRA_OEMAKE = "'CPU=generic' \
 
 do_compile() {
     cd ${S}
-    oe_runmake CC="${CC}" CFLAGS="${CFLAGS}" SBINDIR="${sbindir}" \
+    oe_runmake CC="${CC}" CPU_CFLAGS="${CFLAGS}" SBINDIR="${sbindir}" \
                PREFIX="${prefix}" \
                ZLIB_INC=${STAGING_INCDIR} \
                ZLIB_LIB=${STAGING_LIBDIR} \
