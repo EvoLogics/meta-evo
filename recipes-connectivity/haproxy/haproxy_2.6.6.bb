@@ -19,9 +19,9 @@ SRC_URI[sha256sum] = "d0c80c90c04ae79598b58b9749d53787f00f7b515175e7d8203f2796e6
 inherit systemd useradd
 
 #create a user for running haproxy
-HAP_USER_HOME = "/etc/haproxy"
+HAP_USER_HOME = "/home/haproxy"
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system --home ${HAP_USER_HOME} --no-create-home --shell /bin/false --groups haproxy --gid haproxy haproxy"
+USERADD_PARAM_${PN} = "--system --home ${HAP_USER_HOME} --shell /bin/false --groups haproxy --gid haproxy haproxy"
 GROUPADD_PARAM_${PN} = "haproxy"
 
 EXTRA_OEMAKE = "'CPU=generic' \
