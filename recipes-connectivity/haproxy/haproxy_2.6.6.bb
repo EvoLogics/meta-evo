@@ -25,7 +25,7 @@ USERADD_PARAM_${PN} = "--system --home ${HAP_USER_HOME} --shell /bin/false --gro
 GROUPADD_PARAM_${PN} = "haproxy"
 
 EXTRA_OEMAKE = "'CPU=generic' \
-                'TARGET=linux-glibc' \
+                'TARGET=linux-${TCLIBC}' \
                 'USE_GETADDRINFO=1' \
                 'USE_OPENSSL=1' \
                 'USE_PCRE=1' 'USE_PCRE_JIT=1' \
