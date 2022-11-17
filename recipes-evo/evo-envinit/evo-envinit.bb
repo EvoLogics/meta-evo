@@ -20,6 +20,7 @@ SRC_URI_mx6-evobb = " \
   file://11-add-kvm-group.sh \
   file://13-format-storage.sh \
   file://15-mount-storage.sh \
+  file://16-mk-storage-dirs.sh \
   file://20-cp-from-skel.sh \
   file://31-create-dune-dirs.sh \
   file://32-create-soft-hwclock-dirs.sh \
