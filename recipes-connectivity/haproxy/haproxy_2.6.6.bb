@@ -21,7 +21,7 @@ inherit systemd useradd
 #create a user for running haproxy
 HAP_USER_HOME = "/home/haproxy"
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system --home ${HAP_USER_HOME} --shell /bin/false --groups haproxy --gid haproxy haproxy"
+USERADD_PARAM_${PN} = "--system --create-home --home ${HAP_USER_HOME} --shell /bin/false --groups haproxy --gid haproxy haproxy"
 GROUPADD_PARAM_${PN} = "haproxy"
 
 EXTRA_OEMAKE = "'CPU=generic' \
