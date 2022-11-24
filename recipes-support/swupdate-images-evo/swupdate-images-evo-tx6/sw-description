@@ -79,6 +79,11 @@ software =
       a = { ref = "#./../@@EVOHW@@-@@EVOSN@@/a"; }
       b = { ref = "#./../@@EVOHW@@-@@EVOSN@@/b"; }
     }
+    sonobot-0000 =
+    {
+      a = { ref = "#./../@@EVOHW@@-@@EVOSN@@/a"; }
+      b = { ref = "#./../@@EVOHW@@-@@EVOSN@@/b"; }
+    }
   }
 }
 
