@@ -759,7 +759,7 @@ sandbox_start() {
     lxc-start -d -n sandbox -f /tmp/lxc-config #-l debug -o /tmp/lxc-start.log
     sleep .2
     
-    echo -n Waing sandbox start.
+    echo -n Waiting sandbox start.
     DONE=false
     for i in $(seq 20); do
         if ifconfig vlxc 192.168.42.2 2>/dev/null; then
