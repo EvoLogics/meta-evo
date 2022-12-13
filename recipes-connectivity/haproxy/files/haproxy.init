@@ -1,0 +1,32 @@
+#!/bin/sh
+
+NAME=haproxy
+DAEMON=/usr/sbin/${NAME}
+PIDFILE=/var/run/${NAME}.pid
+D_OPTS="-f /etc/haproxy/haproxy.cfg"
+if [ -f "/etc/default/${NAME}" ]; then
+    . /etc/default/${NAME}
+fi
+
+case "$1" in
+  stop|restart)
+    printf "Stopping ${NAME}: "
+    if [ -e ${PIDFILE} ]; then
+      kill -s TERM $(cat ${PIDFILE}) && echo "OK" || echo "FAIL"
+    else
+      killall -s TERM ${NAME} && echo "OK" || echo "FAIL"
+    fi
+    ;;&
+  start|restart)
+    printf "Starting ${NAME}: "
+    ${DAEMON} ${D_OPTS}
+    [ $? = 0 ] && echo "OK" || echo "FAIL"
+    ;;
+  stop)
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart}"
+    exit 1
+esac
+
+exit $?
