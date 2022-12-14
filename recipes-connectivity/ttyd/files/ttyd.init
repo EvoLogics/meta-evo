@@ -4,7 +4,7 @@ NAME=ttyd
 DAEMON=/usr/bin/${NAME}
 PIDFILE=/var/run/${NAME}.pid
 LOG=/var/log/${NAME}.log
-D_OPTS="login"
+D_OPTS="-i lo login"
 if [ -f "/etc/default/${NAME}" ]; then
     . /etc/default/${NAME}
 fi
