@@ -25,6 +25,7 @@ SRC_URI_mx6-evobb = " \
   file://31-create-dune-dirs.sh \
   file://32-create-soft-hwclock-dirs.sh \
   file://33-create-sinaps-dirs.sh \
+  file://97-envinit-done.sh \
   file://98-mark-root-good.sh \
   file://99-reboot.sh \
   "

@@ -1,17 +1,14 @@
 #!/bin/sh
 
-DROPBEAR_RSAKEY_DIR="/etc/dropbear"
-DROPBEAR_RSAKEY="${DROPBEAR_RSAKEY_DIR}/dropbear_rsa_host_key"
-OPENSSH_RSAKEY_DIR="/etc/ssh"
-OPENSSH_RSAKEY="${OPENSSH_RSAKEY_DIR}/ssh_host_rsa_key"
+ENVINIT_DONE=/etc/envinit-done
 ENVINIT_PATH="/sbin/evo-envinit"
 
 case "$1" in
   start)
     # look for ssh/dropbear host keys
     # exit if found, remount root as rw otherwise
-    if [ -e ${DROPBEAR_RSAKEY} -o -e ${OPENSSH_RSAKEY} ]; then
-      echo "Host keys found, boot in normal mode"
+    if [ -e ${ENVINIT_DONE} ]; then
+      echo "Environment initialization complete, boot in normal mode"
       exit 0
     fi
 
