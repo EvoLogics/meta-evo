@@ -4,7 +4,7 @@ DESCRIPTION = "HAProxy is a free, very fast and reliable solution offering high 
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2d862e836f92129cdc0ecccc54eed5e0"
 
-DEPENDS = "libpcre openssl zlib"
+DEPENDS = "libpcre openssl zlib  ${@bb.utils.contains("DISTRO_FEATURES","systemd",'systemd','',d)}"
 RDEPENDS_${PN} = "openssl"
 
 SRC_URI = "http://www.haproxy.org/download/2.6/src/haproxy-2.6.6.tar.gz \
@@ -30,6 +30,7 @@ EXTRA_OEMAKE = "'CPU=generic' \
                 'USE_OPENSSL=1' \
                 'USE_PCRE=1' 'USE_PCRE_JIT=1' \
                 'USE_ZLIB=1' \
+                ${@bb.utils.contains("DISTRO_FEATURES","systemd",'USE_SYSTEMD=1','',d)} \
                "
 
 do_compile() {

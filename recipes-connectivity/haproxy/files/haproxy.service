@@ -3,12 +3,15 @@ Description=HAProxy Load Balancer
 After=syslog.target network.target
 
 [Service]
-ExecStartPre=/usr/sbin/haproxy -f /etc/haproxy/haproxy.cfg -c -q
-ExecStart=/usr/sbin/haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid
+Environment="CONFIG=/etc/haproxy/haproxy.cfg" "EXTRAOPTS=-S /run/haproxy-master.sock"
+ExecStartPre=/usr/sbin/haproxy -f $CONFIG -c -q $EXTRAOPTS
+ExecStart=/usr/sbin/haproxy -Ws -f $CONFIG  $EXTRAOPTS $OPTIONS
+ExecReload=/usr/sbin/haproxy -f $CONFIG -c -q $EXTRAOPTS
 ExecReload=/bin/kill -USR2 $MAINPID
 KillMode=mixed
 Restart=always
-RestartSec=2s
+SuccessExitStatus=143
+Type=notify
 
 [Install]
 WantedBy=multi-user.target
