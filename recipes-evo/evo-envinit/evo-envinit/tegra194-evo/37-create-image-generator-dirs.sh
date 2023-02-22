@@ -19,6 +19,7 @@ if [ $? -eq 0 ]; then
 
   [ ! -d "/mnt/storage/image-generator/log" ] && mkdir -p /mnt/storage/image-generator/log
   [ ! -d "/mnt/storage/image-generator/images" ] && install -d -m 0755 -o ig -g ig /mnt/storage/image-generator/images
+  [ ! -d "/mnt/storage/image-generator/images/tmp" ] && mkdir -p /mnt/storage/image-generator/images/tmp
 
   # Check if /mnt/storage/image-generator/conf-plugins doesnt exit
   if [ -d "/mnt/storage/image-generator/conf-plugins" ]; then
