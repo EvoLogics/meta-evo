@@ -43,6 +43,33 @@ do_install_mx6ul-comm-module(){
         sed -i -e 's!Gateway=10.0.0.1!Gateway=${BRIDGE_GATEWAY}!g' ${D}${systemd_unitdir}/network/Bridge.network
     fi
 
+    if ${@bb.utils.contains("IMAGE_CONFIGS","streamcaster",'true','false',d)};
+    then
+      # Disable bridge network
+      rm -f ${D}${systemd_unitdir}/network/Bridge.network
+      rm -f ${D}${systemd_unitdir}/network/Bridge.netdev
+      rm -f ${D}${systemd_unitdir}/network/10-wwan0.network
+
+      sed -i -e 's!Bridge=br0!Address=10.0.0.2/24!g' ${D}${systemd_unitdir}/network/10-eth1.network
+      echo "Address=10.0.0.1/24"                  >> ${D}${systemd_unitdir}/network/10-eth1.network
+      echo "Gateway=10.0.0.1"                     >> ${D}${systemd_unitdir}/network/10-eth1.network
+
+      if [ -n "${EXTERNAL_IP}" ]
+      then
+        sed -i -e 's!Bridge=br0!Address=${EXTERNAL_IP}!g' ${D}${systemd_unitdir}/network/10-eth0.network
+      else
+        sed -i -e 's!Bridge=br0!Address=172.16.222.2/16!g' ${D}${systemd_unitdir}/network/10-eth0.network
+      fi
+
+      if [ -n "${EXTERNAL_GATEWAY}" ]
+      then
+        echo "Gateway=${EXTERNAL_GATEWAY}"             >> ${D}${systemd_unitdir}/network/10-eth0.network
+      else
+        echo "Gateway=172.16.222.2"                >> ${D}${systemd_unitdir}/network/10-eth0.network
+      fi
+    fi
+
+
     install -d ${D}${systemd_system_unitdir}/
     for file in $(find ${WORKDIR} -maxdepth 1 -type f -name *.service); do
         install -m 0644 "$file" ${D}${systemd_system_unitdir}/
