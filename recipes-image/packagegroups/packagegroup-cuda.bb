@@ -5,11 +5,6 @@ inherit packagegroup
 RDEPENDS_${PN} = "          	\
     cuda-nvrtc                \
     cuda-nvgraph              \
-    cuda-cusolver             \
-    cuda-cufft                \
-    cuda-curand               \
-    cuda-cusparse             \
-    cuda-npp                  \
     cuda-cudart               \
     cuda-compiler             \
     cuda-libraries            \
@@ -18,7 +13,6 @@ RDEPENDS_${PN} = "          	\
     cuda-cupti                \
     cuda-gdb                  \
     cuda-memcheck             \
-    cuda-misc-headers         \
     cuda-nvcc-headers         \
     cuda-nvcc                 \
     cuda-nvdisasm             \
@@ -31,7 +25,6 @@ RDEPENDS_${PN} = "          	\
     cudnn                     \
     cuda-command-line-tools   \
     libcublas                 \
-    tegra-libraries           \
     tensorrt-core             \
     tensorrt-plugins-prebuilt \
 "

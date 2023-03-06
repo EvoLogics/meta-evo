@@ -81,6 +81,8 @@ do_install_append_tegra194-evo() {
     if [ -n "${IP_ALIAS}" ]
     then
       echo "\n\n[Address]\nLabel=eth0:evo\nAddress=${IP_ALIAS}" >> ${D}${sysconfdir}/systemd/network/10-eth0.network
+      # Do not add route for IP alias
+      echo "\nAddPrefixRoute=false\n" >> ${D}${sysconfdir}/systemd/network/10-eth0.network
     fi
 }
 
