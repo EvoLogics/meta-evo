@@ -1,0 +1,43 @@
+From d50da0ac57574451fae7bfa514d49fe55bafa1a3 Mon Sep 17 00:00:00 2001
+From: Victor Voronin <viktor.voronin@evologics.de>
+Date: Wed, 17 May 2023 10:57:28 +0200
+Subject: [PATCH] src/avrdude.conf.in: hack to keep gpio/spi config
+
+---
+ src/avrdude.conf.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/avrdude.conf.in b/src/avrdude.conf.in
+index 43dbe767..0849522b 100644
+--- a/src/avrdude.conf.in
++++ b/src/avrdude.conf.in
+@@ -680,6 +680,7 @@ programmer
+ @HAVE_PARPORT_END@
+ 
+ @HAVE_LINUXGPIO_BEGIN@
++@HAVE_LINUXGPIO_END@
+ 
+ # This programmer bitbangs GPIO lines using the Linux sysfs GPIO interface
+ #
+@@ -709,9 +710,9 @@ programmer
+ #     sdo                  = ?;
+ #     sdi                  = ?;
+ # ;
+-@HAVE_LINUXGPIO_END@
+ 
+ @HAVE_LINUXSPI_BEGIN@
++@HAVE_LINUXSPI_END@
+ #------------------------------------------------------------
+ # linuxspi
+ #------------------------------------------------------------
+@@ -730,7 +731,6 @@ programmer
+     connection_type        = spi;
+     reset                  = 25;    # Pi GPIO number - this is J8:22
+ ;
+-@HAVE_LINUXSPI_END@
+ 
+ #
+ # PROGRAMMER DEFINITIONS
+-- 
+2.25.1
+
