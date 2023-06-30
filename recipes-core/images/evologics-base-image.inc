@@ -126,20 +126,24 @@ DEPENDS += "\
     \
     usbutils \
     \
+    jq \
+    \
     tmux \
     bash-completion \
     \
     procps \
     iperf3 \
-    wget \
-    dosfstools \
     \
+    wget \
     rsync \
+    \
+    dosfstools \
     \
     can-utils \
     \
     tcpdump \
     ltrace \
+    valgrind \
     hdparm \
     \
     packagegroup-erlang-embedded \
