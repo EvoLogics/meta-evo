@@ -36,6 +36,8 @@ SRC_URI += "\
     file://${MACHINE}_defconfig \
     file://sandbox.cfg \
 "
+SRC_URI += "file://crypto.cfg"
+SRC_URI += "file://initramfs.cfg"
 
 PACKAGES_append = " ${KERNEL_PACKAGE_NAME}-devicetree-compressed"
 FILES_${KERNEL_PACKAGE_NAME}-devicetree-compressed = "/${KERNEL_IMAGEDEST}/*.dtb.xz /${KERNEL_IMAGEDEST}/*.dtbo.xz"

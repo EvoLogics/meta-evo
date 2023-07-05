@@ -1,4 +1,0 @@
-#
-# Config.in.board for the contributed board configuration
-#
-source "contrib/board/acme/sama5d2_roadrunner/Config.in.linux_arg"
