@@ -1,4 +1,13 @@
 #!/bin/sh
+
+DROPBEAR_KEY_DIR="/etc/dropbear"
+DROPBEAR_RSAKEY="${DROPBEAR_KEY_DIR}/dropbear_rsa_host_key"
+DROPBEAR_ECDSAKEY="${DROPBEAR_KEY_DIR}/dropbear_ecdsa_host_key"
+OPENSSH_KEY_DIR="/etc/ssh"
+OPENSSH_RSAKEY="${OPENSSH_KEY_DIR}/ssh_host_rsa_key"
+OPENSSH_ECDSAKEY="${OPENSSH_KEY_DIR}/ssh_host_ecdsa_key"
+ZEROTIER_DIRECTORY="/opt/zerotier-one/creds"
+
 check_command_success()
 {
     if [ $1 -eq 0 ]; then
@@ -32,6 +41,30 @@ do_postinst()
     check_command_success $?
     umount /boot
     check_command_success $?
+    mkdir -p /tmp/new_root
+    check_command_success $?
+    mount -t auto /dev/mmcblk1p2 /tmp/new_root
+    check_command_success $?
+    for file in \
+      ${DROPBEAR_RSAKEY} \
+      ${DROPBEAR_ECDSAKEY} \
+      ${OPENSSH_RSAKEY} \
+      ${OPENSSH_ECDSAKEY}; do
+
+      if [ -e ${file} ]; then
+        echo "Found ${file}, copying to the new destination"
+        cp -v ${file} /tmp/new_root${file}
+      fi
+    done
+
+    if [ -d ${ZEROTIER_DIRECTORY} ]; then
+      mkdir -p /tmp/new_root${ZEROTIER_DIRECTORY}
+      echo "Found ${ZEROTIER_DIRECTORY}, copying to the new destination"
+      cp -R ${ZEROTIER_DIRECTORY}/* /tmp/new_root${ZEROTIER_DIRECTORY}/
+    fi
+
+    sync && umount /dev/mmcblk1p2
+
     /sbin/update-util -sa
     exit 0
 }
