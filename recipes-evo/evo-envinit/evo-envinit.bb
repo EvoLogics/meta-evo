@@ -46,7 +46,7 @@ SRC_URI_append_mx6ul-comm-module = "            \
         file://32-create-soft-hwclock-dirs.sh   \
         file://33-create-sinaps-dirs.sh         \
         file://40-create-pure-ftpd-db.sh        \
-        file://systemd-firstboot.sh             \
+        file://systemdfirstboot.sh              \
         file://se                               \
         file://init-gpio.service                \
         file://systemd-firstboot.service        \
@@ -98,7 +98,7 @@ do_install_mx6ul-comm-module(){
     install -m 0755 ${WORKDIR}/update-util ${D}${base_sbindir}/update-util
     install -m 0755 ${WORKDIR}/comm-hw ${D}${base_sbindir}/
 
-    install -m 0755 ${WORKDIR}/systemd-firstboot.sh ${D}${base_sbindir}/
+    install -m 0755 ${WORKDIR}/systemdfirstboot.sh ${D}${base_sbindir}/
     install -m 0755 ${WORKDIR}/se ${D}${base_sbindir}/
 
     if ${@bb.utils.contains("IMAGE_CONFIGS","enablesw",'true','false',d)}; then
