@@ -52,7 +52,12 @@ do_install_mx6ul-comm-module(){
 
       sed -i -e 's!Bridge=br0!Address=10.0.0.2/24!g' ${D}${systemd_unitdir}/network/10-eth1.network
       echo "Address=10.0.0.1/24"                  >> ${D}${systemd_unitdir}/network/10-eth1.network
-      echo "Gateway=10.0.0.1"                     >> ${D}${systemd_unitdir}/network/10-eth1.network
+
+      if ${@bb.utils.contains("IMAGE_CONFIGS","iridium",'true','false',d)};
+      then
+         echo "Address=10.0.1.2/24"                  >> ${D}${systemd_unitdir}/network/10-eth1.network
+         echo "Gateway=10.0.1.1"                     >> ${D}${systemd_unitdir}/network/10-eth1.network
+      fi
 
       if [ -n "${EXTERNAL_IP}" ]
       then
@@ -64,8 +69,6 @@ do_install_mx6ul-comm-module(){
       if [ -n "${EXTERNAL_GATEWAY}" ]
       then
         echo "Gateway=${EXTERNAL_GATEWAY}"             >> ${D}${systemd_unitdir}/network/10-eth0.network
-      else
-        echo "Gateway=172.16.222.2"                >> ${D}${systemd_unitdir}/network/10-eth0.network
       fi
     fi
 
