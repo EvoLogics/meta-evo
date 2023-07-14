@@ -92,6 +92,8 @@ IMAGE_INSTALL = "\
     can-utils \
     iproute2 \
     \
+    tclreadline \
+    \
     erlang \
     erlang-sasl \
     erlang-stdlib \
@@ -149,6 +151,8 @@ DEPENDS += "\
     packagegroup-erlang-embedded \
     \
     tcllib \
+    tclx \
+    tcludp \
     \
     fftw \
 "
