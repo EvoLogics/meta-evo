@@ -13,7 +13,7 @@ TOOLCHAIN_TARGET_TASK_append = " readline readline-staticdev \
 TOOLCHAIN_TARGET_TASK_append = " tcl-staticdev"
 
 ##################### install nativesdk packages ##################################
-TOOLCHAIN_HOST_TASK_append = " nativesdk-erlang nativesdk-rebar \
+TOOLCHAIN_HOST_TASK_append = " nativesdk-erlang nativesdk-rebar3 \
                                nativesdk-erlang-modules-dev \
                                nativesdk-tcl-staticdev"
 
