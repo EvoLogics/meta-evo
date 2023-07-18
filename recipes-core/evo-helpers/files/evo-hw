@@ -285,6 +285,9 @@ set_hwtype_dtb() {
     fi
 
     if [ "$HWTYPE" = "$CFG_HWTYPE" ]; then
+        if $OPT_QUIET; then
+            exit 0
+        fi
         warn "Hardware type \"$HWTYPE\" no need to change" 
         exit 1
     fi
