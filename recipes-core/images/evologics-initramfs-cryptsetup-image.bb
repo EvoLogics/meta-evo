@@ -46,6 +46,7 @@ prepare_rootfs () {
     # before even executing /init.
     mknod -m 622 ${IMAGE_ROOTFS}/dev/console c 5 1
 
+    mv ${IMAGE_ROOTFS}/usr/bin/* ${IMAGE_ROOTFS}/bin/
     # FIXME: Find a way do not install alternatives
     # setup with cryptsetup-plain-static
     rm -rf ${IMAGE_ROOTFS}/etc \
