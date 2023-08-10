@@ -1,0 +1,23 @@
+From 26711a8486fefad8d67a9a605f9939e20f6c1718 Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Sat, 8 Jul 2023 21:16:34 +0200
+Subject: [PATCH] Fix founding .so without symbolic links
+
+Yocto QA prevent shipping symbolic link to .so in not -dev packages
+---
+ tclreadlineInit.tcl.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tclreadlineInit.tcl.in b/tclreadlineInit.tcl.in
+index 4d98a82..694163b 100644
+--- a/tclreadlineInit.tcl.in
++++ b/tclreadlineInit.tcl.in
+@@ -18,7 +18,7 @@ proc ::tclreadline::Init {} {
+         if {![info exists tclreadline::library]} {
+             set msg ""
+             foreach dirname {@TCLRL_LIBDIR@ [file dirname [info script]]} {
+-                if {[catch {load [file join $dirname libtclreadline[info sharedlibextension]]} msg] == 0} {
++                if {[catch {load [file join $dirname libtclreadline-@VERSION@[info sharedlibextension]]} msg] == 0} {
+                     set msg ""
+                     break
+                 }

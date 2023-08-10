@@ -13,7 +13,7 @@ TOOLCHAIN_TARGET_TASK_append = " readline readline-staticdev \
 TOOLCHAIN_TARGET_TASK_append = " tcl-staticdev"
 
 ##################### install nativesdk packages ##################################
-TOOLCHAIN_HOST_TASK_append = " nativesdk-erlang nativesdk-rebar \
+TOOLCHAIN_HOST_TASK_append = " nativesdk-erlang nativesdk-rebar3 \
                                nativesdk-erlang-modules-dev \
                                nativesdk-tcl-staticdev"
 
@@ -92,6 +92,8 @@ IMAGE_INSTALL = "\
     can-utils \
     iproute2 \
     \
+    tclreadline \
+    \
     erlang \
     erlang-sasl \
     erlang-stdlib \
@@ -149,6 +151,8 @@ DEPENDS += "\
     packagegroup-erlang-embedded \
     \
     tcllib \
+    tclx \
+    tcludp \
     \
     fftw \
 "
