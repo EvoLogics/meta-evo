@@ -72,6 +72,11 @@ do_install_mx6ul-comm-module(){
       fi
     fi
 
+    if ${@bb.utils.contains("IMAGE_CONFIGS","EC25",'true','false',d)};
+    then
+        sed -i -e 's!Bridge=br0!DHCP=ipv4!g' ${D}${systemd_unitdir}/network/10-wwan0.network
+        sed -i -e 's!Gateway=10.0.0.1! !g' ${D}${systemd_unitdir}/network/Bridge.network
+    fi
 
     install -d ${D}${systemd_system_unitdir}/
     for file in $(find ${WORKDIR} -maxdepth 1 -type f -name *.service); do
