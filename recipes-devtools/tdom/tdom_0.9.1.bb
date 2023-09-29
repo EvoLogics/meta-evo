@@ -41,4 +41,4 @@ do_install_append() {
 
 FILES_${PN} = "${libdir}/tdom*"
 FILES_${PN}-dev = "${includedir}/tdom.h"
-FILES_${PN}-staticdev = "${libdir}/tdom${PV}/*.a ${includedir}/tdom.h"
+FILES_${PN}-staticdev_sama5d2-roadrunner-evo = "${libdir}/tdom${PV}/*.a ${includedir}/tdom.h"
