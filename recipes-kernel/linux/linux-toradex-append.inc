@@ -47,6 +47,7 @@ SRC_URI_append_tx6 = "\
 
 SRC_URI_append_tx6 = "\
   file://imx6-tx6-evobb.cfg \
+  file://imx6-tx6-evobb-iptables.cfg \
   file://imx6-${MACHINE}.dts;subdir=${S}/arch/arm/boot/dts \
   file://imx6-tx6-common.dtsi;subdir=${S}/arch/arm/boot/dts \
   file://imx6-tx6-evobb.dtsi;subdir=${S}/arch/arm/boot/dts \
