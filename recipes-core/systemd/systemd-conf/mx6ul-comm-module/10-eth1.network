@@ -2,4 +2,5 @@
 Name=eth1
 
 [Network]
+ConfigureWithoutCarrier=true
 Bridge=br0

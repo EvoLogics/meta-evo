@@ -35,3 +35,4 @@ do_install_append() {
 }
 
 FILES_${PN} = "${libdir}/udp${PV}"
+BBCLASSEXTEND = "native nativesdk"

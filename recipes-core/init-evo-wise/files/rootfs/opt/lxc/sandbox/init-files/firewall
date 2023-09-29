@@ -34,11 +34,14 @@ firewall_start () {
         # S2C SDM port
         iptables -t nat -A PREROUTING -p tcp -d $IP --dport 4200 -j DNAT --to-destination 192.168.42.2:4200
 
-        # S2C Transponder Communication port
+        # S2C Transponder Communication port (uncomment in /var/www/html/index.html if you need)
         iptables -t nat -A PREROUTING -p tcp -d $IP --dport 8090 -j DNAT --to-destination 192.168.42.2:8090
 
-        # Uncomment this if you want disable lighttpd and use modem web interface directly
-       #iptables -t nat -A PREROUTING -p tcp -d $IP --dport 80 -j DNAT --to-destination 192.168.42.2:80
+        # Atomic Clock Utility (uncomment in /var/www/html/index.html if you need)
+        iptables -t nat -A PREROUTING -p tcp -d $IP --dport 8091 -j DNAT --to-destination 192.168.42.2:8091
+
+        ## Uncomment this if you want disable lighttpd and use modem web interface directly
+        #iptables -t nat -A PREROUTING -p tcp -d $IP --dport 80 -j DNAT --to-destination 192.168.42.2:80
         
         # ssh host
         iptables -t nat -A PREROUTING -p tcp -d $IP --dport 2222 -j DNAT --to-destination 192.168.42.2:22

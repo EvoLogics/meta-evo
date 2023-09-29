@@ -4,11 +4,11 @@ FILESEXTRAPATHS_prepend_mx6-evobb := "${THISDIR}/${PN}/mx6:"
 DEPENDS += "librsync json-c e2fsprogs "
 DEPENDS_append_tegra194-evo = "systemd"
 
-SRC_URI_append_mx6ul-comm-module = "  \
-	file://defconfig   				          \
-	file://swupdate.service     	      \
-	file://hwrevision				            \
-	"
+SRC_URI_append_mx6ul-comm-module = "			\
+				file://defconfig   				\
+				file://swupdate.service     	\
+				file://hwrevision				\
+				"
 
 SRC_URI_append_mx6 = " \
 	file://hwrevision	\

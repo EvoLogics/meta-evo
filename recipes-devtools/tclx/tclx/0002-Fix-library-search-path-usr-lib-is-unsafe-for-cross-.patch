@@ -1,0 +1,23 @@
+From 9edd18e29ecd61795b75452b23602b2a8db68596 Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Fri, 14 Jul 2023 12:01:40 +0200
+Subject: [PATCH] Fix library search path "/usr/lib" is unsafe for
+ cross-compilation
+
+---
+ tclconfig/tcl.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tclconfig/tcl.m4 b/tclconfig/tcl.m4
+index 8479514..1550c5f 100644
+--- a/tclconfig/tcl.m4
++++ b/tclconfig/tcl.m4
+@@ -370,7 +370,7 @@ AC_DEFUN([TEA_LOAD_TCLCONFIG], [
+     # of TCL_BUILD_LIB_SPEC. An extension should make use of TCL_LIB_SPEC
+     # instead of TCL_BUILD_LIB_SPEC since it will work with both an
+     # installed and uninstalled version of Tcl.
+-    if test -f "${TCL_BIN_DIR}/Makefile" ; then
++    if test -f "${TCL_BIN_DIR}/Makefile" || test "$cross_compiling" = yes; then
+         TCL_LIB_SPEC="${TCL_BUILD_LIB_SPEC}"
+         TCL_STUB_LIB_SPEC="${TCL_BUILD_STUB_LIB_SPEC}"
+         TCL_STUB_LIB_PATH="${TCL_BUILD_STUB_LIB_PATH}"

@@ -16,6 +16,7 @@ DEPENDS = "openssl zlib virtual/crypt"
 SRC_URI = "\
 	http://mmonit.com/monit/dist/${BP}.tar.gz \
 	file://init \
+	file://monitrc \
 	"
 
 SRC_URI_append_mx6ul-comm-module = "    \
@@ -53,15 +54,8 @@ do_install_append() {
 	install -d ${D}${sysconfdir}/init.d/
 	install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/monit
 
-	install -m 600 ${S}/monitrc ${D}${sysconfdir}/monitrc
+	install -m 600 ${WORKDIR}/monitrc ${D}${sysconfdir}/monitrc
   install -m 700 -d ${D}${sysconfdir}/monit.d/
-	sed -i -e 's:#*\s*include /etc/monit.d/:include ${sysconfdir}/monit.d/:' \
-         -e 's:#*\s*set idfile.*:set idfile /etc/monitid:' \
-         -e 's:#*\s*set pidfile.*:set pidfile /var/run/monit.pid:' \
-         -e 's:#*\s*set statefile.*:set statefile /var/tmp/monit.state:' \
-         -e 's:\s*use address localhost:# use address localhost:' \
-         -e 's:\s*allow localhost.*:# allow localhost:' \
-	       ${D}${sysconfdir}/monitrc
 }
 
 do_install_append_mx6ul-comm-module(){

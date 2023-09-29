@@ -65,6 +65,7 @@ do_install_append_sama5d2-roadrunner-evo() {
     echo 'export RLWRAP_HOME=/data' >> ${D}/${sysconfdir}/profile
     echo "alias sudo=''" >> ${D}/${sysconfdir}/profile
     echo '[ -e $HOME/.bashrc ] && . $HOME/.bashrc' >> ${D}/${sysconfdir}/profile
+    echo 'export RLWRAP_HOME=/data' >> ${D}/${sysconfdir}/profile
 }
 
 ##########################

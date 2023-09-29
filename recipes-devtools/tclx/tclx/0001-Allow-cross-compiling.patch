@@ -1,0 +1,42 @@
+From 8958bcba8713f13dbbb5eba8fd064df2fa084137 Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Fri, 14 Jul 2023 12:01:07 +0200
+Subject: [PATCH] Allow cross compiling
+
+---
+ configure.in | 22 ----------------------
+ 1 file changed, 22 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index c0e6f1d..2647136 100755
+--- a/configure.in
++++ b/configure.in
+@@ -187,28 +187,6 @@ WIFEXITED(x);	/* Generates compiler error if WIFEXITED uses an int. */
+     fi
+ 
+     #-------------------------------------------------------------------------
+-    # Test to see if "times" returns a status or the amount of elapsed real
+-    # time.
+-    #-------------------------------------------------------------------------
+-    
+-    AC_MSG_CHECKING(checking to see what 'times' returns)
+-    AC_TRY_RUN([
+-#include <stdlib.h>
+-#include <sys/types.h>
+-#include <sys/times.h>
+-#include <unistd.h>
+-int main(void) {
+-    struct tms cpu;
+-    times(&cpu);
+-    sleep(2);
+-    exit ((times(&cpu) > 0) ? 0 : 1);
+-}
+-], [AC_MSG_RESULT(elapsed real time)],
+-       [AC_MSG_RESULT(a status)
+-    	AC_DEFINE(TIMES_RETS_STATUS)],
+-       [AC_MSG_ERROR(cross-compiling not supported)])
+-    
+-    #-------------------------------------------------------------------------
+     # Check for missing typedefs.
+     #-------------------------------------------------------------------------
+     

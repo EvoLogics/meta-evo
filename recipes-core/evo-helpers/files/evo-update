@@ -3,6 +3,7 @@ NEW_ROOT=/update
 PROG=$(basename $0)
 PROG_ABS=$(realpath $0)
 UPDATER_PUB=/etc/ssl/private/evo-updater.pub.pem
+ROOTFS_PASS_FILE=/tmp/rootfs.pass
 
 ROOTFS_OLD=rootfs-old
 VAR_DATA_BAK=/tmp/var-data.bak.tar.xz
@@ -18,17 +19,41 @@ CONSPY_TTY=/dev/tty$CONSPY_TTY_NUM
 trap 'sed $LINENO"s/.*/Error line $LINENO: + &/p" $PROG_ABS' ERR
 
 ######### utils ###########
-msg() {
-    printf "$*"
-}
-
-warn() {
-    printf "\e[35;1m%s\e[0m\n" "$*"
-}
+if [ -t 1 ]; then
+    C_NONE="\033[m"
+    C_MSG_ERR="\033[1;31m"
+    C_MSG_WARN="\033[1;35m"
+    C_MSG_INFO="\033[1;37m"
+    C_MSG_TIPS="\033[1;32m"
+    C_MSG_DONE="\033[1;32m"
+    C_MSG_KEY="\033[1;37m"
+fi
 
 die() {
-    [ -n "$*" ] && printf "\e[31;1m%s\e[0m\n" "$*"
-    exit 1
+    msg err "$1\n"
+    exit $2
+}
+
+msg() {
+    TYPE=$1
+    shift
+    if $OPT_QUIET; then
+        case "$TYPE" in
+            err) ;;
+            warn|norm|info|tips|null|done) return;;
+            *) return ;;
+        esac
+    fi
+    case "$TYPE" in
+        err)  printf "ERROR: $C_MSG_ERR$*$C_NONE"    >&2 ;;
+        warn) printf "WARNING: $C_MSG_WARN$*$C_NONE" >&2 ;;
+        norm) printf "$C_MSG_NORM$*$C_NONE" ;;
+        info) printf "$C_MSG_INFO$*$C_NONE" ;;
+        tips) printf "$C_MSG_TIPS$*$C_NONE" ;;
+        done) printf "$C_MSG_DONE$*$C_NONE" ;;
+        null) ;;
+        *)    printf "%s" "$*" ;;
+    esac
 }
 
 mk_ram_root_tgz() {
@@ -37,13 +62,13 @@ mk_ram_root_tgz() {
 }
 
 mk_ram_root() {
-    msg "Create update system... "
+    msg info "Create update system... "
     [ -d /opt/arsp ] && ADD=/opt/arsp
     tar -C / -c \
          bin etc lib sbin var usr/bin usr/lib usr/sbin usr/share home/root/.ssh $ADD |
               tar -C $NEW_ROOT -x
     #(cd $NEW_ROOT && ln -s /var/volatile/tmp tmp)
-    msg "done\n"
+    msg info "done\n"
 }
 
 mount_ramfs() {
@@ -74,11 +99,11 @@ prepare_swu() {
 }
 
 check_swu() {
-    msg "Check update .swu file... "
+    msg info "Check update .swu file... "
     if ! swupdate -c -k $UPDATER_PUB -i "$1" > /dev/null; then
         die ""
     fi
-    msg "done\n"
+    msg info "done\n"
 }
 
 is_update_rootfs() {
@@ -93,13 +118,13 @@ check_system_update_stage() {
     case "$STAGE" in
         1)
             if is_update_rootfs; then
-                msg "System ready for second stage of system update\n"
+                msg info "System ready for second stage of system update\n"
                 STAGE=2
             fi
             ;;
         2)
             if ! is_update_rootfs; then
-                msg "System NOT ready for second stage of system update. Stage will be prepared\n"
+                msg info "System NOT ready for second stage of system update. Stage will be prepared\n"
                 STAGE=1
             fi
             ;;
@@ -114,12 +139,12 @@ var_data_backup() {
     if ! $OPT_CLEAN_VAR_DATA; then
         for DIR in usr/local opt/arsp opt/evins data; do
             if [ -e /$1/$DIR ]; then
-                msg "Will backup $DIR\n"
+                msg info "Will backup $DIR\n"
                 BAK_ADD_DIR="$DIR $BAK_ADD_DIR"
             fi
         done
     fi
-    msg "Backup data from old system... "
+    msg info "Backup data from old system... "
     tar -C "$1" $TAR_VERBOSE -cjf $VAR_DATA_BAK \
         home/root/.ssh \
         etc/ssl/private \
@@ -131,7 +156,7 @@ var_data_backup() {
 #            etc/passwd \
 #            etc/group \
 #            sbin/init
-    msg "done\n"
+    msg info "done\n"
 }
 
 remount_all() {
@@ -167,7 +192,7 @@ var_data_restore() {
              /$ROOTFS_OLD/var/volatile/log
 
     chroot /$ROOTFS_OLD sh /usr/local/etc/rc.local
-    msg "Waiting initial setup ends... "
+    msg info "Waiting initial setup ends... "
     while chroot /$ROOTFS_OLD test -f /tmp/init-setup.lock; do
         echo -n .
         sleep 1
@@ -283,19 +308,19 @@ update_system_update_stage_1() {
     SWU="$1"
 
     if [ -z "$SWU" ]; then
-        usage
+        usage 3
     fi
 
     SWU="$(realpath $SWU)"
 
-    msg "Prepare .swu... "
+    msg info "Prepare .swu... "
     SWU="$(prepare_swu $SWU)"
-    msg "done\n"
+    msg info "done\n"
 
     check_swu "$SWU"
 
     if $OPT_NO_ACTION; then
-        msg "No action\n"
+        msg warn "No action\n"
         exit
     fi
 
@@ -319,17 +344,17 @@ update_system_update_stage_1() {
     case "$(tty)" in
         /dev/pts/*)
             if [ -n "$SSH_CONNECTION" ]; then
-                msg "You will be disconnect in order to make upgrade\n"
-                msg "You can connect back to see update process:\n"
-                msg "$ ssh -t $USER@$(echo $SSH_CONNECTION | awk '{print $3}') conspy 42\n"
+                msg tips "You will be disconnect in order to make upgrade\n"
+                msg tips "You can connect back to see update process:\n"
+                msg tips "$ ssh -t $USER@$(echo $SSH_CONNECTION | awk '{print $3}') conspy 42\n"
             elif [ "$SHELL" = "/sbin/eush" ]; then
-                msg "You will be logout in order to make upgrade\n"
+                msg tips "You will be logout in order to make upgrade\n"
                 # give time send message via arsp (rs485)
                 sleep 5
             else
-                msg "You will be logout in order to make upgrade\n"
-                msg "You can login back to see update process:\n"
-                msg "$ conspy 42\n"
+                msg tips "You will be logout in order to make upgrade\n"
+                msg tips "You can login back to see update process:\n"
+                msg tips "$ conspy 42\n"
             fi
             ;;
     esac
@@ -345,11 +370,11 @@ update_system_update_stage_2() {
 
     if [ -z "$SWU" ]; then
         die "TODO: search for swu in second stage"
-        usage
+        usage 3
     fi
 
     if $OPT_NO_ACTION; then
-        msg "No action\n"
+        msg warn "No action\n"
         exit
     fi
 
@@ -360,21 +385,21 @@ update_system_update_stage_2() {
     var_data_backup /$ROOTFS_OLD
     flash_detach
 
-    msg "Flashing new images..."
+    msg info "Flashing new images..."
     if $OPT_VERBOSE; then
-        msg "\n"
+        msg info "\n"
         swupdate -k $UPDATER_PUB -i "$SWU" -v
     else
         expect -c "log_user 0; spawn swupdate -k $UPDATER_PUB -i $SWU;\
             expect -re .+ exp_continue -timeout 5 timeout {send_user .;exp_continue}"
-        msg " done\n"
+        msg info " done\n"
     fi
 
     flash_attach
     var_data_restore /$ROOTFS_OLD
     flash_detach
 
-    msg "System update done\n"
+    msg info "System update done\n"
     $OPT_REBOOT && reboot
 }
 
@@ -415,9 +440,9 @@ install_to_mtd() {
             die "Backup file $BAK exist. Use -f to force it"
         fi
 
-        msg "Backup $1 to $BAK ... "
+        msg info "Backup $1 to $BAK ... "
         dd status=none if=$MTD_DEV | gzip -c > $BAK
-        msg "done\n"
+        msg info "done\n"
     fi
 
     CAT=cat
@@ -428,9 +453,9 @@ install_to_mtd() {
     esac
 
     $OPT_NO_ACTION || flash_erase $MTD_DEV 0 0
-    msg "Update $1... "
+    msg info "Update $1... "
     $OPT_NO_ACTION || $CAT "$2" | dd status=none of=$MTD_DEV
-    msg "done\n"
+    msg info "done\n"
 
     if [ -n "$3" ]; then
         printf "$3\n"
@@ -497,37 +522,133 @@ install_modules () {
         if ! $OPT_FORCE && [ -f "$BAK" ]; then
             die "Backup file $BAK exist. Use -f to force it"
         fi
-        msg "Backup kernel modules to $BAK ... "
+        msg info "Backup kernel modules to $BAK ... "
         tar -C / $TAR_VERBOSE -czf "$BAK" lib/modules
-        msg "done\n"
+        msg info "done\n"
     fi
 
     temporary_remount /
     if $OPT_FORCE; then
-        msg "Clean old modules..."
+        msg info "Clean old modules..."
         $OPT_NO_ACTION || rm -r /lib/modules/*
-        msg "done\n"
+        msg info "done\n"
     fi
 
-    msg "Update kernel modules... "
+    msg info "Update kernel modules... "
     $OPT_NO_ACTION || tar -C / $TAR_VERBOSE -xf "$1"
     temporary_remount /
-    msg "done\n"
+    msg info "done\n"
     printf "Do not forget update kernel\n"
+}
+
+rootfs_type () {
+    awk '$2 != "/"         {next}             \
+         $1 ~ /^ubi0:/     {print "ubi";exit} \
+         $1 ~ /sd-rootfs$/ {print "sd"; exit} \
+         {print "uknown"}' < /proc/mounts
+}
+
+mount_rootfs_sd() {
+    if [ ! -e $ROOTFS_PASS_FILE ]; then
+        die "There is no $ROOTFS_PASS_FILE"
+    fi
+
+    if mountpoint -q /mnt; then
+        umount /mnt
+    fi
+
+    if [ -e /dev/mapper/sd-rootfs ]; then
+        cryptsetup-plain close sd-rootfs
+    fi
+
+    cryptsetup-plain open $ROOTFS_PASS_FILE /dev/mmcblk0p2 sd-rootfs
+    /bin/mount -o rw /dev/mapper/sd-rootfs /mnt
+}
+
+mount_rootfs_ubi() {
+    if mountpoint -q /mnt; then
+        umount /mnt
+    fi
+
+    /bin/mount -o rw ubi0:sama5d2-roadrunner-evo-rootfs /mnt
+}
+
+do_sync_rootfs () {
+    ROOTFS_TYPE="$(rootfs_type)"
+    DST_TYPE=$2
+    BACK_SYNC=false # sync from secondary rootfs to current one
+    
+    if [ "$DST_TYPE" = "$ROOTFS_TYPE" ]; then
+        SRC_DIR=/mnt
+        DST_DIR=/
+        if [ $DST_TYPE = "ubi" ]; then
+            DST_TYPE="sd"
+        elif [ $DST_TYPE = "sd" ]; then
+            DST_TYPE="ubi"
+        fi
+        BACK_SYNC=true
+    else
+        SRC_DIR=/
+        DST_DIR=/mnt
+    fi
+
+    case "$DST_TYPE" in
+        auto)
+            case "$ROOTFS_TYPE" in
+                ubi) mount_rootfs_sd  ;;
+                sd)  mount_rootfs_ubi ;;
+                unknown) die "Unknown rootfs type" ;;
+            esac
+            ;;
+        ubi|sd) eval mount_rootfs_"$DST_TYPE" ;;
+        *)      die "sync-rootfs [sd|ubi|auto]"
+    esac
+
+    keep_run -m || true
+
+    [ "$OPT_VERBOSE" ] && RSYNC_OPT="$RSYNC_OPT -v"
+    [ "$OPT_TRACE" ]   && RSYNC_OPT="$RSYNC_OPT -v"
+    [ "$OPT_QUIET" ]   && RSYNC_OPT="$RSYNC_OPT -q"
+    rsync -ax $RSYNC_OPT --delete $SRC_DIR $DST_DIR
+
+    umount /mnt
+    if [ "$ROOTFS_TYPE" != "sd" ]; then
+        cryptsetup-plain close sd-rootfs
+    fi
+    if ! $BACK_SYNC; then
+        msg tips "If you want change booting rootfs to $DST_TYPE run:\n"
+        msg tips "$ fw_setenv -f rootfs_type $DST_TYPE\n"
+    fi
 }
 
 ######################################
 usage() {
     cat << END
-Usage: $PROG [<image.swu>|<zImage>|<modules.tgz>|<dtb>|<at91bootstrap>] ...
+Usage: $PROG [sync-rootfs <ubi|sd|auto>|<image.swu>|<zImage>|<modules.tgz>|<dtb>|<at91bootstrap>] ...
+
+    sync-rootfs - Sync rootfs from ubi/sd to sd/ubi. Can be 'auto'.
+
     -b - Backup before update
     -f - Force override old backup. Or clean /lib/modules before update
     -c - Clean var data. Do not safe data (configs and /data) after update.
-    -n - no action
+    -n - No action
+    -v - Verbose output. -vv - Trace output
+    -q - Supress output
     -z - Stage (for internal usage)
     -h - Help
+
+Examples:
+    # Sync ubi rootfs to crypted rootfs on SD
+    $PROG sync-rootfs sd
+
+    # Sync current rootfs to second rootfs
+    $PROG sync-rootfs auto
+
+    # Sync crypted rootfs on SD to rootfs on ubi
+    $PROG sync-rootfs ubi
+
 END
-    exit 1
+    exit $1
 }
 
 STAGE=1
@@ -538,6 +659,7 @@ OPT_BACKUP=false
 OPT_FORCE=false
 OPT_REBOOT=false
 OPT_VERBOSE=false
+OPT_TRACE=false
 OPT_NO_ACTION=false
 OPT_QUIET=false
 
@@ -549,17 +671,17 @@ while getopts bfcnz:rh:vq FLAG; do
         f) OPT_NO_ACTION=true      ;;
         z) STAGE="$OPTARG"         ;;
         r) OPT_REBOOT=true         ;;
-        v) OPT_VERBOSE=true        ;;
+        v) [ -n "$OPT_VERBOSE" ] && OPT_TRACE=true; OPT_VERBOSE=true ;;
         q) OPT_QUIET=true          ;;
         h) usage ;;
-        *) usage ;;
+        *) usage 1;;
     esac
 done
 
 shift $(expr $OPTIND - 1)
 
 if [ -z "$1" ]; then
-    usage
+    usage 2
 fi
 
 if $OPT_VERBOSE; then
@@ -568,6 +690,10 @@ fi
 
 while [ -n "$1" ]; do
     case "$(basename $1)" in
+        sync-rootfs)
+            do_sync_rootfs $@
+            exit
+            ;;
         at91bootstrap*.bin)
             install_at91bootstrap "$1"
             shift

@@ -1,0 +1,73 @@
+From 50503711c872784a6977a7a59085b597047c2821 Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Fri, 2 Sep 2022 05:06:24 +0200
+Subject: [PATCH] load_kernel: Fix not setted CONFIG_OVERRIDE_CMDLINE not
+ working
+
+---
+ driver/load_kernel.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/driver/load_kernel.c b/driver/load_kernel.c
+index de710293..936fb316 100644
+--- a/driver/load_kernel.c
++++ b/driver/load_kernel.c
+@@ -23,8 +23,10 @@
+ 
+ #include "debug.h"
+ 
++#ifdef CONFIG_OVERRIDE_CMDLINE
+ static char cmdline_buf[256];
+-static char *bootargs;
++#endif
++static char *bootargs = NULL;
+ 
+ #ifdef CONFIG_OF_LIBFDT
+ 
+@@ -361,6 +363,8 @@ int load_kernel(struct image_info *image)
+ 	unsigned int r2;
+ 	unsigned int mach_type;
+ 	int ret;
++
++#ifdef CONFIG_OVERRIDE_CMDLINE
+ 	unsigned int mem_size;
+ 
+ #if defined(CONFIG_SDRAM)
+@@ -371,8 +375,6 @@ int load_kernel(struct image_info *image)
+ #error "No DRAM type specified!"
+ #endif
+ 
+-	void (*kernel_entry)(int zero, int arch, unsigned int params);
+-
+ 	bootargs = board_override_cmd_line();
+ 	if (sizeof(cmdline_buf) < 10 + strlen(bootargs)){
+ 		dbg_very_loud("\nKERNEL: buffer for bootargs is too small\n\n");
+@@ -412,14 +414,16 @@ int load_kernel(struct image_info *image)
+ 			break;
+ 	}
+ 	bootargs = cmdline_buf;
++#endif
+ 
+ 	ret = load_kernel_image(image);
+ 	if (ret)
+ 		return ret;
+ 
+-#ifdef CONFIG_OVERRIDE_CMDLINE_FROM_EXT_FILE
++#if defined(CONFIG_OVERRIDE_CMDLINE) && defined(CONFIG_OVERRIDE_CMDLINE_FROM_EXT_FILE)
+ 	bootargs = board_override_cmd_line_ext(image->cmdline_args);
+ #endif
++
+ #if defined(CONFIG_SECURE)
+ 	ret = secure_check(image->dest);
+ 	if (ret)
+@@ -438,6 +442,7 @@ int load_kernel(struct image_info *image)
+ 	if (ret)
+ 		return -1;
+ 
++	void (*kernel_entry)(int zero, int arch, unsigned int params);
+ 	kernel_entry = (void (*)(int, int, unsigned int))entry_point;
+ 
+ #ifdef CONFIG_OF_LIBFDT
+-- 
+2.30.2
+

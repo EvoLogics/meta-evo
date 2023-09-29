@@ -759,7 +759,7 @@ sandbox_start() {
     lxc-start -d -n sandbox -f /tmp/lxc-config #-l debug -o /tmp/lxc-start.log
     sleep .2
     
-    echo -n Waing sandbox start.
+    echo -n Waiting sandbox start.
     DONE=false
     for i in $(seq 20); do
         if ifconfig vlxc 192.168.42.2 2>/dev/null; then
@@ -832,7 +832,7 @@ Usage: $(basename $0) [-h] [-q] [-v] [-n] [command]
     mount    - mount sandbox partition
     umount   - unmount sandbox partition
 
-    init-sd  - init system in SD card (password, hostname, IP, etc)
+    init-sd  - init sandbox system in SD card (password, hostname, IP, etc)
     chroot   - chroot to sandbox
 END
     exit $1

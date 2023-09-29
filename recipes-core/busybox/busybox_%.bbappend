@@ -34,5 +34,7 @@ SRC_URI_append_sama5d2-roadrunner-evo = " \
 "
 
 SRC_URI_append_mx6ul-comm-module = "    \
-    file://defconfig                    \
+    file://udhcpc.cfg                   \
 "
+
+

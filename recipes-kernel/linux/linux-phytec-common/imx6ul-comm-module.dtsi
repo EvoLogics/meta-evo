@@ -7,6 +7,7 @@
 &iomuxc {
 	/delete-node/ rtcintgrp;
 	/delete-node/ stmpegrp;
+	/delete-node/ uart1grp;
 	/delete-node/ uart2grp;
 	/delete-node/ uart3grp;
 	/delete-node/ uart4grp;
@@ -38,6 +39,13 @@
 	};
 };
 
+&uart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart1>;
+	dmas = <&sdma 25 4 0>,<&sdma 26 4 0>;
+	dma-names = "rx","tx";
+	status = "okay";
+};
 
 &usbotg1 {
 	pinctrl-names = "default";
@@ -84,6 +92,8 @@
 &uart5 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart5>;
+  dmas = <&sdma 33 4 0>, <&sdma 34 4 0>;
+  dma-names = "rx", "tx";
 	status = "disabled";
 };
 
@@ -106,11 +116,12 @@
 };
 
 
+/* UART8 SDMA events are used for ENET2 1588 */
 &uart8 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart8>;
-//	dmas = <&sdma 45 4 0>,<&sdma 46 4 0>;
-//	dma-names = "rx","tx";
+//  dmas = <&sdma 45 4 0>, <&sdma 46 4 0>;
+//  dma-names = "rx", "tx";
 	status = "disabled";
 };
 
@@ -182,13 +193,13 @@
 	status = "disabled";
 
 	gpiom0: gpio@0 {
-         compatible = "microchip,mcp23s08";
-         #gpio-cells = <2>;
-         gpio-controller;
-         reg = <0>;
-         microchip,spi-present-mask = <0x02>;
-         spi-max-frequency = <10000000>;
-    };
+		compatible = "microchip,mcp23s08";
+		#gpio-cells = <2>;
+		gpio-controller;
+		reg = <0>;
+		microchip,spi-present-mask = <0x02>;
+		spi-max-frequency = <10000000>;
+	};
 };
 
 
@@ -212,9 +223,9 @@
 	pinctrl_ecspi1: ecspi1grp {
 		fsl,pins = <
 			MX6UL_PAD_CSI_DATA04__ECSPI1_SCLK			0x000010B0
-            MX6UL_PAD_CSI_DATA05__ECSPI1_SS0			0x000010B0
-            MX6UL_PAD_CSI_DATA06__ECSPI1_MOSI			0x000010B0
-            MX6UL_PAD_CSI_DATA07__ECSPI1_MISO			0x000010B0
+			MX6UL_PAD_CSI_DATA05__ECSPI1_SS0			0x000010B0
+			MX6UL_PAD_CSI_DATA06__ECSPI1_MOSI			0x000010B0
+			MX6UL_PAD_CSI_DATA07__ECSPI1_MISO			0x000010B0
 			MX6UL_PAD_CSI_DATA05__GPIO4_IO26			0x000010B0
 		>;
 	};
@@ -222,7 +233,7 @@
 	pinctrl_pps0: pps0_default {
 		fsl,pins = <
 			MX6UL_PAD_UART1_CTS_B__GPIO1_IO18			0x000010B0
-	    >;
+		>;
 	};
 
 	pinctrl_pps1: pps1_default {
@@ -247,64 +258,69 @@
 
 	pinctrl_enet2: enet2grp {
 		fsl,pins = <
-			MX6UL_PAD_ENET2_RX_EN__ENET2_RX_EN			0x1b0b0
-			MX6UL_PAD_ENET2_RX_ER__ENET2_RX_ER			0x1b0b0
+			MX6UL_PAD_ENET2_RX_EN__ENET2_RX_EN				0x1b0b0
+			MX6UL_PAD_ENET2_RX_ER__ENET2_RX_ER				0x1b0b0
 			MX6UL_PAD_ENET2_RX_DATA0__ENET2_RDATA00		0x1b0b0
 			MX6UL_PAD_ENET2_RX_DATA1__ENET2_RDATA01		0x1b0b0
-			MX6UL_PAD_ENET2_TX_EN__ENET2_TX_EN			0x1b010
+			MX6UL_PAD_ENET2_TX_EN__ENET2_TX_EN				0x1b010
 			MX6UL_PAD_ENET2_TX_DATA0__ENET2_TDATA00		0x1b010
 			MX6UL_PAD_ENET2_TX_DATA1__ENET2_TDATA01		0x1b010
 			MX6UL_PAD_ENET2_TX_CLK__ENET2_REF_CLK2		0x4001b010
 		>;
 	};
 
+	pinctrl_uart1: uart1grp {
+		fsl,pins = <
+			MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX			0x1b0b1
+			MX6UL_PAD_UART1_RX_DATA__UART1_DCE_RX			0x1b0b1
+		>;
+	};
+
 	pinctrl_uart2: uart2grp {
-         fsl,pins = <
-             MX6UL_PAD_UART2_RX_DATA__UART2_DCE_RX		0x1b0b1
-             MX6UL_PAD_UART2_TX_DATA__UART2_DCE_TX		0x1b0b1
-         >;
-     };
+		fsl,pins = <
+			MX6UL_PAD_UART2_RX_DATA__UART2_DCE_RX		0x1b0b1
+			MX6UL_PAD_UART2_TX_DATA__UART2_DCE_TX		0x1b0b1
+		>;
+	};
 
-    pinctrl_uart3: uart3grp {
-         fsl,pins = <
-             MX6UL_PAD_UART3_RX_DATA__UART3_DCE_RX		0x1b0b1
-             MX6UL_PAD_UART3_TX_DATA__UART3_DCE_TX		0x1b0b1
-         >;
-    };
+	pinctrl_uart3: uart3grp {
+		fsl,pins = <
+			MX6UL_PAD_UART3_RX_DATA__UART3_DCE_RX		0x1b0b1
+			MX6UL_PAD_UART3_TX_DATA__UART3_DCE_TX		0x1b0b1
+		>;
+	};
 
-    pinctrl_uart4: uart4grp {
-         fsl,pins = <
-             MX6UL_PAD_LCD_CLK__UART4_DCE_TX			0x1b0b1
-             MX6UL_PAD_LCD_ENABLE__UART4_DCE_RX			0x1b0b1
-         >;
-    };
+	pinctrl_uart4: uart4grp {
+		fsl,pins = <
+			MX6UL_PAD_LCD_CLK__UART4_DCE_TX					0x1b0b1
+			MX6UL_PAD_LCD_ENABLE__UART4_DCE_RX			0x1b0b1
+		>;
+	};
 
 	pinctrl_uart5: uart5grp {
 		fsl,pins = <
 			MX6UL_PAD_UART5_TX_DATA__UART5_DCE_TX		0x1b0b1
-			MX6ULL_PAD_UART5_RX_DATA__UART5_DCE_RX		0x1b0b1
-			MX6UL_PAD_GPIO1_IO08__UART5_DCE_RTS			0x1b0b1
-			MX6UL_PAD_GPIO1_IO09__UART5_DCE_CTS			0x1b0b1
+			MX6ULL_PAD_UART5_RX_DATA__UART5_DCE_RX	0x1b0b1
 		>;
 	};
 
 	pinctrl_uart6: uart6grp {
-         fsl,pins = <
-             MX6UL_PAD_CSI_MCLK__UART6_DCE_TX			0x1b0b1
-             MX6UL_PAD_CSI_PIXCLK__UART6_DCE_RX			0x1b0b1
-         >;
-    };
-
-    pinctrl_uart7: uart7grp {
 		fsl,pins = <
-			MX6UL_PAD_LCD_DATA16__UART7_DCE_TX			0x1b0b1
-			MX6UL_PAD_LCD_DATA17__UART7_DCE_RX			0x1b0b1
+			MX6UL_PAD_CSI_MCLK__UART6_DCE_TX			0x1b0b1
+			MX6UL_PAD_CSI_PIXCLK__UART6_DCE_RX		0x1b0b1
+		>;
+	};
+
+	pinctrl_uart7: uart7grp {
+		fsl,pins = <
+			MX6UL_PAD_LCD_DATA16__UART7_DCE_TX		0x1b0b1
+			MX6UL_PAD_LCD_DATA17__UART7_DCE_RX		0x1b0b1
 		>;
 	};
 	pinctrl_uart8: uart8grp {
 		fsl,pins = <
-			MX6UL_PAD_LCD_DATA20__UART8_DCE_TX			0x1b0b1
-			MX6UL_PAD_LCD_DATA21__UART8_DCE_RX			0x1b0b1
+			MX6UL_PAD_LCD_DATA20__UART8_DCE_TX		0x1b0b1
+			MX6UL_PAD_LCD_DATA21__UART8_DCE_RX		0x1b0b1
 		>;
 	};
 
@@ -322,8 +338,8 @@
 
 	pinctrl_usdhc1: usdhc1grp {
 		fsl,pins = <
-			MX6UL_PAD_SD1_CMD__USDHC1_CMD				0x17059
-			MX6UL_PAD_SD1_CLK__USDHC1_CLK				0x10059
+			MX6UL_PAD_SD1_CMD__USDHC1_CMD					0x17059
+			MX6UL_PAD_SD1_CLK__USDHC1_CLK					0x10059
 			MX6UL_PAD_SD1_DATA0__USDHC1_DATA0			0x17059
 			MX6UL_PAD_SD1_DATA1__USDHC1_DATA1			0x17059
 			MX6UL_PAD_SD1_DATA2__USDHC1_DATA2			0x17059
@@ -334,25 +350,25 @@
 
 	pinctrl_usdhc1_100mhz: usdhc1grp100mhz {
 		fsl,pins = <
-			MX6UL_PAD_SD1_CMD__USDHC1_CMD				0x170b9
-			MX6UL_PAD_SD1_CLK__USDHC1_CLK				0x100b9
+			MX6UL_PAD_SD1_CMD__USDHC1_CMD					0x170b9
+			MX6UL_PAD_SD1_CLK__USDHC1_CLK					0x100b9
 			MX6UL_PAD_SD1_DATA0__USDHC1_DATA0			0x170b9
 			MX6UL_PAD_SD1_DATA1__USDHC1_DATA1			0x170b9
 			MX6UL_PAD_SD1_DATA2__USDHC1_DATA2			0x170b9
 			MX6UL_PAD_SD1_DATA3__USDHC1_DATA3			0x170b9
+			MX6UL_PAD_UART1_RTS_B__GPIO1_IO19			0x17059
 		>;
 	};
 
 	pinctrl_usdhc1_200mhz: usdhc1grp200mhz {
 		fsl,pins = <
-			MX6UL_PAD_SD1_CMD__USDHC1_CMD				0x170f9
-			MX6UL_PAD_SD1_CLK__USDHC1_CLK				0x100f9
+			MX6UL_PAD_SD1_CMD__USDHC1_CMD					0x170f9
+			MX6UL_PAD_SD1_CLK__USDHC1_CLK					0x100f9
 			MX6UL_PAD_SD1_DATA0__USDHC1_DATA0			0x170f9
 			MX6UL_PAD_SD1_DATA1__USDHC1_DATA1			0x170f9
 			MX6UL_PAD_SD1_DATA2__USDHC1_DATA2			0x170f9
 			MX6UL_PAD_SD1_DATA3__USDHC1_DATA3			0x170f9
+			MX6UL_PAD_UART1_RTS_B__GPIO1_IO19			0x17059
 		>;
 	};
-
-
 };

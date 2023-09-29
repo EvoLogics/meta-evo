@@ -1,0 +1,119 @@
+#!/bin/sh
+
+# Show help if requsted
+help()
+{
+  echo "Usage: abtool [OPTIONS]"
+  echo
+  echo "Options:"
+  echo "  -g  Mark current partition scheme as good"
+  echo "  -h  Display this help and exit"
+  echo "  -s  Switch to another partition scheme"
+  echo "  -w  Display current scheme (where am I?)"
+  echo "  -x  Get next partition scheme (a/b)"
+}
+
+whereami()
+{
+  bootpart_uuid=$(findmnt -fn -o PARTUUID /boot/)
+  if [ -n "${bootpart_uuid}" ]; then
+    bootfs_c=$(printf "\x$((60+0$(echo ${bootpart_uuid} | cut -d'-' -f2)))")
+  else
+    bootfs_c=x
+  fi
+  rootpart_uuid=$(findmnt -fn -o PARTUUID /)
+  mmc_uuid=$(echo ${rootpart_uuid} | cut -d'-' -f1)
+  rootfs_c=$(printf "\x$((58+0$(echo ${rootpart_uuid} | cut -d'-' -f2)))")
+  echo "current: bootfs=${bootfs_c} rootfs=${rootfs_c}"
+
+  if [ ${bootfs_c} != ${rootfs_c} ]; then
+    echo "WARNING: ids do not match!"
+  fi
+
+  if [ ${rootfs_c} == 'a' ]; then
+    next=b
+  elif [ ${rootfs_c} == 'b' ]; then
+    next=a
+  else
+    next=x
+  fi
+
+  bootfs_u=$(printf "\x$((60+0$(fw_printenv -n bootpart_id)))")
+  rootpart_uuid=$(fw_printenv -n rootpart_uuid)
+  mmc_uuid=$(echo ${rootpart_uuid} | cut -d'-' -f1)
+  rootfs_u=$(printf "\x$((58+0$(echo ${rootpart_uuid} | cut -d'-' -f2)))")
+  echo " u-boot: bootfs=${bootfs_u} rootfs=${rootfs_u}"
+
+  if [ ${bootfs_u} != ${rootfs_u} ]; then
+    echo "WARNING: ids do not match!"
+  fi
+
+  echo "   next: ${next}"
+}
+
+getnext()
+{
+  whereami >> /dev/null
+  echo ${next}
+}
+
+switch()
+{
+  whereami >> /dev/null
+  if [ ${next} == 'a' ]; then
+    bootid=01
+    rootid=03
+  elif [ ${next} == 'b' ]; then
+    bootid=02
+    rootid=04
+  else
+    exit 1
+  fi
+ 
+  if [ -b /dev/mmcblk3boot0 ]; then
+    echo 0 > /sys/block/mmcblk3boot0/force_ro && sleep 0.2
+    (\
+      echo "bootpart_id ${bootid}";\
+      echo "rootpart_uuid ${mmc_uuid}-${rootid}";\
+      echo "ab_fails 1"\
+      ) | tee /tmp/setenv
+      fw_setenv -s /tmp/setenv
+    echo 1 > /sys/block/mmcblk3boot0/force_ro
+  fi
+}
+
+markgood()
+{
+  if [ -b /dev/mmcblk3boot0 ]; then
+    echo 0 > /sys/block/mmcblk3boot0/force_ro && sleep 0.2
+    (echo "ab_fails 0") | tee /tmp/setenv
+      fw_setenv -s /tmp/setenv
+    echo 1 > /sys/block/mmcblk3boot0/force_ro
+  fi
+}
+
+# Parse passed options
+while getopts "h?wxsg" opt; do
+  case "$opt" in
+    h|\?)
+      help
+      exit 0
+      ;;
+    w)
+      whereami && exit 0
+      ;;
+    x)
+      getnext && exit 0
+      ;;
+    s)
+      switch && exit 0
+      ;;
+    g)
+      markgood && exit 0
+      ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+[ "${1:-}" = "--" ] && shift

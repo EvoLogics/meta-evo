@@ -7,11 +7,12 @@
 [Unit]
 Description=Fake Hardware Clock
 DefaultDependencies=No
-Requires=local-fs.target
-After=local-fs.target
+Requires=local-fs.target opt-soft\x2dhwclock-data.mount
+After=local-fs.target opt-soft\x2dhwclock-data.mount
 Wants=time-sync.target
 Conflicts=shutdown.target
 Before=shutdown.target time-sync.target chronyd.service
+
 
 [Service]
 Type=oneshot
@@ -19,6 +20,8 @@ RemainAfterExit=yes
 ExecStart=/opt/soft-hwclock/soft-hwclock load
 ExecStop=/opt/soft-hwclock/soft-hwclock save
 
+
 [Install]
 WantedBy=multi-user.target
 Also=soft-hwclock-tick.timer
+

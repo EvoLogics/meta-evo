@@ -3,7 +3,7 @@ Description=Systemd Service to fix and generate ssh keys.
 
 [Service]
 Type=simple
-ExecStart=/bin/bash  /sbin/systemd-firstboot.sh
+ExecStart=/bin/bash  /sbin/systemdfirstboot.sh
 
 [Install]
 WantedBy=multi-user.target

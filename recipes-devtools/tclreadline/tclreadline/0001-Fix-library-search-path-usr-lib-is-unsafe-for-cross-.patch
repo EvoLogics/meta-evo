@@ -1,0 +1,49 @@
+From b16d9c20d5d441a657ea9a6826b73cee26d8432d Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Thu, 13 Jul 2023 21:53:20 +0200
+Subject: [PATCH] Fix library search path "/usr/lib" is unsafe for
+ cross-compilation
+
+---
+ Makefile.am  | 6 +++---
+ configure.ac | 3 ++-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 84e1085..72aa8d0 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -23,9 +23,9 @@ else
+     libtclreadline_la_CFLAGS = -Wall -DUSE_TCL_STUBS
+ endif
+ if !USE_TCL_STUBS
+-    libtclreadline_la_LIBADD = $(TCL_LIB_SPEC)
++    libtclreadline_la_LIBADD = $(TCL_BUILD_LIB_SPEC)
+ else
+-    libtclreadline_la_LIBADD = $(TCL_STUB_LIB_SPEC)
++    libtclreadline_la_LIBADD = $(TCL_BUILD_STUB_LIB_SPEC)
+ endif
+ libtclreadline_la_LDFLAGS = -release $(MAJOR).$(MINOR).$(PATCHLEVEL)
+ 
+@@ -45,7 +45,7 @@ EXTRA_DIST =                 \
+ 
+ if STATIC_TCLSHRL
+ static_tclshrl = tclshrl
+-tclshrl_LDADD = libtclreadline.la $(TCL_LIB_SPEC)
++tclshrl_LDADD = libtclreadline.la $(TCL_BUILD_LIB_SPEC)
+ tclshrl_LDFLAGS = -static
+ endif
+ 
+diff --git a/configure.ac b/configure.ac
+index 6c0a5a4..23dfa76 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -254,6 +254,7 @@ AM_CONDITIONAL(STATIC_TCLSHRL, test x$enable_static = xtrue)
+ 
+ AC_SUBST(TCL_INCLUDE_DIR)
+ AC_SUBST(TCL_STUB_LIB_SPEC)
+-AC_SUBST(TCL_LIB_SPEC)
++AC_SUBST(TCL_BUILD_LIB_SPEC)
++AC_SUBST(TCL_BUILD_STUB_LIB_SPEC)
+ AC_SUBST(READLINE_INCLUDE_DIR)
+ AC_OUTPUT(Makefile tclreadline.h tclreadlineInit.tcl tclreadlineSetup.tcl tclreadline.n pkgIndex.tcl)

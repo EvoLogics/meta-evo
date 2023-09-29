@@ -1,0 +1,105 @@
+From d855072f56699758e337f37867e8eb02f0d3f6f0 Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Sat, 8 Jul 2023 21:15:10 +0200
+Subject: [PATCH] Remove Tk dependency
+
+---
+ Makefile.am  |  9 +--------
+ configure.ac | 56 --------------------------------------------------------
+ 2 files changed, 1 insertion(+), 64 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index ae55024..84e1085 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -49,15 +49,8 @@ tclshrl_LDADD = libtclreadline.la $(TCL_LIB_SPEC)
+ tclshrl_LDFLAGS = -static
+ endif
+ 
+-if STATIC_WISHRL
+-static_wishrl = wishrl
+-wishrl_LDADD = libtclreadline.la $(TCL_LIB_SPEC) $(TK_LIB_SPEC)
+-wishrl_LDFLAGS = -static
+-endif
+-
+-bin_PROGRAMS = $(static_tclshrl) $(static_wishrl)
++bin_PROGRAMS = $(static_tclshrl)
+ tclshrl_SOURCES = tclshrl.c
+-wishrl_SOURCES = wishrl.c
+ 
+ man_MANS = tclreadline.n
+ 
+diff --git a/configure.ac b/configure.ac
+index b5c93b0..6c0a5a4 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -78,42 +78,6 @@ if test $TCL_MAJOR_VERSION -lt 8; then
+     AC_MSG_ERROR(need tcl 8.0 or higher.)
+ fi
+ 
+-
+-# -- WHICH TK TO USE
+-AC_ARG_WITH(
+-    tk,
+-    [  --with-tk=DIR          where to look for tkConfig.sh],
+-    tk_search=$withval,
+-    tk_search=""
+-)
+-
+-if test x$tk_search != xno; then
+-
+-    AC_MSG_CHECKING([which tkConfig.sh to use])
+-    TK_LIB_DIR=""
+-    for dir in $tk_search $tcl_search /usr/lib /usr/local/lib $exec_prefix/lib /usr/local/lib/unix /opt/tcl/lib; do
+-        if test -r $dir/tkConfig.sh; then
+-            TK_LIB_DIR=$dir
+-            break
+-        fi
+-    done
+-
+-    if test -z "$TK_LIB_DIR"; then
+-        AC_MSG_ERROR(Can't find Tk libraries.  Use --with-tk to specify the directory containing tkConfig.sh on your system.)
+-    fi
+-
+-    . $TK_LIB_DIR/tkConfig.sh
+-    AC_MSG_RESULT($TK_LIB_DIR/tkConfig.sh)
+-    AC_MSG_CHECKING([for your tk version])
+-    AC_MSG_RESULT([$TK_VERSION, patchlevel $TK_PATCH_LEVEL])
+-
+-    # Check, if tk_version is > 8.0
+-    if test $TK_MAJOR_VERSION -lt 8; then
+-        AC_MSG_ERROR(need tk 8.0 or higher.)
+-    fi
+-    
+-fi
+-
+ # -----------------------------------------------------------------------
+ #   Set up a new default --prefix.
+ # -----------------------------------------------------------------------
+@@ -288,26 +252,6 @@ AC_ARG_ENABLE(tclshrl,
+ )
+ AM_CONDITIONAL(STATIC_TCLSHRL, test x$enable_static = xtrue)
+ 
+-AC_ARG_ENABLE(wishrl,
+-    [  --enable-wishrl         build statically linked wishrl],
+-    [dnl action if given
+-    case "${enableval}" in
+-        yes)
+-        enable_static=true
+-        dnl source the tkConfig.sh which defines TK_LIB_SPEC
+-        . $TK_LIB_DIR/tkConfig.sh
+-        AC_SUBST(TK_LIB_SPEC)
+-        ;;
+-        no)  enable_static=false ;;
+-        *)   AC_MSG_ERROR(bad value ${enableval} for --enable-static) ;;
+-    esac
+-    ],
+-    [dnl action if not given
+-    enable_static=false
+-    ]
+-)
+-AM_CONDITIONAL(STATIC_WISHRL, test x$enable_static = xtrue)
+-
+ AC_SUBST(TCL_INCLUDE_DIR)
+ AC_SUBST(TCL_STUB_LIB_SPEC)
+ AC_SUBST(TCL_LIB_SPEC)

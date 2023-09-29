@@ -175,10 +175,7 @@
 		regulator-name = "usbotg_vbus";
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_usbotg_vbus>;
-		gpio = <&gpio1 7 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
+		regulator-always-on;
 	};
 
 	sound {
@@ -606,13 +603,7 @@
 
 	pinctrl_usbotg: usbotggrp {
 		fsl,pins = <
-			MX6QDL_PAD_EIM_D23__GPIO3_IO23		0x17059
-		>;
-	};
-
-	pinctrl_usbotg_vbus: usbotg-vbusgrp {
-		fsl,pins = <
-			MX6QDL_PAD_GPIO_7__GPIO1_IO07		0x1b0b0 /* USBOTG_VBUSEN */
+			MX6QDL_PAD_EIM_D23__GPIO3_IO23		0x13059
 		>;
 	};
 

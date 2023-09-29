@@ -1,0 +1,39 @@
+From f9dc769bf2e96b123dd6edab592a05258c5dcd15 Mon Sep 17 00:00:00 2001
+From: Victor Voronin <viktor.voronin@evologics.de>
+Date: Wed, 17 May 2023 09:58:38 +0200
+Subject: [PATCH] Fix for older cmake
+
+---
+ CMakeLists.txt     | 2 +-
+ src/CMakeLists.txt | 5 +----
+ 2 files changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 66ef3a74..d3a3614f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,7 +20,7 @@
+ #     cmake -B build
+ #     cmake --build build
+ 
+-cmake_minimum_required(VERSION 3.14)
++cmake_minimum_required(VERSION 3.12)
+ project(avrdude VERSION 7.1 LANGUAGES C)
+ 
+ set(CMAKE_C_STANDARD 11)
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index c51214e6..d1537d1e 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -300,7 +300,4 @@ install(TARGETS libavrdude
+     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+     PUBLIC_HEADER DESTINATION include COMPONENT dev
+     )
+-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/avrdude.conf" TYPE SYSCONF)
+-install(FILES "avrdude.1"
+-	DESTINATION "${CMAKE_INSTALL_MANDIR}/man1"
+-	)
++  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/avrdude.conf" DESTINATION /etc)
+-- 
+2.25.1
+
