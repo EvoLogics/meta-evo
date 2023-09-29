@@ -6,7 +6,8 @@ DEPENDS = "tegra-helper-scripts-native tegra-bootfiles"
 
 COMPATIBLE_MACHINE = "(tegra)"
 
-inherit python3native image_types_tegra
+inherit python3native
+inherit ${@bb.utils.contains('MACHINE', 'tegra', 'image_types_tegra', '', d)}
 
 do_configure() {
     tegraflash_create_flash_config ${B} "dummy"
