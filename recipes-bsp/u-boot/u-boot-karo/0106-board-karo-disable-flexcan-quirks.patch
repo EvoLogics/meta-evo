@@ -1,0 +1,40 @@
+From 9f98aeff6db38bc942f8a0079336137c0a7e1282 Mon Sep 17 00:00:00 2001
+From: Victor Voronin <viktor.voronin@evologics.de>
+Date: Wed, 2 Aug 2023 09:54:17 +0200
+Subject: [PATCH] board/karo: disable flexcan quirks
+
+---
+ board/karo/common/fdt.c | 3 +++
+ board/karo/tx6/tx6qdl.c | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/board/karo/common/fdt.c b/board/karo/common/fdt.c
+index 17619f383f..a54a7d2f4f 100644
+--- a/board/karo/common/fdt.c
++++ b/board/karo/common/fdt.c
+@@ -377,6 +377,9 @@ static inline void karo_fdt_set_lcd_pins(void *blob, const char *name)
+ 
+ void karo_fdt_fixup_flexcan(void *blob, int xcvr_present)
+ {
++  printf("karo_fdt_fixup_flexcan should not be called");
++  return;
++
+ 	int ret;
+ 	const char *xcvr_status = "disabled";
+ 	const char *otg_mode = getenv("otg_mode");
+diff --git a/board/karo/tx6/tx6qdl.c b/board/karo/tx6/tx6qdl.c
+index a3340b22b9..2467cf252c 100644
+--- a/board/karo/tx6/tx6qdl.c
++++ b/board/karo/tx6/tx6qdl.c
+@@ -1562,7 +1562,7 @@ int ft_board_setup(void *blob, bd_t *bd)
+ 	karo_fdt_fixup_touchpanel(blob, tx6_touchpanels,
+ 				  ARRAY_SIZE(tx6_touchpanels));
+ 	karo_fdt_fixup_usb_otg(blob, "usbotg", "fsl,usbphy", "vbus-supply");
+-	karo_fdt_fixup_flexcan(blob, stk5_v5);
++//	karo_fdt_fixup_flexcan(blob, stk5_v5);
+ 
+ #ifdef CONFIG_SYS_LVDS_IF
+ 	karo_fdt_update_fb_mode(blob, video_mode, "/lvds0-panel");
+-- 
+2.25.1
+

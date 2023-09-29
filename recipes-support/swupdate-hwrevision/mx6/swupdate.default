@@ -1,4 +1,4 @@
 SWUPDATE_EVOHW=generic
 SWUPDATE_NEXT=$(/sbin/abtool -x 2>/dev/null)
-export SWUPDATE_EXTRA_ARGS=" -e ${SWUPDATE_EVOHW},${SWUPDATE_NEXT} -k /etc/ca-certificates/swu-pub.pem -p reboot "
+export SWUPDATE_EXTRA_ARGS=" -e ${SWUPDATE_EVOHW},${SWUPDATE_NEXT} --ca-path /etc/ca-certificates/evo-ca-root.crt -p reboot "
 export SWUPDATE_MONGOOSE_EXTRA_ARGS="-p 1234"
