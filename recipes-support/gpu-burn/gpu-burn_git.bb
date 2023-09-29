@@ -12,7 +12,8 @@ COMPATIBLE_MACHINE = "(cuda)"
 
 S = "${WORKDIR}/git"
 
-inherit cuda cmake pkgconfig
+inherit cmake pkgconfig
+inherit ${@bb.utils.contains('MACHINE', 'tegra', 'cuda', '', d)}
 
 EXTRA_OECMAKE = "-DCMAKE_INSTALL_PREFIX=/opt/cudatests"
 lcl_maybe_fortify = ""
