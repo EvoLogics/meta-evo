@@ -43,4 +43,4 @@ do_install() {
     oe_runmake install DESTDIR=${D} prefix=${prefix}
 }
 
-inherit pythonnative python3native
+inherit python3native
