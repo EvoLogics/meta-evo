@@ -6,7 +6,6 @@ DESCRIPTION = "Linux Kernel that produces a \
 Manufacturing Tool compatible Linux Kernel to be used in updater environment"
 
 require recipes-kernel/linux/linux-toradex_${PV}.bb
-require recipes-kernel/linux/linux-toradex-append.inc
 require recipes-kernel/linux/linux-mfgtool.inc
 
 KERNEL_IMAGE_BASE_NAME[vardepsexclude] = "DATETIME"

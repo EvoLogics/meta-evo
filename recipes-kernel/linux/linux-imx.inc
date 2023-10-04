@@ -12,7 +12,7 @@ SCMVERSION ?= "y"
 SRCBRANCH ?= ""
 
 # Set the PV to the correct kernel version to satisfy the kernel version sanity check
-PV = "${LINUX_VERSION}+git${SRCPV}"
+#PV = "${LINUX_VERSION}+git${SRCPV}"
 
 SRC_URI = "git://github.com/nxp-imx/linux-imx;protocol=https;branch=${SRCBRANCH} \
            file://defconfig \
