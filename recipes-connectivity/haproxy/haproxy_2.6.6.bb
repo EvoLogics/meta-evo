@@ -24,6 +24,8 @@ USERADD_PACKAGES = "${PN}"
 USERADD_PARAM:${PN} = "--system --create-home --home ${HAP_USER_HOME} --shell /bin/false --groups haproxy --gid haproxy haproxy"
 GROUPADD_PARAM:${PN} = "haproxy"
 
+TARGET_CC_ARCH += "${LDFLAGS}"
+
 EXTRA_OEMAKE = "'CPU=generic' \
                 'TARGET=linux-${TCLIBC}' \
                 'USE_GETADDRINFO=1' \
