@@ -16,6 +16,8 @@ SRC_URI = " \
 
 S = "${WORKDIR}/git"
 
+UBOOT_INITIAL_ENV = ""
+
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 COMPATIBLE_MACHINE  = "(tx6[qsu]-.*|txul-.*)"
