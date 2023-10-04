@@ -7,7 +7,7 @@ LICENSE = "MIT"
 SECTION = "devel"
 DEPENDS += "tcl"
 
-RDEPENDS_${PN} += "tcl"
+RDEPENDS:${PN} += "tcl"
 
 SRC_URI = "${DEBIAN_MIRROR}/main/t/tcludp/tcludp_1.0.11.orig.tar.gz \
            file://0001-Bump-version-to-1.0.11-in-configure.in.patch \
@@ -23,16 +23,16 @@ LIC_FILES_CHKSUM="file://license.terms;md5=5f94cd289c546cf308271804775ddc10"
 S = "${WORKDIR}/${PN}"
 
 TCL_INCLUDE_PATH = ""
-TCL_INCLUDE_PATH_class-target = "--with-tclinclude=${STAGING_INCDIR}/tcl8.6"
+TCL_INCLUDE_PATH:class-target = "--with-tclinclude=${STAGING_INCDIR}/tcl8.6"
 
 EXTRA_OECONF += "--with-tcl=${STAGING_LIBDIR} \
                  ${TCL_INCLUDE_PATH}"
 
 inherit autotools lib_package
 
-do_install_append() {
+do_install:append() {
     rmdir ${D}/${bindir}
 }
 
-FILES_${PN} = "${libdir}/udp${PV}"
+FILES:${PN} = "${libdir}/udp${PV}"
 BBCLASSEXTEND = "native nativesdk"

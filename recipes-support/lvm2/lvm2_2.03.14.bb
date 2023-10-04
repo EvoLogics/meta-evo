@@ -12,7 +12,7 @@ MULTILIB_SCRIPTS = "${PN}:${sysconfdir}/lvm/lvm.conf"
 
 CACHED_CONFIGUREVARS += "MODPROBE_CMD=${base_sbindir}/modprobe"
 
-do_install_append() {
+do_install:append() {
     # Install machine specific configuration file
     install -d ${D}${sysconfdir}/lvm
     install -m 0644 ${WORKDIR}/lvm.conf ${D}${sysconfdir}/lvm/lvm.conf
@@ -33,28 +33,28 @@ do_install_append() {
 PACKAGE_BEFORE_PN = "${PN}-scripts ${PN}-udevrules"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "${@bb.utils.contains('PACKAGECONFIG', 'dmeventd', 'lvm2-monitor.service dm-event.socket dm-event.service', '', d)} \
+SYSTEMD_SERVICE:${PN} = "${@bb.utils.contains('PACKAGECONFIG', 'dmeventd', 'lvm2-monitor.service dm-event.socket dm-event.service', '', d)} \
                          blk-availability.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 
-EXTRA_OECONF_append_class-nativesdk = " --with-confdir=${sysconfdir}"
+EXTRA_OECONF:append:class-nativesdk = " --with-confdir=${sysconfdir}"
 
 DEPENDS += "util-linux"
-LVM2_PACKAGECONFIG_append_class-target = " \
+LVM2_PACKAGECONFIG:append:class-target = " \
     udev \
 "
 PACKAGECONFIG[udev] = "--enable-udev_sync --enable-udev_rules --with-udevdir=${nonarch_base_libdir}/udev/rules.d,--disable-udev_sync --disable-udev_rules,udev,${PN}-udevrules"
 
 DEPENDS =+ "libdevmapper"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${libdir}/device-mapper/*.so \
     ${systemd_system_unitdir}/lvm2-pvscan@.service \
 "
 
-FILES_${PN}-scripts = " \
+FILES:${PN}-scripts = " \
     ${sbindir}/blkdeactivate \
     ${sbindir}/fsadm \
     ${sbindir}/lvmconf \
@@ -62,26 +62,26 @@ FILES_${PN}-scripts = " \
 "
 # Specified explicitly for the udev rules, just in case that it does not get picked
 # up automatically:
-FILES_${PN}-udevrules = "${nonarch_base_libdir}/udev/rules.d"
-RDEPENDS_${PN}-udevrules = "libdevmapper"
-RDEPENDS_${PN}_append_class-target = " libdevmapper"
-RDEPENDS_${PN}_append_class-nativesdk = " libdevmapper"
+FILES:${PN}-udevrules = "${nonarch_base_libdir}/udev/rules.d"
+RDEPENDS:${PN}-udevrules = "libdevmapper"
+RDEPENDS:${PN}:append:class-target = " libdevmapper"
+RDEPENDS:${PN}:append:class-nativesdk = " libdevmapper"
 
-RDEPENDS_${PN}-scripts = "${PN} (= ${EXTENDPKGV}) \
+RDEPENDS:${PN}-scripts = "${PN} (= ${EXTENDPKGV}) \
                           bash \
                           util-linux \
                           coreutils \
 "
 
 # FIXME: ERROR: lvm2-2.03.14-r0 do_package_qa: QA Issue: /usr/sbin/lvm_import_vdo \
-#  contained in package lvm2 requires /bin/bash, but no providers found in RDEPENDS_lvm2? [file-rdeps]
-RDEPENDS_${PN} = "bash"
+#  contained in package lvm2 requires /bin/bash, but no providers found in RDEPENDS:lvm2? [file-rdeps]
+RDEPENDS:${PN} = "bash"
 
-RRECOMMENDS_${PN}_class-target = "${PN}-scripts (= ${EXTENDPKGV})"
+RRECOMMENDS:${PN}:class-target = "${PN}-scripts (= ${EXTENDPKGV})"
 
-CONFFILES_${PN} += "${sysconfdir}/lvm/lvm.conf"
+CONFFILES:${PN} += "${sysconfdir}/lvm/lvm.conf"
 
-do_install_append() {
+do_install:append() {
     rm -f ${D}${libdir}/libdevmapper.so* \
        ${D}${libdir}/libdevmapper.a \
        ${D}${sbindir}/dmsetup* \

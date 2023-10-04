@@ -12,9 +12,9 @@ SRC_URI = "http://www.busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://CVE-2018-20679.patch \
 	   file://CVE-2019-5747.patch \
 "
-SRC_URI_append_libc-musl = " file://musl.cfg "
+SRC_URI:append:libc-musl = " file://musl.cfg "
 
-#SRC_URI_append_sama5d2-roadrunner-evo = " \
+#SRC_URI:append_sama5d2-roadrunner-evo = " \
 #    file://sh.cfg \
 #"
 

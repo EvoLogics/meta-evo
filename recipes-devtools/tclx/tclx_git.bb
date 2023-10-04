@@ -20,19 +20,19 @@ SRCREV = "v8.6.2"
 S = "${WORKDIR}/git"
 
 DEPENDS += "tcl"
-RDEPENDS_${PN} += "tcl"
+RDEPENDS:${PN} += "tcl"
 
 inherit autotools lib_package
 
 TCL_INCLUDE_PATH = ""
-TCL_INCLUDE_PATH_class-target = "--with-tclinclude=${STAGING_INCDIR}/tcl${BPV}"
+TCL_INCLUDE_PATH:class-target = "--with-tclinclude=${STAGING_INCDIR}/tcl${BPV}"
 
 EXTRA_OECONF = "--with-tcl=${STAGING_LIBDIR} \
     --enable-threads \
     --libdir=${libdir} \
     ${TCL_INCLUDE_PATH}"
 
-FILES_${PN} += "${libdir}/${PN}${BPV}/*.tcl \
+FILES:${PN} += "${libdir}/${PN}${BPV}/*.tcl \
                 ${libdir}/${PN}${BPV}/lib${PN}${BPV}.so \
                 ${bindir}"
 

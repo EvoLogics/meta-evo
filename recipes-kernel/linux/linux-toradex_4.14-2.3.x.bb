@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}-${PV}:"
 require recipes-kernel/linux/linux-imx.inc
 
 SUMMARY = "Linux kernel for Toradex Freescale i.MX based modules"
@@ -12,7 +12,7 @@ SRC_URI = " \
 KERNEL_MODULE_AUTOLOAD += "${@bb.utils.contains('COMBINED_FEATURES', 'usbgadget', ' libcomposite', '',d)}"
 
 LOCALVERSION = "-${TDX_VER_ITEM}"
-PV_append = "+git"
+PV:append = "+git"
 
 SRCREV = "b8e49e74e60c8eb20328e4aac412f5cf338e9d0f"
 SRCBRANCH = "toradex_4.14-2.3.x-imx"

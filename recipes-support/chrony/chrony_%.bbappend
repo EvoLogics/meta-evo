@@ -1,40 +1,40 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
-FILESEXTRAPATHS_prepend_mx6ul-comm-module := "${THISDIR}/commod-mx6ul:"
-FILESEXTRAPATHS_prepend_mx6-evobb := "${THISDIR}/mx6:"
-FILESEXTRAPATHS_prepend_tegra194-evo := "${THISDIR}/tegra194-evo:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend_mx6ul-comm-module := "${THISDIR}/commod-mx6ul:"
+FILESEXTRAPATHS:prepend_mx6-evobb := "${THISDIR}/mx6:"
+FILESEXTRAPATHS:prepend_tegra194-evo := "${THISDIR}/tegra194-evo:"
 
-SRC_URI_append = "                        \
+SRC_URI:append = "                        \
     file://chrony.conf                    \
     file://chrony-force.sh             	  \
     "
 
-SRC_URI_append_mx6ul-comm-module = "      \
+SRC_URI:append_mx6ul-comm-module = "      \
     file://chrony.conf                 	  \
     file://chronyd.service                \
 "
 
-SRC_URI_append_mx6-evobb = "              \
+SRC_URI:append_mx6-evobb = "              \
     file://chrony.conf                 	  \
     "
-SRC_URI_append_tegra194-evo = "           \
+SRC_URI:append_tegra194-evo = "           \
     file://chrony.conf                    \
     file://chronyd.service                \
     "
 
-FILES_${PN} += "${base_sbindir}/chrony-force.sh"
+FILES:${PN} += "${base_sbindir}/chrony-force.sh"
 
-do_configure_append() {
+do_configure:append() {
     # getrandom() slowdown bootup run of chrony to 2 min.
     # Force to use embedded UTI_GetRandomBytesUrandom() which use /dev/urandom
     sed -i '/HAVE_GETRANDOM/d' config.h
 }
 
-do_install_append() {
+do_install:append() {
   install -d ${D}${base_sbindir}
     install -m 0755 ${WORKDIR}/chrony-force.sh ${D}${base_sbindir}/
 }
 
-do_install_append_mx6ul-comm-module(){
+do_install:append_mx6ul-comm-module(){
 	install -m 0644 ${WORKDIR}/chronyd.service ${D}${systemd_unitdir}/system/
 
   if [ -n "${BRIDGE_ADDRESS}" ]
@@ -44,7 +44,7 @@ do_install_append_mx6ul-comm-module(){
   fi
 }
 
-do_install_append_tegra194-evo(){
+do_install:append_tegra194-evo(){
   install -m 0644 ${WORKDIR}/chronyd.service ${D}${systemd_unitdir}/system/
 }
 

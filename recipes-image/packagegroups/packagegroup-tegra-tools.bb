@@ -2,7 +2,7 @@ DESCRIPTION = "Useful tools for Jetson"
 
 inherit packagegroup
 
-RDEPENDS_${PN} = "               \
+RDEPENDS:${PN} = "               \
     tegra-nvpmodel               \
     tegra-tools                  \
     tegra-redundant-boot         \

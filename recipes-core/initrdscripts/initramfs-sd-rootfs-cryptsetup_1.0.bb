@@ -20,4 +20,4 @@ do_install() {
 
 inherit allarch
 
-FILES_${PN} += " /init /rootfs.pass"
+FILES:${PN} += " /init /rootfs.pass"

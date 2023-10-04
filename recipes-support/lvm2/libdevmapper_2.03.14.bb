@@ -14,12 +14,12 @@ do_compile() {
 
 PACKAGES =+ "${PN}-bin ${PN}-bin-static"
 
-FILES_${PN}-bin = " \
+FILES:${PN}-bin = " \
     ${sbindir}/dmsetup \
     ${sbindir}/dmstats \
 "
 
-FILES_${PN}-bin-static = " \
+FILES:${PN}-bin-static = " \
     ${sbindir}/dmsetup.static \
     ${sbindir}/dmstats.static \
 "

@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 PR .= ".0"
 COMPATIBLE_MACHINE := "(sama5d2-roadrunner-.*)"
 
@@ -8,7 +8,7 @@ DEPENDS += "ncurses-native lz4-native"
 SRCREV = "7e44ddb093c3b8d723e16212c9a04cd56c77d165"
 
 # NOTE: when you add new dts, do not forget add to meta-evo/conf/machine/sama5d2-roadrunner-evo.conf
-SRC_URI_remove = "file://0001-Drop-using-_-in-version.patch"
+SRC_URI:remove = "file://0001-Drop-using-_-in-version.patch"
 SRC_URI += "\
     file://adc-remove-regulator-hack.patch \
     file://adc-force-set-csnaat.patch \
@@ -39,10 +39,10 @@ SRC_URI += "\
 SRC_URI += "file://crypto.cfg"
 SRC_URI += "file://initramfs.cfg"
 
-PACKAGES_append = " ${KERNEL_PACKAGE_NAME}-devicetree-compressed"
-FILES_${KERNEL_PACKAGE_NAME}-devicetree-compressed = "/${KERNEL_IMAGEDEST}/*.dtb.xz /${KERNEL_IMAGEDEST}/*.dtbo.xz"
+PACKAGES:append = " ${KERNEL_PACKAGE_NAME}-devicetree-compressed"
+FILES:${KERNEL_PACKAGE_NAME}-devicetree-compressed = "/${KERNEL_IMAGEDEST}/*.dtb.xz /${KERNEL_IMAGEDEST}/*.dtbo.xz"
 
-do_install_append() {
+do_install:append() {
 	for dtbf in ${KERNEL_DEVICETREE}; do
 		dtb=`normalize_dtb "$dtbf"`
 		dtb_ext=${dtb##*.}
@@ -62,7 +62,7 @@ do_install_append() {
         esac
     done
 }
-do_deploy_append() {
+do_deploy:append() {
 	for dtbf in ${KERNEL_DEVICETREE}; do
 		dtb=`normalize_dtb "$dtbf"`
 		dtb_ext=${dtb##*.}
@@ -108,13 +108,13 @@ do_deploy_append() {
 # boot time 7.3s
 #SRC_URI += "file://debug-memory-more.cfg"
 
-do_configure_prepend() {
+do_configure:prepend() {
     cp ${WORKDIR}/${MACHINE}*.dts  ${S}/arch/arm/boot/dts/
     cp -r ${WORKDIR}/overlays ${S}/arch/arm/boot/dts/
     cp ${WORKDIR}/${MACHINE}_defconfig ${WORKDIR}/defconfig
 }
 
-do_configure_append() {
+do_configure:append() {
     CFG="$(ls ${WORKDIR}/*.cfg 2> /dev/null || true)"
     test -n "$CFG" && cat ${WORKDIR}/*.cfg >> ${B}/.config
     return 0

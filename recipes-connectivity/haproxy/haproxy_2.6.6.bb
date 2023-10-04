@@ -5,7 +5,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2d862e836f92129cdc0ecccc54eed5e0"
 
 DEPENDS = "libpcre openssl zlib  ${@bb.utils.contains("DISTRO_FEATURES","systemd",'systemd','',d)}"
-RDEPENDS_${PN} = "openssl"
+RDEPENDS:${PN} = "openssl"
 
 SRC_URI = "http://www.haproxy.org/download/2.6/src/haproxy-2.6.6.tar.gz \
            file://haproxy.cfg \
@@ -21,8 +21,8 @@ inherit systemd useradd
 #create a user for running haproxy
 HAP_USER_HOME = "/home/haproxy"
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system --create-home --home ${HAP_USER_HOME} --shell /bin/false --groups haproxy --gid haproxy haproxy"
-GROUPADD_PARAM_${PN} = "haproxy"
+USERADD_PARAM:${PN} = "--system --create-home --home ${HAP_USER_HOME} --shell /bin/false --groups haproxy --gid haproxy haproxy"
+GROUPADD_PARAM:${PN} = "haproxy"
 
 EXTRA_OEMAKE = "'CPU=generic' \
                 'TARGET=linux-${TCLIBC}' \
@@ -65,9 +65,9 @@ do_install() {
   fi
 }
 
-FILES_${PN} = "${sbindir} \
+FILES:${PN} = "${sbindir} \
                ${sysconfdir} \
                ${systemd_unitdir} \
               "
 
-SYSTEMD_SERVICE_${PN} = "haproxy.service"
+SYSTEMD_SERVICE:${PN} = "haproxy.service"

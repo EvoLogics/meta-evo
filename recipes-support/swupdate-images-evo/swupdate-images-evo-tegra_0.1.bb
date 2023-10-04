@@ -1,6 +1,6 @@
 # Copyright (C) 2019 Llewellyn Fernandes <llewellyn.fernandes@evologics.de>
 # Released under the MIT license (see COPYING.MIT for the terms)
-FILESEXTRAPATHS_prepend_tegra194-evo := "${THISDIR}/swupdate-images-evo-tegra194-evo:"
+FILESEXTRAPATHS:prepend_tegra194-evo := "${THISDIR}/swupdate-images-evo-tegra194-evo:"
 
 SUMMARY = "Evologics Jetson Module SWU image"
 DESCRIPTION = "Evologics recipe generating SWU image for Jetson module "
@@ -8,7 +8,7 @@ DESCRIPTION = "Evologics recipe generating SWU image for Jetson module "
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
-SRC_URI_append_tegra194-evo = "   \
+SRC_URI:append_tegra194-evo = "   \
     file://sw-description         \
     file://swupdate-bl-update.sh  \
 "

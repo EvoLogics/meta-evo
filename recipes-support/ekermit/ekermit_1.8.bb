@@ -15,11 +15,11 @@ SRC_URI = "https://www.kermitproject.org/ftp/kermit/archives/ek18.tar;subdir=${B
 SRC_URI[md5sum] = "f352e41113ee9b269dc6ad540387d19e"
 SRC_URI[sha256sum] = "59c54f3fee05797ae2c3fbb9905cd518938bce86db83675a377532289ea2da1b"
 
-ALLOW_EMPTY_${PN}-dev = "0"
+ALLOW_EMPTY:${PN}-dev = "0"
 
 inherit update-alternatives
 
-ALTERNATIVE_${PN} = "kermit"
+ALTERNATIVE:${PN} = "kermit"
 ALTERNATIVE_LINK_NAME[kermit] = "${bindir}/kermit"
 ALTERNATIVE_TARGET[kermit] = "${bindir}/ek"
 ALTERNATIVE_PRIORITY = "10"

@@ -18,23 +18,23 @@ SRC_URI[md5sum] = "f9ff7068272befa82d22637737735a8a"
 SRC_URI[sha256sum] = "a64e0faed5957b8e1ac16f179948e21cdd6d3b8313590b7ab049a3192ab864fb"
 
 DEPENDS += "tcl readline"
-RDEPENDS_${PN} += "tcl readline"
+RDEPENDS:${PN} += "tcl readline"
 
 inherit autotools lib_package
 
 TCL_INCLUDE_PATH = ""
-TCL_INCLUDE_PATH_class-target = "--with-tcl-includes=${STAGING_INCDIR}/tcl8.6 \
+TCL_INCLUDE_PATH:class-target = "--with-tcl-includes=${STAGING_INCDIR}/tcl8.6 \
                                  --with-readline-includes=${STAGING_INCDIR}"
 
 EXTRA_OECONF = "--with-tcl=${STAGING_LIBDIR} \
     ${TCL_INCLUDE_PATH}"
 
-FILES_${PN} += "${libdir}/${PN}${PV}/*.tcl \
+FILES:${PN} += "${libdir}/${PN}${PV}/*.tcl \
                 ${libdir}/lib${PN}-${PV}.so"
-FILES_${PN}-dev = "${includedir}/*.h ${libdir}/lib${PN}.so"
+FILES:${PN}-dev = "${includedir}/*.h ${libdir}/lib${PN}.so"
 
 PACKAGES =+ "tclshrl"
-FILES_tclshrl = "${bindir}/tclshrl"
+FILES:tclshrl = "${bindir}/tclshrl"
 EXTRA_OECONF += "--enable-tclshrl"
 
 BBCLASSEXTEND = "native nativesdk"

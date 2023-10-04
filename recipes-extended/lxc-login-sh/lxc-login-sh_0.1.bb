@@ -19,12 +19,12 @@ do_install () {
     install -o root -g root -m 6755 ${S}/lxc-login-sh ${D}${bindir}/
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
     touch $D${sysconfdir}/shells
     grep -q "usr/bin/lxc-login-sh" $D${sysconfdir}/shells || echo "/usr/bin/lxc-login-sh" >> $D${sysconfdir}/shells
 }
 
-pkg_postrm_${PN} () {
+pkg_postrm:${PN} () {
     if [ -e $D${sysconfdir}/shells ]; then
         sed -i -e '/\/usr/\/bin\/lxc-login-sh/d' $D${sysconfdir}/shells
     fi

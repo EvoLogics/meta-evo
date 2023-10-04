@@ -3,5 +3,5 @@
 # https://patchwork.openembedded.org/patch/154992/
 
 PACKAGES =+ "${PN}-sftp-server-dev"
-RDEPENDS_${PN}-sftp-server-dev += "${PN}-sftp-server"
+RDEPENDS:${PN}-sftp-server-dev += "${PN}-sftp-server"
 

@@ -2,7 +2,7 @@ DESCRIPTION = "Cuda tools and libraries for tegra"
 
 inherit packagegroup
 
-RDEPENDS_${PN} = "          	\
+RDEPENDS:${PN} = "          	\
     cuda-nvrtc                \
     cuda-nvgraph              \
     cuda-cudart               \

@@ -16,8 +16,8 @@ DEPENDS = " \
     util-linux \
 "
 
-DEPENDS_append_libc-musl = " argp-standalone"
-LDFLAGS_append_libc-musl = " -largp"
+DEPENDS:append:libc-musl = " argp-standalone"
+LDFLAGS:append:libc-musl = " -largp"
 
 SRC_URI = "${KERNELORG_MIRROR}/linux/utils/${BPN}/v${@d.getVar('PV').split('.')[0]}.${@d.getVar('PV').split('.')[1]}/${BP}.tar.xz"
 SRC_URI[sha256sum] = "170cc2326a9daeeeb578579176bd10d4a60ee5c4fc5bc69018ce67dafc540b9c"
@@ -39,7 +39,7 @@ PACKAGECONFIG ??= " \
     luks-adjust-xts-keysize \
     openssl \
 "
-PACKAGECONFIG_append_class-target = " \
+PACKAGECONFIG:append:class-target = " \
     udev \
 "
 
@@ -86,13 +86,13 @@ EXTRA_OECONF += "--disable-udev"
 EXTRA_OECONF += "--with-crypto_backend=kernel"
 #EXTRA_OECONF += "--enable-static-cryptsetup"
 
-FILES_${PN} += "${@bb.utils.contains('DISTRO_FEATURES','systemd','${exec_prefix}/lib/tmpfiles.d/cryptsetup.conf', '', d)}"
+FILES:${PN} += "${@bb.utils.contains('DISTRO_FEATURES','systemd','${exec_prefix}/lib/tmpfiles.d/cryptsetup.conf', '', d)}"
 
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     libdevmapper \
 "
 
-RRECOMMENDS_${PN}_class-target = " \
+RRECOMMENDS:${PN}:class-target = " \
     kernel-module-aes-generic \
     kernel-module-dm-crypt \
     kernel-module-md5 \
@@ -101,7 +101,7 @@ RRECOMMENDS_${PN}_class-target = " \
     kernel-module-xts \
 "
 
-do_install_append () {
+do_install:append () {
     if [ -d ${D}/usr/lib/cryptsetup ]; then
         rmdir ${D}/usr/lib/cryptsetup
     fi

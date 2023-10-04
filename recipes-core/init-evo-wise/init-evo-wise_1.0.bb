@@ -7,14 +7,14 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.GPLv2;md5=751419260aa954499f7abaabaa882bbe"
 #SECTION = ""
 
-RDEPENDS_${PN} = "busybox expect lxc-login-sh liblxc evo-configs ppp"
+RDEPENDS:${PN} = "busybox expect lxc-login-sh liblxc evo-configs ppp"
 # need satisfy QA for ssh-proxy-sh, but actually don't need it
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"
 
 DEPENDS += "xz-native"
 
-ALLOW_EMPTY_${PN}-dbg = "0"
-ALLOW_EMPTY_${PN}-dev = "0"
+ALLOW_EMPTY:${PN}-dbg = "0"
+ALLOW_EMPTY:${PN}-dev = "0"
 
 SRC_URI = "file://rootfs/sbin/init \
            file://rootfs/sbin/initctl.exp \
@@ -47,7 +47,7 @@ SRC_URI = "file://rootfs/sbin/init \
            file://rootfs/opt/lxc/sandbox/init-files/evo.sudoers \
     "
 
-FILES_${PN} += "/usr/local/www \
+FILES:${PN} += "/usr/local/www \
                 /usr/local/etc/rc.local \
                 /usr/local/etc/rc-post.d/99-hwtype_autoconfig.sh \
                 /opt/lxc/sandbox/ \
@@ -120,13 +120,13 @@ do_install() {
     install -m 0644 -o root -g root ${WORKDIR}/rootfs/opt/lxc/sandbox/init-files/options  ${D}/opt/lxc/sandbox/init-files/
 }
 
-#FILES_${PN} = "${base_sbindir}/*"
+#FILES:${PN} = "${base_sbindir}/*"
 
-#FILES_${PN} = "${base_sbindir}/init \
+#FILES:${PN} = "${base_sbindir}/init \
 #  ${base_sbindir}/initctl.exp \
 #  ${base_sbindir}/evo-gen-mac \
 #"
-#FILES_${PN} = "/sbin/init \
+#FILES:${PN} = "/sbin/init \
 #  /sbin/initctl.exp \
 #  /sbin/evo-gen-mac \
 #"

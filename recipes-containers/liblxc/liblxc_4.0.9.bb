@@ -31,37 +31,37 @@ EXTRA_OECONF = "--enable-tools     \
                 --disable-examples \
                "
 
-RCONFLICTS_${PN} = "lxc"
+RCONFLICTS:${PN} = "lxc"
 
-do_install_append() {
+do_install:append() {
     rm -rf ${D}${nonarch_libdir}/lxc/rootfs/README
 }
 
 # Remove binary files from ${PN} and ${PN}-bin,
 # becouse binaryes will splited to separated packages.
-FILES_${PN}_remove     = "${bindir}/*"
-FILES_${PN}-bin_remove = "${bindir}/*"
+FILES:${PN}:remove     = "${bindir}/*"
+FILES:${PN}-bin:remove = "${bindir}/*"
 
 # TODO: what -bin depends from libexec?
-FILES_${PN}-libexec         = "${libexecdir}/*"
+FILES:${PN}-libexec         = "${libexecdir}/*"
 
-FILES_${PN}-conf            = "${sysconfdir}/*"
+FILES:${PN}-conf            = "${sysconfdir}/*"
 
 # Cannot use do_split_packages() becouse legitimize_package_name()
 # not replace '.' with '-', produce package name like 'liblxc-bin-init.lxc'
-FILES_${PN}-bin-init-lxc    = "${sbindir}/init.lxc*"
-RDEPENDS_${PN}-bin-init-lxc = "${PN}-common"
+FILES:${PN}-bin-init-lxc    = "${sbindir}/init.lxc*"
+RDEPENDS:${PN}-bin-init-lxc = "${PN}-common"
 
 # lxc-execute run init.lxc*
-RDEPENDS_${PN}-bin-lxc-execute = "${PN}-bin-init-lxc"
+RDEPENDS:${PN}-bin-lxc-execute = "${PN}-bin-init-lxc"
 
-FILES_${PN}-common          = "  \
+FILES:${PN}-common          = "  \
     ${localstatedir}/lib/lxc     \
     ${localstatedir}/cache       \
     ${nonarch_libdir}/lxc/rootfs \
 "
 
-FILES_${PN}-extra           = "\
+FILES:${PN}-extra           = "\
     ${datadir}/lxc/lxc-patch.py  \
     ${datadir}/lxc/lxc.functions \
     ${datadir}/lxc/hooks/*       \
@@ -69,19 +69,19 @@ FILES_${PN}-extra           = "\
     ${datadir}/lxc/templates/*   \
     ${datadir}/lxc/config/*      \
 "
-RDEPENDS_${PN}-extra = "bash"
+RDEPENDS:${PN}-extra = "bash"
 
 PACKAGES  =+ " ${PN}-bin-init-lxc ${PN}-common ${PN}-libexec ${PN}-conf ${PN}-extra"
 PACKAGES_DYNAMIC = '${PN}-bin-.*'
 
 # *-bin package will be empty with depends from all *-bin-* packages
-ALLOW_EMPTY_${PN}-bin = "1"
+ALLOW_EMPTY:${PN}-bin = "1"
 
-python populate_packages_prepend() {
+python populate_packages:prepend() {
     import glob
     pn = d.getVar('PN') or ''
     bindir = d.expand('${bindir}')
     pkgs = do_split_packages(d, bindir, '(lxc-.*)', '${BPN}-bin-%s', 'Binary in %s', extra_depends='${BPN}-common')
 
-    d.prependVar("RDEPENDS_"  + pn + '-bin', "%s " % (" ".join(pkgs)))
+    d.prependVar("RDEPENDS:"  + pn + '-bin', "%s " % (" ".join(pkgs)))
 }

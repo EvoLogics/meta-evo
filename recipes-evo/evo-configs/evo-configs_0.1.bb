@@ -12,11 +12,11 @@ SRC_URI = "file://bashrc \
            file://screenrc \
            file://tmux.conf \
 "
-FILES_${PN} = "${datadir}/${PN}/*.xz"
+FILES:${PN} = "${datadir}/${PN}/*.xz"
 
 inherit allarch
-ALLOW_EMPTY_${PN}-dbg = "0"
-ALLOW_EMPTY_${PN}-dev = "0"
+ALLOW_EMPTY:${PN}-dbg = "0"
+ALLOW_EMPTY:${PN}-dev = "0"
 
 do_install() {
     mkdir -p ${D}${datadir}/evo-configs

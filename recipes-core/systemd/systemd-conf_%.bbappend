@@ -2,19 +2,19 @@ SUMMARY = "Machine specific systemd units"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 PR = "r23"
 inherit systemd
 
 NATIVE_SYSTEMD_SUPPORT = "1"
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 
 # Don't generate empty -dbg package
 PACKAGES = "${PN}"
 
-SRC_URI_append_mx6ul-comm-module = "  \
+SRC_URI:append_mx6ul-comm-module = "  \
     file://10-eth0.network      \
     file://10-eth1.network      \
     file://Bridge.network       \
@@ -23,7 +23,7 @@ SRC_URI_append_mx6ul-comm-module = "  \
     ${@bb.utils.contains("IMAGE_CONFIGS", "can", "file://can0.service", "", d)} \
 "
 
-SRC_URI_append_tegra194-evo = "     \
+SRC_URI:append_tegra194-evo = "     \
     file://10-watchdog.conf         \
     file://10-eth0.network          \
     file://90-dhcp-default.network  \
@@ -31,8 +31,8 @@ SRC_URI_append_tegra194-evo = "     \
     ${@bb.utils.contains("IMAGE_CONFIGS", "can", "file://can0.service", "", d)} \
 "
 
-SYSTEMD_SERVICE_${PN}_mx6ul-comm-module = "${@bb.utils.contains("IMAGE_CONFIGS", "can", "can0.service", "", d)}"
-SYSTEMD_SERVICE_${PN}_tegra194-evo = "${@bb.utils.contains("IMAGE_CONFIGS", "can", "can0.service", "", d)}"
+SYSTEMD_SERVICE:${PN}_mx6ul-comm-module = "${@bb.utils.contains("IMAGE_CONFIGS", "can", "can0.service", "", d)}"
+SYSTEMD_SERVICE:${PN}_tegra194-evo = "${@bb.utils.contains("IMAGE_CONFIGS", "can", "can0.service", "", d)}"
 
 
 do_install_mx6ul-comm-module(){
@@ -94,7 +94,7 @@ do_install_mx6ul-comm-module(){
     done
 }
 
-do_install_append_tegra194-evo() {
+do_install:append_tegra194-evo() {
     install -d ${D}${sysconfdir}/systemd/network
 
     install -m 0644 ../system.conf ${D}${sysconfdir}/systemd/system.conf
@@ -121,7 +121,7 @@ do_install_append_tegra194-evo() {
     fi
 }
 
-FILES_${PN} += "\
+FILES:${PN} += "\
     ${systemd_system_unitdir} \
     ${sysconfdir} \
 "

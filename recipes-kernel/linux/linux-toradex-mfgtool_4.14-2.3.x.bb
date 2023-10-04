@@ -13,6 +13,6 @@ KERNEL_IMAGE_BASE_NAME[vardepsexclude] = "DATETIME"
 MODULE_IMAGE_BASE_NAME[vardepsexclude] = "DATETIME"
 do_package[vardepsexclude] = "DATETIME"
 
-SRC_URI_append = " \
+SRC_URI:append = " \
   file://mfgtool.cfg \
   "

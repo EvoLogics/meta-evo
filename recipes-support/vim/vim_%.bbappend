@@ -1,8 +1,8 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 PACKAGES =+ "${PN}-xxd"
 
-FILES_${PN}-xxd = "${bindir}/xxd.vim"
+FILES:${PN}-xxd = "${bindir}/xxd.vim"
 
-ALTERNATIVE_${PN} = "vi vim"
-ALTERNATIVE_${PN}-xxd = "xxd"
+ALTERNATIVE:${PN} = "vi vim"
+ALTERNATIVE:${PN}-xxd = "xxd"

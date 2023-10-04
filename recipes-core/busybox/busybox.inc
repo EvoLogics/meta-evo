@@ -57,12 +57,12 @@ DO_IPv6 := "${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 1, 0, d)}"
 
 python () {
   if "${OE_DEL}":
-    d.setVar('configmangle_append', "${OE_DEL}" + "\n")
+    d.setVar('configmangle:append', "${OE_DEL}" + "\n")
   if "${OE_FEATURES}":
-    d.setVar('configmangle_append',
+    d.setVar('configmangle:append',
                    "/^### DISTRO FEATURES$/a\\\n%s\n\n" %
                    ("\\n".join((d.expand("${OE_FEATURES}").split("\n")))))
-  d.setVar('configmangle_append',
+  d.setVar('configmangle:append',
                  "/^### CROSS$/a\\\n%s\n" %
                   ("\\n".join(["CONFIG_EXTRA_CFLAGS=\"${CFLAGS} ${HOST_CC_ARCH}\""
                         ])
@@ -321,7 +321,7 @@ inherit update-alternatives
 
 ALTERNATIVE_PRIORITY = "50"
 
-python do_package_prepend () {
+python do_package:prepend () {
     # We need to load the full set of busybox provides from the /etc/busybox.links
     # Use this to see the update-alternatives with the right information
 
@@ -338,9 +338,9 @@ python do_package_prepend () {
             if alt_name == '[':
                 alt_name = 'lbracket'
             if alt_name == 'klogd' or alt_name == 'syslogd':
-                d.appendVar('ALTERNATIVE_%s-syslog' % (pn), ' ' + alt_name)
+                d.appendVar('ALTERNATIVE:%s-syslog' % (pn), ' ' + alt_name)
             else:
-                d.appendVar('ALTERNATIVE_%s' % (pn), ' ' + alt_name)
+                d.appendVar('ALTERNATIVE:%s' % (pn), ' ' + alt_name)
             d.setVarFlag('ALTERNATIVE_LINK_NAME', alt_name, alt_link_name)
             if os.path.exists('%s%s' % (dvar, target)):
                 d.setVarFlag('ALTERNATIVE_TARGET', alt_name, target)
@@ -354,7 +354,7 @@ python do_package_prepend () {
         set_alternative_vars("${sysconfdir}/busybox.links.suid", "${base_bindir}/busybox.suid")
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
 	# This part of code is dedicated to the on target upgrade problem.
 	# It's known that if we don't make appropriate symlinks before update-alternatives calls,
 	# there will be errors indicating missing commands such as 'sed'.
@@ -384,7 +384,7 @@ pkg_postinst_${PN} () {
 	fi
 }
 
-pkg_prerm_${PN} () {
+pkg_prerm:${PN} () {
 	# This is so you can make busybox commit suicide - removing busybox with no other packages
 	# providing its files, this will make update-alternatives work, but the update-rc.d part
 	# for syslog, httpd and/or udhcpd will fail if there is no other package providing sh
@@ -406,13 +406,13 @@ pkg_prerm_${PN} () {
 	export PATH=$PATH:$tmpdir
 }
 
-pkg_postrm_${PN} () {
+pkg_postrm:${PN} () {
 	if grep -q "^${base_bindir}/bash$" $D${sysconfdir}/busybox.links* && [ ! -e $D${base_bindir}/bash ]; then
 		printf "$(grep -v "^${base_bindir}/bash$" $D${sysconfdir}/shells)\n" > $D${sysconfdir}/shells
 	fi
 }
 
-pkg_prerm_${PN}-syslog () {
+pkg_prerm:${PN}-syslog () {
 	# remove syslog
 	if test "x$D" = "x"; then
 		if test "$1" = "upgrade" -o "$1" = "remove"; then
@@ -421,4 +421,4 @@ pkg_prerm_${PN}-syslog () {
 	fi
 }
 
-RPROVIDES_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', '/bin/sh', '', d)}"
+RPROVIDES:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', '/bin/sh', '', d)}"

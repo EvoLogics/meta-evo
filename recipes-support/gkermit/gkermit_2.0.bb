@@ -17,14 +17,14 @@ SRC_URI[md5sum] = "5a4935fbf2e58237169368720249f012"
 SRC_URI[sha256sum] = "3ee95b7b08e2633ff277b541caf053a32b3b4bdcc160a0d319bdf5e60571da68"
 
 
-DEPENDS_class-target = "gwart-native"
+DEPENDS:class-target = "gwart-native"
 
 PROVIDES += "gwart"
-FILES_gwart = "${bindir}/gwart"
+FILES:gwart = "${bindir}/gwart"
 
 inherit update-alternatives
 
-ALTERNATIVE_${PN} = "kermit"
+ALTERNATIVE:${PN} = "kermit"
 ALTERNATIVE_LINK_NAME[kermit] = "${bindir}/kermit"
 ALTERNATIVE_TARGET[kermit] = "${bindir}/gkermit"
 ALTERNATIVE_PRIORITY = "50"
@@ -33,20 +33,20 @@ do_configure () {
 	:
 }
 
-do_compile_class-native () {
+do_compile:class-native () {
 	oe_runmake gwart CC="${CC}" CFLAGS="${CFLAGS} -DPOSIX"
 }
 
-do_compile_class-target () {
+do_compile:class-target () {
 	oe_runmake gkermit CC="${CC}" CFLAGS="${CFLAGS} -DPOSIX"
 }
 
-do_install_class-native () {
+do_install:class-native () {
     install -d ${D}${bindir}
     install -m 0755 ${B}/gwart ${D}/${bindir}
 }
 
-do_install_class-target () {
+do_install:class-target () {
     install -d ${D}${bindir}
     install -m 0755 ${B}/gkermit ${D}/${bindir}
 }

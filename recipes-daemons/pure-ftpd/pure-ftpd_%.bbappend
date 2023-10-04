@@ -1,26 +1,26 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 # Additional configure options for pure-ftpd
 
-EXTRA_OECONF_append = " --with-puredb --with-ftpwho"
+EXTRA_OECONF:append = " --with-puredb --with-ftpwho"
 
-SRC_URI_append_mx6-evobb = "         \
+SRC_URI:append_mx6-evobb = "         \
   file://${PN}.init                  \
   file://${PN}.monitd                \
   "
-SRC_URI_append_mx6ul-comm-module = " \
+SRC_URI:append_mx6ul-comm-module = " \
   file://${PN}.default               \
   file://${PN}.service               \
 "
 
-SYSTEMD_SERVICE_${PN}_mx6ul-comm-module = "${PN}.service"
+SYSTEMD_SERVICE:${PN}_mx6ul-comm-module = "${PN}.service"
 
 INITSCRIPT_NAME = "${PN}"
 INITSCRIPT_PARAMS = "defaults 80"
 
 inherit update-rc.d systemd
 
-do_install_append() {
+do_install:append() {
 
   if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
     install -d ${D}${sysconfdir}/default

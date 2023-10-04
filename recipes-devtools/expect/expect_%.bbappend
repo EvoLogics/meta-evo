@@ -1,10 +1,10 @@
-FILES_lib${BPN} = "${libdir}/libexpect${PV}.so \
+FILES:lib${BPN} = "${libdir}/libexpect${PV}.so \
                    ${libdir}/expect${PV}/pkgIndex.tcl"
 
-FILES_${PN} = "${bindir}/expect"
-RDEPENDS_${PN} += "lib${BPN}"
+FILES:${PN} = "${bindir}/expect"
+RDEPENDS:${PN} += "lib${BPN}"
 
-FILES_${PN}-scripts  = "\
+FILES:${PN}-scripts  = "\
     ${libdir}/expect${PV} \
     ${bindir}/* \
 "

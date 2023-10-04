@@ -8,11 +8,11 @@ PROVIDES = "virtual/gpsd"
 
 CONFLICT = "gpsd"
 RCONFLICT = "gpsd"
-RCONFLICTS_virtual/gpsd = "gpsd"
+RCONFLICTS:virtual/gpsd = "gpsd"
 
 EXTRANATIVEPATH += "chrpath-native"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/gpsd-tiny-3.17:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/gpsd-tiny-3.17:"
 
 ON="${@'${BP}'.replace('-tiny','')}"
 S = "${WORKDIR}/${ON}"
@@ -23,7 +23,7 @@ SRC_URI = "${SAVANNAH_GNU_MIRROR}/${@'${BPN}'.replace('-tiny','')}/${ON}.tar.gz 
     file://allow-work-with-socat-pty.patch \
 "
 
-SRC_URI_append_mx6ul-comm-module = "   \
+SRC_URI:append_mx6ul-comm-module = "   \
     file://gpsd.commod                 \ 
     file://gpsd.service                \
 "
@@ -84,7 +84,7 @@ EXTRA_OESCONS = " \
 # this cannot be used, because then chrpath is not found and only static lib is built
 # target=${HOST_SYS}
 
-do_compile_prepend() {
+do_compile:prepend() {
     export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}"
     export PKG_CONFIG="PKG_CONFIG_SYSROOT_DIR=\"${PKG_CONFIG_SYSROOT_DIR}\" pkg-config"
     export STAGING_PREFIX="${STAGING_DIR_HOST}/${prefix}"
@@ -103,7 +103,7 @@ do_install() {
       bbfatal "scons install execution failed."
 }
 
-do_install_append() {
+do_install:append() {
     install -d ${D}/${sysconfdir}/init.d
     install -m 0755 ${S}/packaging/deb/etc_init.d_gpsd ${D}/${sysconfdir}/init.d/gpsd
     install -d ${D}/${sysconfdir}/default
@@ -126,43 +126,43 @@ do_install_append() {
     install -m 0644 ${S}/systemd/gpsd.socket ${D}${systemd_unitdir}/system/${BPN}.socket
 }
 
-do_install_append_mx6ul-comm-module(){
+do_install:append_mx6ul-comm-module(){
     install -m 0644 ${WORKDIR}/gpsd.commod ${D}/${sysconfdir}/default/gpsd.commod
     install -m 0644 ${WORKDIR}/gpsd.service ${D}${systemd_unitdir}/system/${BPN}.service
 }
 
 PACKAGES =+ "libgps lib${BPN} ${BPN}-udev ${BPN}-conf ${BPN}-gpsctl"
 
-FILES_${PN}-dev += "${libdir}/pkgconfdir/libgpsd.pc ${libdir}/pkgconfdir/libgps.pc \
+FILES:${PN}-dev += "${libdir}/pkgconfdir/libgpsd.pc ${libdir}/pkgconfdir/libgps.pc \
                     ${libdir}/libQgpsmm.prl"
 
-RDEPENDS_${PN} = "${BPN}-gpsctl"
-RRECOMMENDS_${PN} = "${BPN}-conf ${BPN}-udev gpsd-machine-conf"
+RDEPENDS:${PN} = "${BPN}-gpsctl"
+RRECOMMENDS:${PN} = "${BPN}-conf ${BPN}-udev gpsd-machine-conf"
 
-SUMMARY_${BPN}-udev = "udev relevant files to use gpsd hotplugging"
-FILES_${BPN}-udev = "${base_libdir}/udev ${sysconfdir}/udev/*"
-RDEPENDS_${BPN}-udev += "udev gpsd-tiny-conf"
+SUMMARY:${BPN}-udev = "udev relevant files to use gpsd hotplugging"
+FILES:${BPN}-udev = "${base_libdir}/udev ${sysconfdir}/udev/*"
+RDEPENDS:${BPN}-udev += "udev gpsd-tiny-conf"
 
-SUMMARY_lib${BPN} = "C service library used for communicating with gpsd"
-FILES_lib${BPN} = "${libdir}/libgpsd.so.*"
+SUMMARY:lib${BPN} = "C service library used for communicating with gpsd"
+FILES:lib${BPN} = "${libdir}/libgpsd.so.*"
 
-SUMMARY_libgps = "C service library used for communicating with gpsd"
-FILES_libgps = "${libdir}/libgps.so.*"
+SUMMARY:libgps = "C service library used for communicating with gpsd"
+FILES:libgps = "${libdir}/libgps.so.*"
 
-SUMMARY_${BPN}-conf = "gpsd configuration files and init scripts"
-FILES_${BPN}-conf = "${sysconfdir}"
-CONFFILES_${BPN}-conf = "${sysconfdir}/default/gpsd.default"
+SUMMARY:${BPN}-conf = "gpsd configuration files and init scripts"
+FILES:${BPN}-conf = "${sysconfdir}"
+CONFFILES:${BPN}-conf = "${sysconfdir}/default/gpsd.default"
 
-SUMMARY_${BPN}-gpsctl = "Tool for tweaking GPS modes"
-FILES_${BPN}-gpsctl = "${bindir}/gpsctl"
+SUMMARY:${BPN}-gpsctl = "Tool for tweaking GPS modes"
+FILES:${BPN}-gpsctl = "${bindir}/gpsctl"
 
-RPROVIDES_${PN} += "${PN}-systemd"
-RREPLACES_${PN} += "${PN}-systemd"
-RCONFLICTS_${PN} += "${PN}-systemd"
-SYSTEMD_SERVICE_${PN} = "${BPN}.socket ${BPN}ctl@.service"
-SYSTEMD_SERVICE_${PN}_mx6ul-comm-module = "${BPN}.socket ${BPN}.service  ${BPN}ctl@.service"
+RPROVIDES:${PN} += "${PN}-systemd"
+RREPLACES:${PN} += "${PN}-systemd"
+RCONFLICTS:${PN} += "${PN}-systemd"
+SYSTEMD_SERVICE:${PN} = "${BPN}.socket ${BPN}ctl@.service"
+SYSTEMD_SERVICE:${PN}_mx6ul-comm-module = "${BPN}.socket ${BPN}.service  ${BPN}ctl@.service"
 
 
-ALTERNATIVE_${PN} = "gpsd-defaults"
+ALTERNATIVE:${PN} = "gpsd-defaults"
 ALTERNATIVE_LINK_NAME[gpsd-defaults] = "${sysconfdir}/default/gpsd"
 ALTERNATIVE_TARGET[gpsd-defaults] = "${sysconfdir}/default/gpsd.default"

@@ -55,4 +55,4 @@ MKUBIFS_VOLUME_SIZE[etc2] = "2MiB"
 MKUBIFS_VOLUME_ARGS[etc2] = "-m 1 -e 65408 -c 22 -F"
 
 JFFS2_ERASEBLOCK = "0x1000"
-EXTRA_IMAGECMD_jffs2 = "${JFFS2_ENDIANNESS} --eraseblock=${JFFS2_ERASEBLOCK} --no-cleanmarkers"
+EXTRA_IMAGECMD:jffs2 = "${JFFS2_ENDIANNESS} --eraseblock=${JFFS2_ERASEBLOCK} --no-cleanmarkers"

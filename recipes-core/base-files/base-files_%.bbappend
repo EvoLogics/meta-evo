@@ -1,27 +1,27 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-FILESEXTRAPATHS_prepend_mx6-evobb := "${THISDIR}/${PN}/mx6ul-comm-module:"
-FILESEXTRAPATHS_prepend_mx6-evobb := "${THISDIR}/${PN}/tegra194-evo:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend_mx6-evobb := "${THISDIR}/${PN}/mx6ul-comm-module:"
+FILESEXTRAPATHS:prepend_mx6-evobb := "${THISDIR}/${PN}/tegra194-evo:"
 
 #PRINC := "${@int(PRINC) + 1}"
 PR .= ".2"
 SRC_URI += "file://issue*        \
            "
 
-SRC_URI_append_mx6ul-comm-module = "    \
+SRC_URI:append_mx6ul-comm-module = "    \
     file://print_issue.sh               \
     file://share/dot.bashrc             \
     file://share/dot.profile            \
 "
 
-SRC_URI_append_tegra194-evo      = "    \
+SRC_URI:append_tegra194-evo      = "    \
     file://print_issue.sh               \
     file://share/dot.bashrc             \
     file://share/dot.profile            \
 "
 
-dirs755_append = " ${sysconfdir}/profile.d"
+dirs755:append = " ${sysconfdir}/profile.d"
 
-do_install_append_sama5d2-roadrunner-evo() {
+do_install:append_sama5d2-roadrunner-evo() {
 	install -d ${D}${sysconfdir}
 	install -m 0644 ${WORKDIR}/issue.base ${D}${sysconfdir}
 	install -m 0644 ${WORKDIR}/issue.wise ${D}${sysconfdir}
@@ -72,9 +72,9 @@ do_install_append_sama5d2-roadrunner-evo() {
 ### MX6-EVOBB Specific ###
 ##########################
 
-FILESEXTRAPATHS_prepend_mx6-evobb := "${THISDIR}/${PN}/tx6:"
+FILESEXTRAPATHS:prepend_mx6-evobb := "${THISDIR}/${PN}/tx6:"
 
-do_install_append_mx6-evobb() {
+do_install:append_mx6-evobb() {
 	install -d ${D}${sysconfdir}
 	install -m 0644 ${WORKDIR}/issue.tx6 ${D}${sysconfdir}
 
@@ -83,10 +83,10 @@ do_install_append_mx6-evobb() {
     rm -f issue.net issue.tx6
 }
 
-SYSROOT_DIRS_append_mx6ul-comm-module = "${sysconfdir}/skel"
-SYSROOT_DIRS_append_tegra194-evo = "${sysconfdir}/skel"
+SYSROOT_DIRS:append_mx6ul-comm-module = "${sysconfdir}/skel"
+SYSROOT_DIRS:append_tegra194-evo = "${sysconfdir}/skel"
 
-do_install_append_mx6ul-comm-module() {
+do_install:append_mx6ul-comm-module() {
     install -m 0755 ${WORKDIR}/print_issue.sh ${D}${sysconfdir}/profile.d/print_issue.sh
     install -m 0755 ${WORKDIR}/share/dot.profile ${D}${sysconfdir}/skel/.profile
     install -m 0755 ${WORKDIR}/share/dot.bashrc ${D}${sysconfdir}/skel/.bashrc
@@ -94,7 +94,7 @@ do_install_append_mx6ul-comm-module() {
 }
 
 
-do_install_append_tegra194-evo() {
+do_install:append_tegra194-evo() {
     install -m 0755 ${WORKDIR}/print_issue.sh ${D}${sysconfdir}/profile.d/print_issue.sh
     install -m 0755 ${WORKDIR}/share/dot.profile ${D}${sysconfdir}/skel/.profile
     install -m 0755 ${WORKDIR}/share/dot.bashrc ${D}${sysconfdir}/skel/.bashrc

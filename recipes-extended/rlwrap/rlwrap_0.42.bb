@@ -8,7 +8,7 @@ PR = "r0"
 
 DEPENDS="readline"
 
-RDEPENDS_${PN}="readline"
+RDEPENDS:${PN}="readline"
 
 inherit autotools binconfig
 

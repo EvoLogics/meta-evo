@@ -8,7 +8,7 @@ DEPENDS = "tcl-native"
 
 # TODO: fix pkgIndex.tcl to search only installed tcllib-package-* directory
 
-RDEPENDS_${PN} = "tcl"
+RDEPENDS:${PN} = "tcl"
 SRC_URI = " \
   ${SOURCEFORGE_MIRROR}/project/tcllib/tcllib/${PV}/tcllib-${PV}.tar.gz\
 "
@@ -20,21 +20,21 @@ SRC_URI[sha256sum] = "01fe87cf1855b96866cf5394b6a786fd40b314022714b34110aeb6af54
 inherit autotools binconfig lib_package allarch
 
 # tcllib package will be empty with depends from all packages
-ALLOW_EMPTY_${PN} = "1"
-ALLOW_EMPTY_${PN}-dbg = "0"
-ALLOW_EMPTY_${PN}-dev = "0"
+ALLOW_EMPTY:${PN} = "1"
+ALLOW_EMPTY:${PN}-dbg = "0"
+ALLOW_EMPTY:${PN}-dev = "0"
 
 PACKAGES =+ "tcllib-common"
-FILES_${PN}-common = "${libdir}/${PN}${PV}/pkgIndex.tcl"
-RDEPENDS_${PN}-common = "tcl"
+FILES:${PN}-common = "${libdir}/${PN}${PV}/pkgIndex.tcl"
+RDEPENDS:${PN}-common = "tcl"
 
-FILES_${PN}-package-nns = "${bindir}/nns*"
-FILES_${PN}-package-dtplite = "${bindir}/dtplite"
-FILES_${PN}-package-page = "${bindir}/page"
-FILES_${PN}-package-pt = "${bindir}/pt"
-FILES_${PN}-package-docstrip = "${bindir}/tcldocstrip"
+FILES:${PN}-package-nns = "${bindir}/nns*"
+FILES:${PN}-package-dtplite = "${bindir}/dtplite"
+FILES:${PN}-package-page = "${bindir}/page"
+FILES:${PN}-package-pt = "${bindir}/pt"
+FILES:${PN}-package-docstrip = "${bindir}/tcldocstrip"
 
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     pn = d.getVar('PN') or ''
     libdir = bb.data.expand('${libdir}/${PN}${PV}', d)
 
@@ -43,13 +43,13 @@ python populate_packages_prepend () {
     for f in os.listdir(libdir):
         if os.path.isdir(os.path.join(libdir,f)):
             pkg = "%s-package-%s" % (pn, f.replace('_', '-'))
-            d.appendVar("FILES_%s" % pkg, " ${libdir}/${PN}${PV}/%s" % f)
-            d.appendVar("RDEPENDS_%s" % pkg, " %s-common" % pn)
-            d.setVar("DESCRIPTION_%s" % pkg, "%s package %s" % (pkg, f))
+            d.appendVar("FILES:%s" % pkg, " ${libdir}/${PN}${PV}/%s" % f)
+            d.appendVar("RDEPENDS:%s" % pkg, " %s-common" % pn)
+            d.setVar("DESCRIPTION:%s" % pkg, "%s package %s" % (pkg, f))
             pkgs.append(pkg)
 
     d.prependVar("PACKAGES", "%s " % (" ".join(pkgs)))
-    d.prependVar("RDEPENDS_%s" % pn, "%s " % (" ".join(pkgs)))
+    d.prependVar("RDEPENDS:%s" % pn, "%s " % (" ".join(pkgs)))
 }
 
 BBCLASSEXTEND = "native nativesdk"

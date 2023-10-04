@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}-${PV}:"
 
 PR .= ".0"
 
@@ -8,7 +8,7 @@ SRC_URI[sdma-imx6q.sha256sum] = "7790c161b7e013a9dbcbffb17cc5d4cb63d952949a50564
 
 KERNEL_IMAGETYPE = "uImage"
 
-do_configure_append() {
+do_configure:append() {
     CFG="$(ls ${WORKDIR}/*.cfg 2> /dev/null || true)"
     test -n "$CFG" && cat ${WORKDIR}/*.cfg >> ${B}/.config
     return 0
@@ -18,11 +18,11 @@ do_configure_append() {
 ### Colibri Specific ###
 ########################
 
-SRC_URI_append_colibri-imx6-iris-evo = "\
+SRC_URI:append_colibri-imx6-iris-evo = "\
   file://0001-Define-SD_1_8.patch \
   "
 
-do_patch_prepend_colibri-imx6-iris-evo() {
+do_patch:prepend_colibri-imx6-iris-evo() {
     s = d.getVar("S")
     src = oe.path.join(s, "arch/arm/boot/dts/imx6dl-colibri-eval-v3.dts")
     dest = oe.path.join(s, "arch/arm/boot/dts/imx6dl-colibri-eval-v3-sd18.dts")
@@ -34,18 +34,18 @@ do_patch_prepend_colibri-imx6-iris-evo() {
 ### TX6 Specific ###
 ####################
 
-FILESEXTRAPATHS_prepend_tx6 := "${THISDIR}/linux-karo-common:"
+FILESEXTRAPATHS:prepend_tx6 := "${THISDIR}/linux-karo-common:"
 
-SRC_URI_append_tx6 = "\
+SRC_URI:append_tx6 = "\
   file://defconfig \
   file://0002-net-fec-reset-PHY-whenever-enet-out-clock-has-been-r.patch \
   "
 
-SRC_URI_append_tx6 = "\
+SRC_URI:append_tx6 = "\
   https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/imx/sdma/sdma-imx6q.bin?id=${SRCREV_sdma-imx6q};subdir=${S}/firmware/imx/sdma/;downloadfilename=sdma-imx6q.bin;name=sdma-imx6q \
   "
 
-SRC_URI_append_tx6 = "\
+SRC_URI:append_tx6 = "\
   file://imx6-tx6-evobb.cfg \
   file://imx6-tx6-evobb-iptables.cfg \
   file://imx6-${MACHINE}.dts;subdir=${S}/arch/arm/boot/dts \

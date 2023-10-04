@@ -3,7 +3,7 @@ DESCRIPTION = "These scripts help to initialize the system on the first run"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
-FILESEXTRAPATHS_prepend_mx6-evobb := "${THISDIR}/${PN}/mx6:"
+FILESEXTRAPATHS:prepend_mx6-evobb := "${THISDIR}/${PN}/mx6:"
 
 PR = "r1"
 
@@ -31,7 +31,7 @@ SRC_URI_mx6-evobb = " \
   file://99-reboot.sh \
   "
 
-SRC_URI_append_mx6ul-comm-module = "            \
+SRC_URI:append_mx6ul-comm-module = "            \
         file://initgpio.sh                      \
         file://update-util                      \
         file://comm-hw                          \
@@ -54,7 +54,7 @@ SRC_URI_append_mx6ul-comm-module = "            \
         file://mark-good.service                \
 "
 
-SRC_URI_append_tegra194-evo = "                 \
+SRC_URI:append_tegra194-evo = "                 \
         file://07-sshd-dropbear-fix.sh          \
         file://08-sshd-dropbear-keys.sh         \
         file://09-monit-id.sh                   \
@@ -101,13 +101,13 @@ do_install_mx6-evobb() {
     install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/evo-envinit
 }
 
-SYSTEMD_SERVICE_${PN}_mx6ul-comm-module += "     \
+SYSTEMD_SERVICE:${PN}_mx6ul-comm-module += "     \
     init-gpio.service                            \
     systemd-firstboot.service                    \
     mark-good.service                            \
 "
 
-SYSTEMD_SERVICE_${PN}_tegra194-evo      += "     \
+SYSTEMD_SERVICE:${PN}_tegra194-evo      += "     \
     systemd-firstboot.service                    \
 "
 

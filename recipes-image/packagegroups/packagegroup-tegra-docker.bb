@@ -2,7 +2,7 @@ DESCRIPTION = "Docker for tegra"
 
 inherit packagegroup
 
-RDEPENDS_${PN} = "                \
+RDEPENDS:${PN} = "                \
     nvidia-docker                 \
     nvidia-container-runtime      \
     nvidia-container-toolkit      \

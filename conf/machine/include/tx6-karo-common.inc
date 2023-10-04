@@ -17,9 +17,9 @@ PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-karo"
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-toradex"
 PREFERRED_PROVIDER_linux-mfgtool ?= "linux-toradex-mfgtool"
 
-MACHINE_FIRMWARE_append_mx6 = " linux-firmware-ath6k"
+MACHINE_FIRMWARE:append_mx6 = " linux-firmware-ath6k"
 MACHINE_FEATURES += " pci wifi bluetooth"
-IMAGE_FSTYPES_remove = "sdcard"
+IMAGE_FSTYPES:remove = "sdcard"
 IMAGE_FSTYPES = "tar.bz2"
 
 TXBASE ?= "mb7"

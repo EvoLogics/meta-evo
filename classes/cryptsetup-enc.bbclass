@@ -56,5 +56,5 @@ oe_mkluks () {
 
 IMAGE_TYPES += "ext2.luks ext3.luks ext4.luks"
 CONVERSIONTYPES += "luks"
-CONVERSION_CMD_luks = "oe_mkluks ${type}"
+CONVERSION_CMD:luks = "oe_mkluks ${type}"
 CONVERSION_DEPENDS_luks = "cryptsetup-native e2fsprogs-native"

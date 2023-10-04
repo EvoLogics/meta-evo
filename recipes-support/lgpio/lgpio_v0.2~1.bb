@@ -30,8 +30,8 @@ EXTRA_OEMAKE += "PYINSTALLARGS='--root=$(DESTDIR) --prefix=${prefix}'"
 EXTRA_OEMAKE += "PYBUILDARGS='--include-dirs=$(DESTDIR)$(includedir) --library-dirs=$(DESTDIR)$(libdir):${S}'"
 TARGET_CC_ARCH += "${LDFLAGS}"
 
-FILES_${PN}-python2 = "${libdir}/python2*/*"
-FILES_${PN}-python3 = "${libdir}/python3*/*"
+FILES:${PN}-python2 = "${libdir}/python2*/*"
+FILES:${PN}-python3 = "${libdir}/python3*/*"
 
 PACKAGES =+ " ${PN}-python2 ${PN}-python3"
 

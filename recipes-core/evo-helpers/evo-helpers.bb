@@ -14,7 +14,7 @@ SRC_URI = "file://evo-hw \
            file://evo-update \
 "
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     expect \
     libgpiod-tools \
     dtc \

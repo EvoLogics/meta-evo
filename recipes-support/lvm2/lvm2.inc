@@ -33,7 +33,7 @@ inherit autotools-brokensep pkgconfig systemd
 
 # FIXME: wan't build with static. how to disable it?
 #LVM2_PACKAGECONFIG = "dmeventd"
-LVM2_PACKAGECONFIG_append_class-target = " \
+LVM2_PACKAGECONFIG:append:class-target = " \
     ${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)} \
 "
 

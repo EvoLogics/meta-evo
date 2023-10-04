@@ -6,7 +6,7 @@ DESCRIPTION = "Monit is a free open source utility for managing and monitoring, 
   "
 HOMEPAGE = "http://mmonit.com/monit/"
 
-FILESEXTRAPATHS_prepend_mx6ul-comm-module := "${THISDIR}/commod-mx6ul:"
+FILESEXTRAPATHS:prepend_mx6ul-comm-module := "${THISDIR}/commod-mx6ul:"
 
 LICENSE = "AGPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ea116a7defaf0e93b3bb73b2a34a3f51"
@@ -19,7 +19,7 @@ SRC_URI = "\
 	file://monitrc \
 	"
 
-SRC_URI_append_mx6ul-comm-module = "    \
+SRC_URI:append_mx6ul-comm-module = "    \
 		file://start-monit.sh    \
 		file://monit.service  \
 "
@@ -33,7 +33,7 @@ INITSCRIPT_PARAMS = "defaults 99"
 inherit autotools-brokensep update-rc.d systemd
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "monit.service"
+SYSTEMD_SERVICE:${PN} = "monit.service"
 SYSTEMD_AUTO_ENABLE = "enable"
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
@@ -46,11 +46,11 @@ EXTRA_OECONF = "\
 	--with-ssl-incl-dir=${STAGING_INCDIR} \
 	"
 
-do_configure_prepend() {
+do_configure:prepend() {
     rm -rf ${S}/m4
 }
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}${sysconfdir}/init.d/
 	install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/monit
 
@@ -58,11 +58,11 @@ do_install_append() {
   install -m 700 -d ${D}${sysconfdir}/monit.d/
 }
 
-do_install_append_mx6ul-comm-module(){
+do_install:append_mx6ul-comm-module(){
 	install -D -m 0644 ${WORKDIR}/monit.service ${D}${systemd_system_unitdir}/monit.service
 	install -d ${D}${base_sbindir}
 	install -m 0755 ${WORKDIR}/start-monit.sh ${D}${base_sbindir}/
 }
 
 
-CONFFILES_${PN} += "${sysconfdir}/monitrc"
+CONFFILES:${PN} += "${sysconfdir}/monitrc"

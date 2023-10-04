@@ -9,7 +9,7 @@ SWUPDATE_SIGNING = "RSA"
 SWUPDATE_PRIVATE_KEY = "${HOME}/swu-prv.pem"
 SWUPDATE_PASSWORD_FILE = "${HOME}/swu-pss.txt"
 
-SRC_URI_append_tx6 = " \
+SRC_URI:append_tx6 = " \
   file://sw-description \
   file://swu-ab.sh \
   file://a-set.sh \

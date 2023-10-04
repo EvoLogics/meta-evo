@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://0101-ethsw-on.patch \
             file://0102-Enable-HUSH_PARSER-for-8133-35-37.patch \

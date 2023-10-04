@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://0001-enabled-fec2.patch \
             file://0001-Changed-hostname.patch \
@@ -7,7 +7,7 @@ SRC_URI += "file://0001-enabled-fec2.patch \
 
 
 #Currently there is no rauc support for eMMC
-python do_env_append_mx6ul(){
+python do_env:append_mx6ul(){
 
     env_rm(d, "boot/system0")
     env_rm(d, "boot/system1")
@@ -121,7 +121,7 @@ state -s
     env_add(d, "nv/boot.default", """bootchooser system0""")
 }
 
-do_configure_append_mx6ul() {
+do_configure:append_mx6ul() {
     # Don't compile target tools for barebox here
     kconfig_set CONFIG_STATE y
     kconfig_set CONFIG_STATE_DRV y

@@ -10,7 +10,7 @@ SECTION = ""
 
 DEPENDS = "cryptsetup"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "\
     file://cryptsetup-plain.c \

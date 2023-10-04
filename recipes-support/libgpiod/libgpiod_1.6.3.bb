@@ -27,7 +27,7 @@ EXTRA_OECONF = "--enable-tools"
 DEPENDS += "autoconf-archive-native"
 
 PACKAGES =+ "${PN}-tools libgpiodcxx ${PN}-python ${PN}-daemon"
-FILES_${PN}-tools = " \
+FILES:${PN}-tools = " \
     ${bindir}/gpiodetect \
     ${bindir}/gpioinfo \
     ${bindir}/gpioget \
@@ -35,8 +35,8 @@ FILES_${PN}-tools = " \
     ${bindir}/gpiofind \
     ${bindir}/gpiomon \
 "
-FILES_libgpiodcxx = "${libdir}/libgpiodcxx.so.*"
-FILES_${PN}-python = "${PYTHON_SITEPACKAGES_DIR}/*.so"
-FILES_${PN}-staticdev_sama5d2-roadrunner-evo += "${PYTHON_SITEPACKAGES_DIR}/*.a"
+FILES:libgpiodcxx = "${libdir}/libgpiodcxx.so.*"
+FILES:${PN}-python = "${PYTHON_SITEPACKAGES_DIR}/*.so"
+FILES:${PN}-staticdev_sama5d2-roadrunner-evo += "${PYTHON_SITEPACKAGES_DIR}/*.a"
 
-RRECOMMENDS_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'python3', '${PN}-python', '', d)}"
+RRECOMMENDS:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'python3', '${PN}-python', '', d)}"

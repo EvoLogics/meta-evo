@@ -37,18 +37,18 @@ EXTRA_OECMAKE += " \
 
 PACKAGES =+ "${PN}-testapps ${PN}-evlib-event ${PN}-evlib-uv ${PN}-evlib-ev ${PN}-evlib-sd"
 
-FILES_${PN}-testapps += "${datadir}/libwebsockets-test-server/* ${bindir}/libwebsockets-test-*"
-FILES_${PN}-evlib-event += "${libdir}/libwebsockets-evlib_event.so"
-FILES_${PN}-evlib-uv += "${libdir}/libwebsockets-evlib_uv.so"
-FILES_${PN}-evlib-ev += "${libdir}/libwebsockets-evlib_ev.so"
-FILES_${PN}-evlib-sd += "${libdir}/libwebsockets-evlib_sd.so"
+FILES:${PN}-testapps += "${datadir}/libwebsockets-test-server/* ${bindir}/libwebsockets-test-*"
+FILES:${PN}-evlib-event += "${libdir}/libwebsockets-evlib_event.so"
+FILES:${PN}-evlib-uv += "${libdir}/libwebsockets-evlib_uv.so"
+FILES:${PN}-evlib-ev += "${libdir}/libwebsockets-evlib_ev.so"
+FILES:${PN}-evlib-sd += "${libdir}/libwebsockets-evlib_sd.so"
 
-RDEPENDS_${PN} += " ${@bb.utils.contains('PACKAGECONFIG', 'libevent', '${PN}-evlib-event', '', d)}"
-RDEPENDS_${PN} += " ${@bb.utils.contains('PACKAGECONFIG', 'libuv', '${PN}-evlib-uv', '', d)}"
-RDEPENDS_${PN} += " ${@bb.utils.contains('PACKAGECONFIG', 'libev', '${PN}-evlib-ev', '', d)}"
-RDEPENDS_${PN} += " ${@bb.utils.contains('PACKAGECONFIG', 'systemd', '${PN}-evlib-sd', '', d)}"
+RDEPENDS:${PN} += " ${@bb.utils.contains('PACKAGECONFIG', 'libevent', '${PN}-evlib-event', '', d)}"
+RDEPENDS:${PN} += " ${@bb.utils.contains('PACKAGECONFIG', 'libuv', '${PN}-evlib-uv', '', d)}"
+RDEPENDS:${PN} += " ${@bb.utils.contains('PACKAGECONFIG', 'libev', '${PN}-evlib-ev', '', d)}"
+RDEPENDS:${PN} += " ${@bb.utils.contains('PACKAGECONFIG', 'systemd', '${PN}-evlib-sd', '', d)}"
 
-RDEPENDS_${PN}-dev += " ${@bb.utils.contains('PACKAGECONFIG', 'static', '${PN}-staticdev', '', d)}"
+RDEPENDS:${PN}-dev += " ${@bb.utils.contains('PACKAGECONFIG', 'static', '${PN}-staticdev', '', d)}"
 
 # Avoid absolute paths to end up in the sysroot.
 SSTATE_SCAN_FILES += "*.cmake"

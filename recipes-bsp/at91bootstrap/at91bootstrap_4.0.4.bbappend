@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 PR .= ".0"
 COMPATIBLE_MACHINE := '(sam9x60-curiosity|sam9x60-curiosity-sd|sama5d2-roadrunner-.*)'
 

@@ -3,7 +3,7 @@ DESCRIPTION = "This scripts saves the time periodically in a file and loads this
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
-FILESEXTRAPATHS_append:= "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:append:= "${THISDIR}/${PN}:"
 
 PR = "r1"
 
@@ -12,19 +12,19 @@ SRC_URI = " \
     file://soft-hwclock \
     "
 
-SRC_URI_append_mx6ul-comm-module = "      \
+SRC_URI:append_mx6ul-comm-module = "      \
     file://soft-hwclock.service           \
     file://soft-hwclock-tick.service      \
     file://soft-hwclock-tick.timer        \
 "
 
-SRC_URI_append_tegra194-evo = "      \
+SRC_URI:append_tegra194-evo = "      \
     file://soft-hwclock.service           \
     file://soft-hwclock-tick.service      \
     file://soft-hwclock-tick.timer        \
 "
 
-SRC_URI_append_mx6 = " \
+SRC_URI:append_mx6 = " \
     file://soft-hwclock.init \
     file://soft-hwclock.init.monitd \
 "
@@ -38,9 +38,9 @@ INITSCRIPT_PARAMS = "defaults 19"
 
 S = "${WORKDIR}"
 
-FILES_${PN}_mx6ul-comm-module = "${prefix}/soft-hwclock ${prefix}/data/"
-FILES_${PN}_mx6 = "${prefix}/soft-hwclock ${prefix}/data/ ${sysconfdir}/init.d ${sysconfdir}/monit.d/"
-FILES_${PN}_tegra194-evo = "${prefix}/soft-hwclock ${prefix}/data/"
+FILES:${PN}_mx6ul-comm-module = "${prefix}/soft-hwclock ${prefix}/data/"
+FILES:${PN}_mx6 = "${prefix}/soft-hwclock ${prefix}/data/ ${sysconfdir}/init.d ${sysconfdir}/monit.d/"
+FILES:${PN}_tegra194-evo = "${prefix}/soft-hwclock ${prefix}/data/"
 
 
 do_configure() {
@@ -51,12 +51,12 @@ do_compile() {
 	:
 }
 
-SYSTEMD_SERVICE_${PN}_mx6ul-comm-module += "      \
+SYSTEMD_SERVICE:${PN}_mx6ul-comm-module += "      \
    	soft-hwclock.service                          \
     soft-hwclock-tick.service                     \
 "
 
-SYSTEMD_SERVICE_${PN}_tegra194-evo       += "     \
+SYSTEMD_SERVICE:${PN}_tegra194-evo       += "     \
     soft-hwclock.service                          \
     soft-hwclock-tick.service                     \
 "

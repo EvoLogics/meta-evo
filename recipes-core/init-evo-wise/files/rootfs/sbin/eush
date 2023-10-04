@@ -116,7 +116,7 @@ proc get_sn {} {
     return $out
 }
 
-proc exec_append {out_ descr arg} {
+proc exec:append {out_ descr arg} {
     upvar $out_ out
     spawn /bin/sh -c [concat $arg]
     expect eof
@@ -131,12 +131,12 @@ proc exec_append {out_ descr arg} {
 proc show_versions {} {
     lappend out "Serial Numer:    [get_sn]"
 
-    exec_append out "MAC address:    " {fw_printenv ethaddr | sed 's/.*=//'}
-    exec_append out "Interface type: " {evo-hw type}
-    exec_append out "Kernel version: " {uname -r}
-    exec_append out "FW version:     " \
+    exec:append out "MAC address:    " {fw_printenv ethaddr | sed 's/.*=//'}
+    exec:append out "Interface type: " {evo-hw type}
+    exec:append out "Kernel version: " {uname -r}
+    exec:append out "FW version:     " \
         {test -x /usr/local/bin/ds && /usr/local/bin/ds -l 0 --version 2> /dev/null | grep '^v'}
-    exec_append out "Evins version:  " \
+    exec:append out "Evins version:  " \
         {find /opt/evins/releases/ -maxdepth 1 -type d 2> /dev/nulll |  sed -n '$s,.*/,,p'}
 
     send_user [join $out \n]\n

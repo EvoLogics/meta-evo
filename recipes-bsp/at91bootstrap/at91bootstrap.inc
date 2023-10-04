@@ -67,13 +67,13 @@ EXTRA_OEMAKE = 'CROSS_COMPILE=${TARGET_PREFIX} CC="${TARGET_PREFIX}gcc ${TOOLCHA
 do_configure() {
 	# Copy board defconfig to .config if .config does not exist. This
 	# allows recipes to manage the .config themselves in
-	# do_configure_prepend().
+	# do_configure:prepend().
 	if [ -f "${AT91BOOTSTRAP_CONFIG_PATH}/${AT91BOOTSTRAP_TARGET}" ] && [ ! -f "${B}/.config" ]; then
 		cp "${AT91BOOTSTRAP_CONFIG_PATH}/${AT91BOOTSTRAP_TARGET}" "${B}/.config"
 	fi
 
 	# Copy defconfig to .config if .config does not exist. This allows
-	# recipes to manage the .config themselves in do_configure_prepend()
+	# recipes to manage the .config themselves in do_configure:prepend()
 	# and to override default settings with a custom file.
 	if [ -f "${WORKDIR}/defconfig" ] && [ ! -f "${B}/.config" ]; then
 		cp "${WORKDIR}/defconfig" "${B}/.config"

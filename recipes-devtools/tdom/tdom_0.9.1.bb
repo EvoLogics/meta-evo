@@ -7,7 +7,7 @@ LICENSE = "MPL-1.1"
 SECTION = "devel"
 DEPENDS += "tcl gumbo-parser"
 
-RDEPENDS_${PN} += "tcl"
+RDEPENDS:${PN} += "tcl"
 
 SRC_URI = "${DEBIAN_MIRROR}/main/t/tdom/tdom_0.9.1.orig.tar.gz \
            file://0001-Fix-L-when-cross-compiling.patch \
@@ -21,7 +21,7 @@ LIC_FILES_CHKSUM="file://LICENSE;md5=4673aaff544d4c9b9a521cb8e0860bfb"
 S = "${WORKDIR}/${BPN}-${PV}"
 
 TCL_INCLUDE_PATH = ""
-TCL_INCLUDE_PATH_class-target = "--with-tclinclude=${STAGING_INCDIR}/tcl8.6"
+TCL_INCLUDE_PATH:class-target = "--with-tclinclude=${STAGING_INCDIR}/tcl8.6"
 
 EXTRA_OECONF += "--with-tcl=${STAGING_LIBDIR} \
                  --enable-html5 \
@@ -35,10 +35,10 @@ EXTRA_OECONF += "--with-tcl=${STAGING_LIBDIR} \
 #
 inherit autotools lib_package pkgconfig
 
-do_install_append() {
+do_install:append() {
     rmdir ${D}/${bindir}
 }
 
-FILES_${PN} = "${libdir}/tdom*"
-FILES_${PN}-dev = "${includedir}/tdom.h"
-FILES_${PN}-staticdev_sama5d2-roadrunner-evo = "${libdir}/tdom${PV}/*.a ${includedir}/tdom.h"
+FILES:${PN} = "${libdir}/tdom*"
+FILES:${PN}-dev = "${includedir}/tdom.h"
+FILES:${PN}-staticdev_sama5d2-roadrunner-evo = "${libdir}/tdom${PV}/*.a ${includedir}/tdom.h"

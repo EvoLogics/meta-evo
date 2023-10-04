@@ -25,10 +25,10 @@ SRC_URI = " \
 
 PACKAGES += "${PN}-scripts ${PN}-www ${PN}-etc ${PN}-tools"
 
-FILES_${PN} = "${prefix}/bin/dune ${prefix}/bin/dune-launcher"
-FILES_${PN}-scripts += "${prefix}/scripts"
-FILES_${PN}-www += "${prefix}/www"
-FILES_${PN}-etc += "${prefix}/etc"
-FILES_${PN}-tools = "${prefix}/bin/dune-*"
+FILES:${PN} = "${prefix}/bin/dune ${prefix}/bin/dune-launcher"
+FILES:${PN}-scripts += "${prefix}/scripts"
+FILES:${PN}-www += "${prefix}/www"
+FILES:${PN}-etc += "${prefix}/etc"
+FILES:${PN}-tools = "${prefix}/bin/dune-*"
 
 inherit cmake
