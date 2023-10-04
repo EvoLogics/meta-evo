@@ -19,6 +19,7 @@ S = "${WORKDIR}/${ON}"
 SRC_URI = "${SAVANNAH_GNU_MIRROR}/${@'${BPN}'.replace('-tiny','')}/${ON}.tar.gz \
     file://0001-SConstruct-prefix-includepy-with-sysroot-and-drop-sy.patch \
     file://0004-SConstruct-disable-html-and-man-docs-building-becaus.patch \
+    file://0005-Fixes-SConstruct-for-SCons-3.0.0.patch \
     file://0001-include-sys-ttydefaults.h.patch \
     file://allow-work-with-socat-pty.patch \
 "
