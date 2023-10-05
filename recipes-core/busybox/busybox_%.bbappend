@@ -1,7 +1,7 @@
 # http://www.yoctoproject.org/docs/current/kernel-dev/kernel-dev.html#changing-the-configuration
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI:append_sama5d2-roadrunner-evo = " \
+SRC_URI:append:sama5d2-roadrunner-evo = " \
     file://coreutils.cfg \
     file://brctl.cfg \
     file://compress.cfg \

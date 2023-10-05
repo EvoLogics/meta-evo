@@ -8,9 +8,9 @@ SRC_URI += "\
     file://0003-Add-quirk-for-ACME-RoadRunner-EvoLogics-board.patch \
 "
 
-AT91BOOTSTRAP_CONFIG_sama5d2-roadrunner-evo = "${AT91BOOTSTRAP_MACHINE}_qspi_linux"
+AT91BOOTSTRAP_CONFIG:sama5d2-roadrunner-evo = "${AT91BOOTSTRAP_MACHINE}_qspi_linux"
 AT91BOOTSTRAP_TARGET ??= "${AT91BOOTSTRAP_CONFIG}_defconfig"
-AT91BOOTSTRAP_LOAD_sama5d2-roadrunner-evo = "dataflashboot-linux"
+AT91BOOTSTRAP_LOAD:sama5d2-roadrunner-evo = "dataflashboot-linux"
 # TODO: find how to set it from config
 #CONFIG_OF_OFFSET="0x00010000"
 

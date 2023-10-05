@@ -14,7 +14,7 @@ SRC_URI = "http://www.busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
 "
 SRC_URI:append:libc-musl = " file://musl.cfg "
 
-#SRC_URI:append_sama5d2-roadrunner-evo = " \
+#SRC_URI:append:sama5d2-roadrunner-evo = " \
 #    file://sh.cfg \
 #"
 

@@ -67,4 +67,4 @@ EXTRA_OECONF = "--with-user= \
                 --enable-static_link \
 "
 
-DISABLE_STATIC_sama5d2-roadrunner-evo = ""
+DISABLE_STATIC:sama5d2-roadrunner-evo = ""

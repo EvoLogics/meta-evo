@@ -37,6 +37,6 @@ FILES:${PN}-tools = " \
 "
 FILES:libgpiodcxx = "${libdir}/libgpiodcxx.so.*"
 FILES:${PN}-python = "${PYTHON_SITEPACKAGES_DIR}/*.so"
-FILES:${PN}-staticdev_sama5d2-roadrunner-evo += "${PYTHON_SITEPACKAGES_DIR}/*.a"
+FILES:${PN}-staticdev:sama5d2-roadrunner-evo += "${PYTHON_SITEPACKAGES_DIR}/*.a"
 
 RRECOMMENDS:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'python3', '${PN}-python', '', d)}"

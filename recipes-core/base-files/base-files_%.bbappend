@@ -21,7 +21,7 @@ SRC_URI:append:tegra194-evo      = "    \
 
 dirs755:append = " ${sysconfdir}/profile.d"
 
-do_install:append_sama5d2-roadrunner-evo() {
+do_install:append:sama5d2-roadrunner-evo() {
 	install -d ${D}${sysconfdir}
 	install -m 0644 ${WORKDIR}/issue.base ${D}${sysconfdir}
 	install -m 0644 ${WORKDIR}/issue.wise ${D}${sysconfdir}

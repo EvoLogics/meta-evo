@@ -5,9 +5,11 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384
 
 DEPENDS = ""
 
-SWUPDATE_SIGNING = "RSA"
-SWUPDATE_PRIVATE_KEY = "${HOME}/swu-prv.pem"
-SWUPDATE_PASSWORD_FILE = "${HOME}/swu-pss.txt"
+SWUPDATE_SIGNING = "CMS"
+SWUPDATE_CMS_KEY = "${HOME}/cms_fwp.pem"
+SWUPDATE_CMS_CERT = "${HOME}/cms_fwc.crt"
+SWUPDATE_CMS_EXTRA_CERTS = "${HOME}/cms_mid.crt"
+SWUPDATE_PASSWORD_FILE = "${HOME}/cms_pss.txt"
 
 SRC_URI:append:tx6 = " \
   file://sw-description \

@@ -69,7 +69,7 @@ PACKAGECONFIG[kernel] = "--with-crypto_backend=kernel"
 PACKAGECONFIG[nettle] = "--with-crypto_backend=nettle,,nettle"
 PACKAGECONFIG[luks2] = "--with-default-luks-format=LUKS2,--with-default-luks-format=LUKS1"
 
-DISABLE_STATIC_sama5d2-roadrunner-evo = ""
+DISABLE_STATIC:sama5d2-roadrunner-evo = ""
 EXTRA_OECONF = "--enable-static"
 # Building without largefile is not supported by upstream
 EXTRA_OECONF += "--enable-largefile"
