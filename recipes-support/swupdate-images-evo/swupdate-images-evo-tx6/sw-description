@@ -15,7 +15,7 @@ software =
         device = "/dev/new_root";
         filesystem = "ext4";
         path = "/";
-        sha256 = "@evologics-base-image-mx6-@@MACHINE@@.tar.bz2";
+        sha256 = "$swupdate_get_sha256(evologics-base-image-mx6-@@MACHINE@@.tar.bz2)";
       },
       {
         filename = "modules-@@MACHINE@@.tgz";
@@ -23,21 +23,21 @@ software =
         device = "/dev/new_root";
         filesystem = "ext4";
         path = "/";
-        sha256 = "@modules-@@MACHINE@@.tgz";
+        sha256 = "$swupdate_get_sha256(modules-@@MACHINE@@.tgz)";
       },
       {
         filename = "uImage";
         path = "/uImage";
         device = "/dev/new_boot";
         filesystem = "vfat"
-        sha256 = "@uImage"
+        sha256 = "$swupdate_get_sha256(uImage)"
       },
       {
         filename = "imx6-@@MACHINE@@.dtb";
         path = "/fdt.dtb";
         device = "/dev/new_boot";
         filesystem = "vfat"
-        sha256 = "@imx6-@@MACHINE@@.dtb"
+        sha256 = "$swupdate_get_sha256(imx6-@@MACHINE@@.dtb)"
       }
       );
 
@@ -48,12 +48,12 @@ software =
         {
           filename = "a-set.sh";
           type = "shellscript";
-          sha256 = "@a-set.sh";
+          sha256 = "$swupdate_get_sha256(a-set.sh)";
         },
         {
           filename = "swu-ab.sh";
           type = "shellscript";
-          sha256 = "@swu-ab.sh";
+          sha256 = "$swupdate_get_sha256(swu-ab.sh)";
         }
         );
       }
@@ -64,12 +64,12 @@ software =
         {
           filename = "b-set.sh";
           type = "shellscript";
-          sha256 = "@b-set.sh";
+          sha256 = "$swupdate_get_sha256(b-set.sh)";
         },
         {
           filename = "swu-ab.sh";
           type = "shellscript";
-          sha256 = "@swu-ab.sh";
+          sha256 = "$swupdate_get_sha256(swu-ab.sh)";
         }
         );
       }
