@@ -20,7 +20,7 @@ IMX_DEFAULT_BSP ?= "mainline"
 IMX_DEFAULT_BSP_mxs ?= "mainline"
 IMX_DEFAULT_BSP_mx5 ?= "mainline"
 
-MACHINEOVERRIDES =. "use-${IMX_DEFAULT_BSP}-bsp:"
+#MACHINEOVERRIDES =. "use-${IMX_DEFAULT_BSP}-bsp:"
 
 PREFERRED_PROVIDER_u-boot ??= "${IMX_DEFAULT_BOOTLOADER}"
 PREFERRED_PROVIDER_u-boot-tools-native ??= "${IMX_DEFAULT_BOOTLOADER}-tools-native"
@@ -196,7 +196,7 @@ MACHINE_SOCARCH_FILTER:append_use-mainline-bsp = " \
     pango \
     qtbase \
 "
-MACHINE_SOCARCH_FILTER:append_mx6q = " \
+MACHINE_SOCARCH_FILTER:append:mx6q = " \
     virtual/opencl-icd \
     opencl-headers \
 "
@@ -223,12 +223,12 @@ MACHINE_FIRMWARE ?= ""
 MACHINE_FIRMWARE:append_mx25 = " firmware-imx-sdma-imx25"
 MACHINE_FIRMWARE:append_mx27 = " firmware-imx-vpu-imx27"
 MACHINE_FIRMWARE:append_mx7d = " linux-firmware-imx-sdma-imx7d firmware-imx-epdc"
-MACHINE_FIRMWARE:append_mx6 = " linux-firmware-imx-sdma-imx6q"
-MACHINE_FIRMWARE:append_mx6q = " firmware-imx-vpu-imx6q"
-MACHINE_FIRMWARE:append_mx6dl = " firmware-imx-vpu-imx6d firmware-imx-epdc"
-MACHINE_FIRMWARE:append_mx6sl = " firmware-imx-epdc"
-MACHINE_FIRMWARE:append_mx6sll = " firmware-imx-epdc"
-MACHINE_FIRMWARE:append_mx6ull = " firmware-imx-epdc"
+MACHINE_FIRMWARE:append:mx6 = " linux-firmware-imx-sdma-imx6q"
+MACHINE_FIRMWARE:append:mx6q = " firmware-imx-vpu-imx6q"
+MACHINE_FIRMWARE:append:mx6dl = " firmware-imx-vpu-imx6d firmware-imx-epdc"
+MACHINE_FIRMWARE:append:mx6sl = " firmware-imx-epdc"
+MACHINE_FIRMWARE:append:mx6sll = " firmware-imx-epdc"
+MACHINE_FIRMWARE:append:mx6ull = " firmware-imx-epdc"
 MACHINE_FIRMWARE:append_mx53 = " firmware-imx-vpu-imx53 firmware-imx-sdma-imx53"
 MACHINE_FIRMWARE:append_mx51 = " firmware-imx-vpu-imx51 firmware-imx-sdma-imx51"
 MACHINE_FIRMWARE:append_mx8mm  = " linux-firmware-imx-sdma-imx7d"
@@ -244,7 +244,7 @@ MACHINE_EXTRA_RRECOMMENDS += "${MACHINE_FIRMWARE}"
 # Extra audio support
 IMX_ALSA_EXTRA = ""
 IMX_ALSA_EXTRA_use-nxp-bsp = "imx-alsa-plugins"
-MACHINE_EXTRA_RRECOMMENDS:append_mx6 = " ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', '${IMX_ALSA_EXTRA}', '', d)}"
+MACHINE_EXTRA_RRECOMMENDS:append:mx6 = " ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', '${IMX_ALSA_EXTRA}', '', d)}"
 MACHINE_EXTRA_RRECOMMENDS:append_mx7 = " ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', '${IMX_ALSA_EXTRA}', '', d)}"
 MACHINE_EXTRA_RRECOMMENDS:append_mx8 = " ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', '${IMX_ALSA_EXTRA}', '', d)}"
 
