@@ -10,11 +10,6 @@ SRC_URI:append:mx6ul-comm-module = "			\
 				file://hwrevision				\
 				"
 
-SRC_URI:append:mx6 = " \
-	file://hwrevision	\
-  file://swupdate.default \
-	"
-
 SRC_URI:append:tegra194-evo = "                       \
   file://hwrevision                                   \
   file://archive.cfg                                  \
@@ -38,12 +33,6 @@ do_install:append:mx6ul-comm-module(){
 	then
 		sed -i -e 's!comm-mod 1.0!comm-mod ${HW_REVISION}!g' ${D}/${sysconfdir}/hwrevision
 	fi
-}
-
-do_install:append:mx6(){
-	install -d ${D}/${sysconfdir}/default
-	install -m 0644 ${WORKDIR}/hwrevision ${D}/${sysconfdir}
-  install -m 0644 ${WORKDIR}/swupdate.default ${D}/${sysconfdir}/default/swupdate
 }
 
 do_install:append:tegra194-evo(){
