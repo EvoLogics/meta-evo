@@ -1,6 +1,6 @@
-FILESEXTRAPATHS:prepend_tegra194-evo := "${THISDIR}/linux-tegra:"
+FILESEXTRAPATHS:prepend:tegra194-evo := "${THISDIR}/linux-tegra:"
 
-SRC_URI:append_tegra194-evo = "  \
+SRC_URI:append:tegra194-evo = "  \
     file://Makefile              \
     file://tegra194-evo.dts      \
     file://tegra194-common.dtsi  \
@@ -8,7 +8,7 @@ SRC_URI:append_tegra194-evo = "  \
     file://dm-crypt.cfg          \
 "
 
-do_configure:prepend_tegra194-evo() {
+do_configure:prepend:tegra194-evo() {
   cp ${WORKDIR}/*.dtsi ${S}/nvidia/platform/t19x/jakku/kernel-dts/common
   cp ${WORKDIR}/*.dts ${S}/nvidia/platform/t19x/jakku/kernel-dts
   cp ${WORKDIR}/Makefile ${S}/nvidia/platform/t19x/jakku/kernel-dts

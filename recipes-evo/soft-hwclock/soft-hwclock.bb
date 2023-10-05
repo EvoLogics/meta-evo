@@ -18,7 +18,7 @@ SRC_URI:append:mx6ul-comm-module = "      \
     file://soft-hwclock-tick.timer        \
 "
 
-SRC_URI:append_tegra194-evo = "      \
+SRC_URI:append:tegra194-evo = "      \
     file://soft-hwclock.service           \
     file://soft-hwclock-tick.service      \
     file://soft-hwclock-tick.timer        \
@@ -38,9 +38,9 @@ INITSCRIPT_PARAMS = "defaults 19"
 
 S = "${WORKDIR}"
 
-FILES:${PN}_mx6ul-comm-module = "${prefix}/soft-hwclock ${prefix}/data/"
-FILES:${PN}_mx6 = "${prefix}/soft-hwclock ${prefix}/data/ ${sysconfdir}/init.d ${sysconfdir}/monit.d/"
-FILES:${PN}_tegra194-evo = "${prefix}/soft-hwclock ${prefix}/data/"
+FILES:${PN}:mx6ul-comm-module = "${prefix}/soft-hwclock ${prefix}/data/"
+FILES:${PN}:mx6 = "${prefix}/soft-hwclock ${prefix}/data/ ${sysconfdir}/init.d ${sysconfdir}/monit.d/"
+FILES:${PN}:tegra194-evo = "${prefix}/soft-hwclock ${prefix}/data/"
 
 
 do_configure() {
@@ -51,17 +51,17 @@ do_compile() {
 	:
 }
 
-SYSTEMD_SERVICE:${PN}_mx6ul-comm-module += "      \
+SYSTEMD_SERVICE:${PN}:mx6ul-comm-module += "      \
    	soft-hwclock.service                          \
     soft-hwclock-tick.service                     \
 "
 
-SYSTEMD_SERVICE:${PN}_tegra194-evo       += "     \
+SYSTEMD_SERVICE:${PN}:tegra194-evo       += "     \
     soft-hwclock.service                          \
     soft-hwclock-tick.service                     \
 "
 
-do_install_mx6ul-comm-module(){
+do_install:mx6ul-comm-module(){
 	install -d ${D}${prefix}/
   install -d ${D}${prefix}/data
   install -m 0755 ${WORKDIR}/soft-hwclock ${D}${prefix}/
@@ -72,7 +72,7 @@ do_install_mx6ul-comm-module(){
   install -m 0644 ${WORKDIR}/soft-hwclock-tick.timer ${D}${systemd_system_unitdir}/
 }
 
-do_install_tegra194-evo(){
+do_install:tegra194-evo(){
   install -d ${D}${prefix}/
   install -d ${D}${prefix}/data
   install -m 0755 ${WORKDIR}/soft-hwclock ${D}${prefix}/
@@ -84,7 +84,7 @@ do_install_tegra194-evo(){
 }
 
 
-do_install_mx6(){
+do_install:mx6(){
 	install -d ${D}${prefix}/
     install -m 0755 ${WORKDIR}/soft-hwclock ${D}${prefix}/
   install -d ${D}${prefix}/data

@@ -23,7 +23,7 @@ SRC_URI:append:mx6ul-comm-module = "  \
     ${@bb.utils.contains("IMAGE_CONFIGS", "can", "file://can0.service", "", d)} \
 "
 
-SRC_URI:append_tegra194-evo = "     \
+SRC_URI:append:tegra194-evo = "     \
     file://10-watchdog.conf         \
     file://10-eth0.network          \
     file://90-dhcp-default.network  \
@@ -31,11 +31,11 @@ SRC_URI:append_tegra194-evo = "     \
     ${@bb.utils.contains("IMAGE_CONFIGS", "can", "file://can0.service", "", d)} \
 "
 
-SYSTEMD_SERVICE:${PN}_mx6ul-comm-module = "${@bb.utils.contains("IMAGE_CONFIGS", "can", "can0.service", "", d)}"
-SYSTEMD_SERVICE:${PN}_tegra194-evo = "${@bb.utils.contains("IMAGE_CONFIGS", "can", "can0.service", "", d)}"
+SYSTEMD_SERVICE:${PN}:mx6ul-comm-module = "${@bb.utils.contains("IMAGE_CONFIGS", "can", "can0.service", "", d)}"
+SYSTEMD_SERVICE:${PN}:tegra194-evo = "${@bb.utils.contains("IMAGE_CONFIGS", "can", "can0.service", "", d)}"
 
 
-do_install_mx6ul-comm-module(){
+do_install:mx6ul-comm-module(){
     install -d ${D}${systemd_unitdir}/network/
     install -m 0644 ${WORKDIR}/10-eth0.network ${D}${systemd_unitdir}/network/
     install -m 0644 ${WORKDIR}/10-eth1.network  ${D}${systemd_unitdir}/network/
@@ -94,7 +94,7 @@ do_install_mx6ul-comm-module(){
     done
 }
 
-do_install:append_tegra194-evo() {
+do_install:append:tegra194-evo() {
     install -d ${D}${sysconfdir}/systemd/network
 
     install -m 0644 ../system.conf ${D}${sysconfdir}/systemd/system.conf

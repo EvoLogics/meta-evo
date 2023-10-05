@@ -162,7 +162,7 @@ RPROVIDES:${PN} += "${PN}-systemd"
 RREPLACES:${PN} += "${PN}-systemd"
 RCONFLICTS:${PN} += "${PN}-systemd"
 SYSTEMD_SERVICE:${PN} = "${BPN}.socket ${BPN}ctl@.service"
-SYSTEMD_SERVICE:${PN}_mx6ul-comm-module = "${BPN}.socket ${BPN}.service  ${BPN}ctl@.service"
+SYSTEMD_SERVICE:${PN}:mx6ul-comm-module = "${BPN}.socket ${BPN}.service  ${BPN}ctl@.service"
 
 
 ALTERNATIVE:${PN} = "gpsd-defaults"

@@ -13,7 +13,7 @@ SRC_URI:append:mx6ul-comm-module = "    \
     file://share/dot.profile            \
 "
 
-SRC_URI:append_tegra194-evo      = "    \
+SRC_URI:append:tegra194-evo      = "    \
     file://print_issue.sh               \
     file://share/dot.bashrc             \
     file://share/dot.profile            \
@@ -84,7 +84,7 @@ do_install:append:mx6-evobb() {
 }
 
 SYSROOT_DIRS:append:mx6ul-comm-module = "${sysconfdir}/skel"
-SYSROOT_DIRS:append_tegra194-evo = "${sysconfdir}/skel"
+SYSROOT_DIRS:append:tegra194-evo = "${sysconfdir}/skel"
 
 do_install:append:mx6ul-comm-module() {
     install -m 0755 ${WORKDIR}/print_issue.sh ${D}${sysconfdir}/profile.d/print_issue.sh
@@ -94,7 +94,7 @@ do_install:append:mx6ul-comm-module() {
 }
 
 
-do_install:append_tegra194-evo() {
+do_install:append:tegra194-evo() {
     install -m 0755 ${WORKDIR}/print_issue.sh ${D}${sysconfdir}/profile.d/print_issue.sh
     install -m 0755 ${WORKDIR}/share/dot.profile ${D}${sysconfdir}/skel/.profile
     install -m 0755 ${WORKDIR}/share/dot.bashrc ${D}${sysconfdir}/skel/.bashrc

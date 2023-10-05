@@ -1,7 +1,7 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 FILESEXTRAPATHS:prepend:mx6ul-comm-module := "${THISDIR}/commod-mx6ul:"
 FILESEXTRAPATHS:prepend:mx6-evobb := "${THISDIR}/mx6:"
-FILESEXTRAPATHS:prepend_tegra194-evo := "${THISDIR}/tegra194-evo:"
+FILESEXTRAPATHS:prepend:tegra194-evo := "${THISDIR}/tegra194-evo:"
 
 SRC_URI:append = "                        \
     file://chrony.conf                    \
@@ -16,7 +16,7 @@ SRC_URI:append:mx6ul-comm-module = "      \
 SRC_URI:append:mx6-evobb = "              \
     file://chrony.conf                 	  \
     "
-SRC_URI:append_tegra194-evo = "           \
+SRC_URI:append:tegra194-evo = "           \
     file://chrony.conf                    \
     file://chronyd.service                \
     "
@@ -44,7 +44,7 @@ do_install:append:mx6ul-comm-module(){
   fi
 }
 
-do_install:append_tegra194-evo(){
+do_install:append:tegra194-evo(){
   install -m 0644 ${WORKDIR}/chronyd.service ${D}${systemd_unitdir}/system/
 }
 

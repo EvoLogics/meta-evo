@@ -13,7 +13,7 @@ SRC_URI:append:mx6ul-comm-module = " \
   file://${PN}.service               \
 "
 
-SYSTEMD_SERVICE:${PN}_mx6ul-comm-module = "${PN}.service"
+SYSTEMD_SERVICE:${PN}:mx6ul-comm-module = "${PN}.service"
 
 INITSCRIPT_NAME = "${PN}"
 INITSCRIPT_PARAMS = "defaults 80"

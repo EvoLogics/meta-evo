@@ -7,7 +7,7 @@ FILESEXTRAPATHS:prepend:mx6-evobb := "${THISDIR}/${PN}/mx6:"
 
 PR = "r1"
 
-SRC_URI_mx6-evobb = " \
+SRC_URI:mx6-evobb = " \
   file://init \
   file://se \
   file://abtool \
@@ -54,7 +54,7 @@ SRC_URI:append:mx6ul-comm-module = "            \
         file://mark-good.service                \
 "
 
-SRC_URI:append_tegra194-evo = "                 \
+SRC_URI:append:tegra194-evo = "                 \
         file://07-sshd-dropbear-fix.sh          \
         file://08-sshd-dropbear-keys.sh         \
         file://09-monit-id.sh                   \
@@ -90,7 +90,7 @@ do_compile() {
 	:
 }
 
-do_install_mx6-evobb() {
+do_install:mx6-evobb() {
     install -d ${D}${base_sbindir}/evo-envinit
     install -m 0755 ${WORKDIR}/se ${D}${base_sbindir}/
     install -m 0755 ${WORKDIR}/abtool ${D}${base_sbindir}/
@@ -101,17 +101,17 @@ do_install_mx6-evobb() {
     install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/evo-envinit
 }
 
-SYSTEMD_SERVICE:${PN}_mx6ul-comm-module += "     \
+SYSTEMD_SERVICE:${PN}:mx6ul-comm-module += "     \
     init-gpio.service                            \
     systemd-firstboot.service                    \
     mark-good.service                            \
 "
 
-SYSTEMD_SERVICE:${PN}_tegra194-evo      += "     \
+SYSTEMD_SERVICE:${PN}:tegra194-evo      += "     \
     systemd-firstboot.service                    \
 "
 
-do_install_mx6ul-comm-module(){
+do_install:mx6ul-comm-module(){
 
     install -d ${D}${systemd_system_unitdir}/
     install -m 0644 ${WORKDIR}/init-gpio.service ${D}${systemd_system_unitdir}/
@@ -148,7 +148,7 @@ do_install_mx6ul-comm-module(){
 }
 
 
-do_install_tegra194-evo(){
+do_install:tegra194-evo(){
 
     install -d ${D}${systemd_system_unitdir}/
     install -m 0644 ${WORKDIR}/systemd-firstboot.service ${D}${systemd_system_unitdir}/
