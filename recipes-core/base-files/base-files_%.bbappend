@@ -1,6 +1,4 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
-FILESEXTRAPATHS:prepend:mx6-evobb := "${THISDIR}/${PN}/mx6ul-comm-module:"
-FILESEXTRAPATHS:prepend:mx6-evobb := "${THISDIR}/${PN}/tegra194-evo:"
 
 #PRINC := "${@int(PRINC) + 1}"
 PR .= ".2"
