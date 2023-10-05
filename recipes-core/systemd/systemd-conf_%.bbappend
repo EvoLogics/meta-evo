@@ -14,7 +14,7 @@ ALLOW_EMPTY:${PN} = "1"
 # Don't generate empty -dbg package
 PACKAGES = "${PN}"
 
-SRC_URI:append_mx6ul-comm-module = "  \
+SRC_URI:append:mx6ul-comm-module = "  \
     file://10-eth0.network      \
     file://10-eth1.network      \
     file://Bridge.network       \

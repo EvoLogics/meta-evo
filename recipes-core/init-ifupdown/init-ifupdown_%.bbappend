@@ -1,1 +1,1 @@
-FILESEXTRAPATHS:prepend_tx6 := "${THISDIR}/${PN}/tx6:"
+FILESEXTRAPATHS:prepend:tx6 := "${THISDIR}/${PN}/tx6:"

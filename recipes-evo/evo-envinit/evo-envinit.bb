@@ -3,7 +3,7 @@ DESCRIPTION = "These scripts help to initialize the system on the first run"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
-FILESEXTRAPATHS:prepend_mx6-evobb := "${THISDIR}/${PN}/mx6:"
+FILESEXTRAPATHS:prepend:mx6-evobb := "${THISDIR}/${PN}/mx6:"
 
 PR = "r1"
 
@@ -31,7 +31,7 @@ SRC_URI_mx6-evobb = " \
   file://99-reboot.sh \
   "
 
-SRC_URI:append_mx6ul-comm-module = "            \
+SRC_URI:append:mx6ul-comm-module = "            \
         file://initgpio.sh                      \
         file://update-util                      \
         file://comm-hw                          \

@@ -12,7 +12,7 @@ SRC_URI = " \
     file://soft-hwclock \
     "
 
-SRC_URI:append_mx6ul-comm-module = "      \
+SRC_URI:append:mx6ul-comm-module = "      \
     file://soft-hwclock.service           \
     file://soft-hwclock-tick.service      \
     file://soft-hwclock-tick.timer        \
@@ -24,7 +24,7 @@ SRC_URI:append_tegra194-evo = "      \
     file://soft-hwclock-tick.timer        \
 "
 
-SRC_URI:append_mx6 = " \
+SRC_URI:append:mx6 = " \
     file://soft-hwclock.init \
     file://soft-hwclock.init.monitd \
 "

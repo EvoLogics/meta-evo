@@ -1,21 +1,21 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
-FILESEXTRAPATHS:prepend_mx6-evobb := "${THISDIR}/${PN}/mx6:"
+FILESEXTRAPATHS:prepend:mx6-evobb := "${THISDIR}/${PN}/mx6:"
 
 DEPENDS += "librsync json-c e2fsprogs "
-DEPENDS:append_tegra194-evo = "systemd"
+DEPENDS:append:tegra194-evo = "systemd"
 
-SRC_URI:append_mx6ul-comm-module = "			\
+SRC_URI:append:mx6ul-comm-module = "			\
 				file://defconfig   				\
 				file://swupdate.service     	\
 				file://hwrevision				\
 				"
 
-SRC_URI:append_mx6 = " \
+SRC_URI:append:mx6 = " \
 	file://hwrevision	\
   file://swupdate.default \
 	"
 
-SRC_URI:append_tegra194-evo = "                       \
+SRC_URI:append:tegra194-evo = "                       \
   file://hwrevision                                   \
   file://archive.cfg                                  \
   file://disable-cfi.cfg                              \
@@ -28,9 +28,9 @@ SRC_URI:append_tegra194-evo = "                       \
   file://swupdate-bootloader-interface-cboot.sh       \
   "
 
-SYSTEMD_SERVICE:${PN}_mx6ul-comm-module = "swupdate.service"
+SYSTEMD_SERVICE:${PN}:mx6ul-comm-module = "swupdate.service"
 
-do_install:append_mx6ul-comm-module(){
+do_install:append:mx6ul-comm-module(){
 	install -d ${D}/${sysconfdir}
 	install -m 0644 ${WORKDIR}/hwrevision ${D}/${sysconfdir}
 
@@ -40,13 +40,13 @@ do_install:append_mx6ul-comm-module(){
 	fi
 }
 
-do_install:append_mx6(){
+do_install:append:mx6(){
 	install -d ${D}/${sysconfdir}/default
 	install -m 0644 ${WORKDIR}/hwrevision ${D}/${sysconfdir}
   install -m 0644 ${WORKDIR}/swupdate.default ${D}/${sysconfdir}/default/swupdate
 }
 
-do_install:append_tegra194-evo(){
+do_install:append:tegra194-evo(){
   install -d ${D}/${sysconfdir}
   install -m 0644 ${WORKDIR}/hwrevision ${D}/${sysconfdir}
   install -d ${D}${sbindir}

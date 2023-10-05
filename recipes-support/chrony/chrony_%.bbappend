@@ -1,6 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
-FILESEXTRAPATHS:prepend_mx6ul-comm-module := "${THISDIR}/commod-mx6ul:"
-FILESEXTRAPATHS:prepend_mx6-evobb := "${THISDIR}/mx6:"
+FILESEXTRAPATHS:prepend:mx6ul-comm-module := "${THISDIR}/commod-mx6ul:"
+FILESEXTRAPATHS:prepend:mx6-evobb := "${THISDIR}/mx6:"
 FILESEXTRAPATHS:prepend_tegra194-evo := "${THISDIR}/tegra194-evo:"
 
 SRC_URI:append = "                        \
@@ -8,12 +8,12 @@ SRC_URI:append = "                        \
     file://chrony-force.sh             	  \
     "
 
-SRC_URI:append_mx6ul-comm-module = "      \
+SRC_URI:append:mx6ul-comm-module = "      \
     file://chrony.conf                 	  \
     file://chronyd.service                \
 "
 
-SRC_URI:append_mx6-evobb = "              \
+SRC_URI:append:mx6-evobb = "              \
     file://chrony.conf                 	  \
     "
 SRC_URI:append_tegra194-evo = "           \
@@ -34,7 +34,7 @@ do_install:append() {
     install -m 0755 ${WORKDIR}/chrony-force.sh ${D}${base_sbindir}/
 }
 
-do_install:append_mx6ul-comm-module(){
+do_install:append:mx6ul-comm-module(){
 	install -m 0644 ${WORKDIR}/chronyd.service ${D}${systemd_unitdir}/system/
 
   if [ -n "${BRIDGE_ADDRESS}" ]

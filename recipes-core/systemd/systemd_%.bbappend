@@ -1,9 +1,9 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}/mx6ul-comm-module:"
 
-SRC_URI:append_mx6ul-comm-module = " file://resolved.conf "
+SRC_URI:append:mx6ul-comm-module = " file://resolved.conf "
 
-do_install:append_mx6ul-comm-module() {
+do_install:append:mx6ul-comm-module() {
   install -m 0644 ../resolved.conf ${D}${sysconfdir}/systemd/resolved.conf
 }
 

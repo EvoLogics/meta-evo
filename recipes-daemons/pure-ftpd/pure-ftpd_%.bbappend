@@ -4,11 +4,11 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 EXTRA_OECONF:append = " --with-puredb --with-ftpwho"
 
-SRC_URI:append_mx6-evobb = "         \
+SRC_URI:append:mx6-evobb = "         \
   file://${PN}.init                  \
   file://${PN}.monitd                \
   "
-SRC_URI:append_mx6ul-comm-module = " \
+SRC_URI:append:mx6ul-comm-module = " \
   file://${PN}.default               \
   file://${PN}.service               \
 "

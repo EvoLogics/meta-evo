@@ -5,21 +5,21 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 HW_REVISION ?= "1.0"
 
-FILESEXTRAPATHS:prepend_mx6-evobb := "${THISDIR}/mx6:"
+FILESEXTRAPATHS:prepend:mx6-evobb := "${THISDIR}/mx6:"
 
 FILES:${PN} = "${sysconfdir}/"
 
-SRC_URI:append_mx6 = " \
+SRC_URI:append:mx6 = " \
   file://swupdate.default \
   "
 
-do_install:append_mx6ul-comm-module(){
+do_install:append:mx6ul-comm-module(){
   echo "comm-mod ${HW_REVISION}" > ${WORKDIR}/hwrevision
 	install -d ${D}/${sysconfdir}
 	  install -m 0644 ${WORKDIR}/hwrevision ${D}/${sysconfdir}
 }
 
-do_install:append_mx6(){
+do_install:append:mx6(){
   echo "${MACHINE} ${HW_REVISION}" > ${WORKDIR}/hwrevision
   if [ -n ${EVOHW} ]; then
     sed -i "s/=generic/=${EVOHW}-${EVOSN}/" ${WORKDIR}/swupdate.default

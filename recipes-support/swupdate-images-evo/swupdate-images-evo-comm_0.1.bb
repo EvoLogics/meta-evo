@@ -17,7 +17,7 @@ SWUPDATE_PASSWORD_FILE = "/work/private/evo-updater.pass"
 # sw-description must always be in the list.
 # You can extend with scripts or wahtever you need
 
-SRC_URI:append_mx6ul-comm-module = "file://sw-description			\
+SRC_URI:append:mx6ul-comm-module = "file://sw-description			\
 									file://evo-swu-emb-system0.sh 	\
 									file://evo-swu-emb-system1.sh 	\
 "
