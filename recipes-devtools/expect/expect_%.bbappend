@@ -1,10 +1,10 @@
-FILES:lib${BPN} = "${libdir}/libexpect${PV}.so \
+FILES:lib${BPN}:sama5d2-roadrunner-evo = "${libdir}/libexpect${PV}.so \
                    ${libdir}/expect${PV}/pkgIndex.tcl"
 
-FILES:${PN} = "${bindir}/expect"
-RDEPENDS:${PN} += "lib${BPN}"
+FILES:${PN}:sama5d2-roadrunner-evo = "${bindir}/expect"
+RDEPENDS:${PN}:sama5d2-roadrunner-evo += "lib${BPN}"
 
-FILES:${PN}-scripts  = "\
+FILES:${PN}-scripts:sama5d2-roadrunner-evo  = "\
     ${libdir}/expect${PV} \
     ${bindir}/* \
 "
@@ -12,4 +12,4 @@ FILES:${PN}-scripts  = "\
 # NOTE: lib${BPN} before ${PN}-script becouse lib${BPN}
 # match pkgIndex.tcl, and ${PN}-scripts match all other files
 # NOTE: += will append to variable, after ${PN}-bin
-PACKAGES  += "lib${BPN} ${PN}-scripts"
+PACKAGES:sama5d2-roadrunner-evo  += "lib${BPN} ${PN}-scripts"
