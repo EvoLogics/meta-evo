@@ -9,6 +9,7 @@ export LS_OPTIONS='--color=auto'
 alias ls='ls $LS_OPTIONS'
 alias ll='ls $LS_OPTIONS -lAF'
 alias l='ls $LS_OPTIONS -lA'
+alias zt-cli='zerotier-cli -D/opt/zerotier-one/merged'
 
 # Some more alias to avoid making mistakes:
 # alias rm='rm -i'
