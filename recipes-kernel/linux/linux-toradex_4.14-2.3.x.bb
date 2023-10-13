@@ -10,12 +10,12 @@ SRC_URI = " \
     file://0002-net-fec-reset-PHY-whenever-enet-out-clock-has-been-r.patch \
     file://imx6-tx6-evobb.cfg \
     file://imx6-tx6-evobb-iptables.cfg \
-    file://imx6-${MACHINE}.dts;subdir=git/arch/arm/boot/dts \
-    file://imx6-tx6-common.dtsi;subdir=git/arch/arm/boot/dts \
-    file://imx6-tx6-evobb.dtsi;subdir=git/arch/arm/boot/dts \
-    file://imx6qdl-tx6.dtsi;subdir=$git/arch/arm/boot/dts \
-    file://imx6qdl-tx6-lcd.dtsi;subdir=git/arch/arm/boot/dts \
-    file://imx6qdl-tx6-lvds.dtsi;subdir=git/arch/arm/boot/dts \
+    file://imx6-${MACHINE}.dts \
+    file://imx6-tx6-common.dtsi \
+    file://imx6-tx6-evobb.dtsi \
+    file://imx6qdl-tx6.dtsi \
+    file://imx6qdl-tx6-lcd.dtsi \
+    file://imx6qdl-tx6-lvds.dtsi \
 "
 
 # Load USB functions configurable through configfs (CONFIG_USB_CONFIGFS)
@@ -35,6 +35,11 @@ DEPENDS += "lzop-native bc-native"
 COMPATIBLE_MACHINE = "(mx6|mx7|mx8)"
 
 PR .= ".0"
+
+do_configure:prepend() {
+  cp -f ${WORKDIR}/*.dtsi ${S}/arch/arm/boot/dts/
+  cp -f ${WORKDIR}/*.dts ${S}/arch/arm/boot/dts/
+}
 
 do_configure:append() {
     CFG="$(ls ${WORKDIR}/*.cfg 2> /dev/null || true)"
