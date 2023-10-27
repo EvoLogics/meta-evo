@@ -1,6 +1,24 @@
 SUMMARY = "A small image just capable of allowing a device to boot."
 
-IMAGE_INSTALL = "packagegroup-core-boot ${CORE_IMAGE_EXTRA_INSTALL} ${EVO_BASE_EXTRA_INSTALL}"
+IMAGE_INSTALL = "packagegroup-core-boot"
+
+IMAGE_INSTALL += "\
+  iproute2 \
+  bash tar monit procps util-linux \
+  e2fsprogs e2fsprogs-resize2fs iputils coreutils \
+  netcat-openbsd screen tmux socat rsync file \
+  htop tcpdump \
+  daemonize curl rlwrap ckermit iperf3 lrzsz \
+  pps-tools pciutils \
+  usbutils ethtool libgpiod \
+  ltrace strace \
+  chrony chronyc \
+  "
+
+IMAGE_INSTALL += "\
+  ${CORE_IMAGE_EXTRA_INSTALL} \
+  ${EVO_BASE_EXTRA_INSTALL} \
+  "
 
 LICENSE = "MIT"
 
