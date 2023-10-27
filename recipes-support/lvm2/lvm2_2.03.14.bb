@@ -3,6 +3,7 @@ require lvm2.inc
 SRC_URI += " \
             file://0001-fix-command-bin-findmnt-bin-lsblk-bin-sort-not-found.patch \
            "
+COMPATIBLE_MACHINE = "(sama5d2|sama5d2-roadrunner-evo)"
 
 DEPENDS += "autoconf-archive-native"
 
