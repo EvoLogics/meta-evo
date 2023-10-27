@@ -252,8 +252,14 @@ mkdir -p /boot
 mount $rootfs_a /tgt_root
 mount -o rw,loop,noatime,nodiratime /run/media/$1/$2 /src_root
 
-echo "Copying rootfs files..."
+echo "Copying rootfs files to partition A..."
 cp -a /src_root/* /tgt_root
+
+if [ -e /run/media/$1/modules.tgz ]; then
+    echo "Copying kernel modules to partition A..."
+    tar zxf /run/media/$1/modules.tgz -C /tgt_root
+fi
+
 if [ -d /tgt_root/etc/ ] ; then
     boot_uuid=$(blkid -o value -s UUID ${bootfs})
     swap_part_uuid=$(blkid -o value -s PARTUUID ${swap})
