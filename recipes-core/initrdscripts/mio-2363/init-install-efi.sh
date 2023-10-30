@@ -7,6 +7,7 @@
 #
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
+UNATTENDED=HELL_YES
 
 echo "=== A/B installer ==="
 
@@ -108,24 +109,29 @@ for hdname in $hdnamelist; do
     echo
 done
 
-hdname_cnt=$(echo hdnamelist | wc -w)
+if [ -n "${UNATTENDED}"]; then
+  # MIO-2363-P1A1
+  if grep -qi 'model\sname.*x6211e' /proc/cpuinfo; then
+    TARGET_DEVICE_NAME=mmcblk0
+  fi
+  # MIO-2363-P2A1
+  if grep -qi 'model\sname.*x6413e' /proc/cpuinfo; then
+    TARGET_DEVICE_NAME=mmcblk0
+  fi
+  # MIO-2363-P3A1
+  if grep -qi 'model\sname.*x6425e' /proc/cpuinfo; then
+    TARGET_DEVICE_NAME=mmcblk0
+  fi
+fi
 
 # Get user choice
-while true; do
-    if [ "$hdname_cnt" -eq 1 ]; then
-        echo "Press y to install or n to exit ($hdnamelist ): "
-    else
-        echo "Please select an install target or press n to exit ($hdnamelist ): "
-    fi
+while [ -z "$TARGET_DEVICE_NAME" ]; do
+    echo "Please select an install target or press n to exit ($hdnamelist ): "
 
     read answer
     if [ "$answer" = "n" ]; then
         echo "Installation manually aborted."
         exit 1
-    fi
-
-    if [ "$answer" = "y" -a "$hdname_cnt" -eq 1 ]; then
-      TARGET_DEVICE_NAME=$(echo $hdnamelist | tr -d " ")
     fi
 
     for hdname in $hdnamelist; do
@@ -134,9 +140,6 @@ while true; do
             break
         fi
     done
-    if [ -n "$TARGET_DEVICE_NAME" ]; then
-        break
-    fi
 done
 
 if [ -n "$TARGET_DEVICE_NAME" ]; then
@@ -232,12 +235,16 @@ while [ $C -ne 3 ] && [ ! -e $bootfs  -o ! -e $rootfs_a -o ! -e $rootfs_b -o ! -
     sleep 1
 done
 
+if [ -n "${UNATTENDED}"]; then
+  MKFS_FORCE_OPT="-F"
+fi
+
 echo "Formatting $bootfs to vfat..."
 mkfs.vfat $bootfs
 
 echo "Formatting $rootfs_a $rootfs_b to ext4..."
-mkfs.ext4 $rootfs_a
-mkfs.ext4 $rootfs_b
+mkfs.ext4 $MKFS_FORCE_OPT $rootfs_a
+mkfs.ext4 $MKFS_FORCE_OPT $rootfs_b
 
 echo "Formatting swap partition...($swap)"
 mkswap $swap
