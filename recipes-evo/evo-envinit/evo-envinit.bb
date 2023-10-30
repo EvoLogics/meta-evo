@@ -15,6 +15,7 @@ SRC_URI = " \
   file://31-create-dune-dirs.sh \
   file://32-create-soft-hwclock-dirs.sh \
   file://34-unpack-assets.sh \
+  file://34-create-docker-dirs.sh \
   "
 
 SRC_URI:append:mx6-evobb = " \
@@ -56,7 +57,6 @@ SRC_URI:append:tegra194-evo = "                 \
         file://20-cp-from-skel.sh               \
         file://30-add-dune-cfg.sh               \
         file://33-create-sinaps-dirs.sh         \
-        file://34-create-docker-dirs.sh         \
         file://35-create-detector-dirs.sh       \
         file://36-create-swupdate-env.sh        \
         file://37-create-image-generator-dirs.sh \
