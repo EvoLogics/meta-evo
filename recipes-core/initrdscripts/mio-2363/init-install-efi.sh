@@ -109,7 +109,7 @@ for hdname in $hdnamelist; do
     echo
 done
 
-if [ -n "${UNATTENDED}"]; then
+if [ -n "${UNATTENDED}" ]; then
   # MIO-2363-P1A1
   if grep -qi 'model\sname.*x6211e' /proc/cpuinfo; then
     TARGET_DEVICE_NAME=mmcblk0
@@ -235,7 +235,7 @@ while [ $C -ne 3 ] && [ ! -e $bootfs  -o ! -e $rootfs_a -o ! -e $rootfs_b -o ! -
     sleep 1
 done
 
-if [ -n "${UNATTENDED}"]; then
+if [ -n "${UNATTENDED}" ]; then
   MKFS_FORCE_OPT="-F"
 fi
 
