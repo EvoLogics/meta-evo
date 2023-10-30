@@ -12,6 +12,7 @@ SRC_URI = " \
   file://07-sshd-dropbear-fix.sh \
   file://08-sshd-dropbear-keys.sh \
   file://09-monit-id.sh \
+  file://16-mk-storage-dirs.sh \
   file://31-create-dune-dirs.sh \
   file://32-create-soft-hwclock-dirs.sh \
   file://34-unpack-assets.sh \
@@ -27,7 +28,6 @@ SRC_URI:append:mx6-evobb = " \
   file://11-add-kvm-group.sh \
   file://13-format-storage.sh \
   file://15-mount-storage.sh \
-  file://16-mk-storage-dirs.sh \
   file://20-cp-from-skel.sh \
   file://33-create-sinaps-dirs.sh \
   file://97-envinit-done.sh \
