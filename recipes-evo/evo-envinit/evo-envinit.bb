@@ -7,23 +7,26 @@ FILESEXTRAPATHS:prepend:mx6-evobb := "${THISDIR}/${PN}/mx6:"
 
 PR = "r1"
 
-SRC_URI:mx6-evobb = " \
-  file://init \
+SRC_URI = " \
   file://se \
-  file://abtool \
-  file://evohw-config \
-  file://06-mount-boot.sh \
   file://07-sshd-dropbear-fix.sh \
   file://08-sshd-dropbear-keys.sh \
   file://09-monit-id.sh \
+  file://31-create-dune-dirs.sh \
+  file://32-create-soft-hwclock-dirs.sh \
+  "
+
+SRC_URI:append:mx6-evobb = " \
+  file://init \
+  file://abtool \
+  file://evohw-config \
+  file://06-mount-boot.sh \
   file://10-add-eth0-sn.sh \
   file://11-add-kvm-group.sh \
   file://13-format-storage.sh \
   file://15-mount-storage.sh \
   file://16-mk-storage-dirs.sh \
   file://20-cp-from-skel.sh \
-  file://31-create-dune-dirs.sh \
-  file://32-create-soft-hwclock-dirs.sh \
   file://33-create-sinaps-dirs.sh \
   file://34-unpack-assets.sh \
   file://97-envinit-done.sh \
@@ -35,34 +38,23 @@ SRC_URI:append:mx6ul-comm-module = "            \
         file://initgpio.sh                      \
         file://update-util                      \
         file://comm-hw                          \
-        file://07-sshd-dropbear-fix.sh          \
-        file://08-sshd-dropbear-keys.sh         \
-        file://09-monit-id.sh                   \
         file://11-create-swupdate-env.sh        \
         file://12-mount-storage.sh              \
         file://20-cp-from-skel.sh               \
         file://21-generate-mac.sh               \
         file://30-add-dune-cfg.sh               \
-        file://31-create-dune-dirs.sh           \
-        file://32-create-soft-hwclock-dirs.sh   \
         file://33-create-sinaps-dirs.sh         \
         file://40-create-pure-ftpd-db.sh        \
         file://systemdfirstboot.sh              \
-        file://se                               \
         file://init-gpio.service                \
         file://systemd-firstboot.service        \
         file://mark-good.service                \
 "
 
 SRC_URI:append:tegra194-evo = "                 \
-        file://07-sshd-dropbear-fix.sh          \
-        file://08-sshd-dropbear-keys.sh         \
-        file://09-monit-id.sh                   \
         file://12-mount-storage.sh              \
         file://20-cp-from-skel.sh               \
         file://30-add-dune-cfg.sh               \
-        file://31-create-dune-dirs.sh           \
-        file://32-create-soft-hwclock-dirs.sh   \
         file://33-create-sinaps-dirs.sh         \
         file://34-create-docker-dirs.sh         \
         file://35-create-detector-dirs.sh       \
@@ -71,7 +63,6 @@ SRC_URI:append:tegra194-evo = "                 \
         file://38-configure-vsftpd.sh           \
         file://39-create-dbagent-dirs.sh        \
         file://systemd-firstboot.sh             \
-        file://se                               \
         file://systemd-firstboot.service        \
 "
 
