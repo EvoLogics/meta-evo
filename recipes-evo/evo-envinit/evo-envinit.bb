@@ -3,6 +3,7 @@ DESCRIPTION = "These scripts help to initialize the system on the first run"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}/common:"
 FILESEXTRAPATHS:prepend:mx6-evobb := "${THISDIR}/${PN}/mx6:"
 
 PR = "r1"
@@ -24,6 +25,19 @@ SRC_URI:append:mx6-evobb = " \
   file://abtool \
   file://evohw-config \
   file://06-mount-boot.sh \
+  file://13-format-storage.sh \
+  file://15-mount-storage.sh \
+  file://20-cp-from-skel.sh \
+  file://33-create-sinaps-dirs.sh \
+  file://97-envinit-done.sh \
+  file://98-mark-root-good.sh \
+  file://99-reboot.sh \
+  "
+
+SRC_URI:append:mio-2363 = " \
+  file://init \
+  file://abtool \
+  file://evohw-config \
   file://13-format-storage.sh \
   file://15-mount-storage.sh \
   file://20-cp-from-skel.sh \
@@ -80,6 +94,17 @@ do_compile() {
 }
 
 do_install:mx6-evobb() {
+    install -d ${D}${base_sbindir}/evo-envinit
+    install -m 0755 ${WORKDIR}/se ${D}${base_sbindir}/
+    install -m 0755 ${WORKDIR}/abtool ${D}${base_sbindir}/
+    install -m 0755 ${WORKDIR}/evohw-config ${D}${base_sbindir}/
+    install -m 0755 ${WORKDIR}/*-*.sh ${D}${base_sbindir}/evo-envinit/
+
+    install -d ${D}${sysconfdir}/init.d/
+    install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/evo-envinit
+}
+
+do_install:mio-2363() {
     install -d ${D}${base_sbindir}/evo-envinit
     install -m 0755 ${WORKDIR}/se ${D}${base_sbindir}/
     install -m 0755 ${WORKDIR}/abtool ${D}${base_sbindir}/

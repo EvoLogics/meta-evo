@@ -1,0 +1,56 @@
+#!/bin/sh
+
+# Show help if requsted
+help()
+{
+  echo "Usage: abtool [OPTIONS]"
+  echo
+  echo "Options:"
+  echo "  -g  Mark current partition scheme as good"
+  echo "  -h  Display this help and exit"
+  echo "  -s  Switch to another partition scheme"
+  echo "  -w  Display current scheme (where am I?)"
+  echo "  -x  Get next partition scheme (a/b)"
+}
+
+whereami()
+{
+}
+
+getnext()
+{
+}
+
+switch()
+{
+}
+
+markgood()
+{
+}
+
+# Parse passed options
+while getopts "h?wxsg" opt; do
+  case "$opt" in
+    h|\?)
+      help
+      exit 0
+      ;;
+    w)
+      whereami && exit 0
+      ;;
+    x)
+      getnext && exit 0
+      ;;
+    s)
+      switch && exit 0
+      ;;
+    g)
+      markgood && exit 0
+      ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+[ "${1:-}" = "--" ] && shift

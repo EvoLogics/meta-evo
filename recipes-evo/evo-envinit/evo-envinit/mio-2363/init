@@ -1,0 +1,31 @@
+#!/bin/sh
+
+ENVINIT_DONE=/etc/envinit-done
+ENVINIT_PATH="/sbin/evo-envinit"
+
+case "$1" in
+  start)
+    # look for ssh/dropbear host keys
+    # exit if found, remount root as rw otherwise
+    if [ -e ${ENVINIT_DONE} ]; then
+      echo "Environment initialization complete, boot in normal mode"
+      exit 0
+    fi
+
+    /sbin/evohw-config
+
+    ;;
+  stop)
+    echo "."
+    ;;
+  restart)
+    $0 stop
+    $0 start
+    ;;
+  status)
+    echo "."
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+esac
