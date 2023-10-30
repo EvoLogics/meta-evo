@@ -19,7 +19,7 @@ SRC_URI:append:tx6 = " \
 "
 
 SWUPDATE_IMAGES = " \
-  evologics-base-image-mx6 \
+  evologics-base-image-mx \
   modules \
   uImage \
   imx6 \
@@ -29,9 +29,9 @@ EVOHW ?= "generic"
 EVOSN ?= "0"
 
 # images to build before building swupdate image
-IMAGE_DEPENDS = "evologics-base-image-mx6 virtual/kernel"
+IMAGE_DEPENDS = "evologics-base-image-mx virtual/kernel"
 
-SWUPDATE_IMAGES_FSTYPES[evologics-base-image-mx6] = ".tar.bz2"
+SWUPDATE_IMAGES_FSTYPES[evologics-base-image-mx] = ".tar.bz2"
 SWUPDATE_IMAGES_FSTYPES[modules] = ".tgz"
 SWUPDATE_IMAGES_FSTYPES[imx6] = ".dtb"
 

@@ -10,12 +10,12 @@ software =
     {
       commonfiles: (
       {
-        filename = "evologics-base-image-mx6-@@MACHINE@@.tar.bz2";
+        filename = "evologics-base-image-mx-@@MACHINE@@.tar.bz2";
         type = "archive";
         device = "/dev/new_root";
         filesystem = "ext4";
         path = "/";
-        sha256 = "$swupdate_get_sha256(evologics-base-image-mx6-@@MACHINE@@.tar.bz2)";
+        sha256 = "$swupdate_get_sha256(evologics-base-image-mx-@@MACHINE@@.tar.bz2)";
       },
       {
         filename = "modules-@@MACHINE@@.tgz";
