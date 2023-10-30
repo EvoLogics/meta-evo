@@ -24,8 +24,6 @@ SRC_URI:append:mx6-evobb = " \
   file://abtool \
   file://evohw-config \
   file://06-mount-boot.sh \
-  file://10-add-eth0-sn.sh \
-  file://11-add-kvm-group.sh \
   file://13-format-storage.sh \
   file://15-mount-storage.sh \
   file://20-cp-from-skel.sh \
