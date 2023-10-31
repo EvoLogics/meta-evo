@@ -271,7 +271,7 @@ if [ -d /tgt_root/etc/ ] ; then
     boot_uuid=$(blkid -o value -s UUID ${bootfs})
     swap_part_uuid=$(blkid -o value -s PARTUUID ${swap})
     echo "/dev/disk/by-partuuid/$swap_part_uuid                swap             swap       defaults              0  0" >> /tgt_root/etc/fstab
-    echo "UUID=$boot_uuid              /boot            vfat       defaults              1  2" >> /tgt_root/etc/fstab
+    echo "UUID=$boot_uuid              /boot            vfat       defaults,ro           1  2" >> /tgt_root/etc/fstab
     # We dont want udev to mount our root device while we're booting...
     if [ -d /tgt_root/etc/udev/ ] ; then
         echo "${device}" >> /tgt_root/etc/udev/mount.blacklist
