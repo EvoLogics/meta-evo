@@ -336,13 +336,19 @@ for types in bzImage zImage vmlinux vmlinuz fitImage; do
     done
 done
 
+echo 1 > /boot/JUST_FLASHED
+
 umount /boot
 
 sync
 
-echo "Installation successful. Remove your installation media and press ENTER to reboot."
-
-read enter
+if [ -n "${UNATTENDED}" ]; then
+  echo "Installation successful. Will reboot in 5 seconds."
+  sleep 5
+else
+  echo "Installation successful. Remove your installation media and press ENTER to reboot."
+  read enter
+fi
 
 echo "Rebooting..."
 reboot -f
