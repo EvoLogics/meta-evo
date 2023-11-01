@@ -43,6 +43,5 @@ do_configure:prepend() {
 
 do_configure:append() {
     CFG="$(ls ${WORKDIR}/*.cfg 2> /dev/null || true)"
-    test -n "$CFG" && cat ${WORKDIR}/*.cfg >> ${B}/.config
-    return 0
+    test -n "$CFG" && cat ${WORKDIR}/*.cfg >> ${B}/.config || true
 }
