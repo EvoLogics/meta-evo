@@ -38,6 +38,7 @@ SRC_URI:append:mio-2363 = " \
   file://init \
   file://abtool \
   file://evohw-config \
+  file://09-depmod.sh \
   file://13-format-storage.sh \
   file://15-mount-storage.sh \
   file://20-cp-from-skel.sh \
