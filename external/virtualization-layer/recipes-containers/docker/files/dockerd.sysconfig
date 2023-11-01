@@ -1,0 +1,3 @@
+if [ -d /mnt/storage/docker/var ]; then
+  other_args="$other_args --data-root /mnt/storage/docker/var"
+fi
