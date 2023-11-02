@@ -32,6 +32,7 @@ ip addr add 192.168.53.198/24 dev br0
 #ip link set tap0 promisc on
 
 ip link set br0 up
+route add default gw 10.0.0.3
 route add -net 172.16.0.0/16 gw 10.0.0.1
 
 touch /tmp/br0.done
