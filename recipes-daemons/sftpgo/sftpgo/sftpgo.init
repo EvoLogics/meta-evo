@@ -1,0 +1,27 @@
+#!/bin/sh
+
+NAME=sftpgo
+
+[ -e /etc/default/${NAME} ] && . /etc/default/${NAME} 
+[ -e /mnt/storage/etc/${NAME} ] && . /mnt/storage/etc/${NAME} 
+
+: ${LOG:=/var/log/${NAME}.log}
+: ${PID_FILE:=/var/run/${NAME}.pid}
+
+[ -x /opt/${NAME}/${NAME} ] || exit 0
+
+if [ "${1}" = "stop" -o "${1}" = "restart" ]
+then
+    echo "Stopping ${NAME}: "
+    start-stop-daemon --stop --quiet --oknodo --pidfile ${PID_FILE}
+    for i in {1..5}; do
+        start-stop-daemon --stop --quiet --test --pidfile ${PID_FILE} 2>/dev/null || { echo OK && exit 0; }
+        sleep 1
+    done
+fi
+
+if [ "${1}" = "start" -o "${1}" = "restart" ]
+then
+    echo "Starting ${NAME}: "
+    daemonize -a -e ${LOG} -p ${PID_FILE} -- /opt/${NAME}/${NAME} serve -c /etc/${NAME}
+fi
