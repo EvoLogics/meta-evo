@@ -47,9 +47,14 @@ do_install() {
     install -m 0755 ${WORKDIR}/${BPN} ${D}/opt/${BPN}/
     cp -r ${WORKDIR}/openapi ${D}/opt/${BPN}/
     cp -r ${WORKDIR}/static ${D}/opt/${BPN}/
+    cp -r ${WORKDIR}/templates ${D}/opt/${BPN}/
 
   install -d ${D}/${sysconfdir}/${BPN}
     install -m 0644 ${WORKDIR}/${BPN}.json ${D}/${sysconfdir}/${BPN}/
+    ln -s /opt/sftpgo/openapi ${D}/${sysconfdir}/${BPN}/openapi
+    ln -s /opt/sftpgo/static ${D}/${sysconfdir}/${BPN}/static
+    ln -s /opt/sftpgo/templates ${D}/${sysconfdir}/${BPN}/templates
+
   
   install -d ${D}/${sysconfdir}/default
     install -m 0644 ${WORKDIR}/${BPN}.default ${D}/${sysconfdir}/default/${BPN}
