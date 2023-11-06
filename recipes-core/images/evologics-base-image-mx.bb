@@ -13,6 +13,7 @@ IMAGE_INSTALL += "\
   usbutils ethtool libgpiod \
   ltrace strace \
   chrony chronyc \
+  lighttpd \
   "
 
 IMAGE_INSTALL += "\
