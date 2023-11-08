@@ -9,6 +9,9 @@ DROPBEAR_ECDSAKEY="${DROPBEAR_KEY_DIR}/dropbear_ecdsa_host_key"
 OPENSSH_KEY_DIR="/etc/ssh"
 OPENSSH_RSAKEY="${OPENSSH_KEY_DIR}/ssh_host_rsa_key"
 OPENSSH_ECDSAKEY="${OPENSSH_KEY_DIR}/ssh_host_ecdsa_key"
+ZT_RO_HOME="/etc/zerotier-one"
+ZT_ID_PRV="${ZT_RO_HOME}/identity.secret"
+ZT_ID_PUB="${ZT_RO_HOME}/identity.public"
 
 if [ -e "${bd}/a-set.sh" ]; then
   source "${bd}/a-set.sh"
@@ -43,7 +46,9 @@ do_postinst()
     ${DROPBEAR_RSAKEY} \
     ${DROPBEAR_ECDSAKEY} \
     ${OPENSSH_RSAKEY} \
-    ${OPENSSH_ECDSAKEY}; do
+    ${OPENSSH_ECDSAKEY} \
+    ${ZT_ID_PRV} \
+    ${ZT_ID_PUB} ; do
 
     if [ -e ${file} ]; then
       echo "Found ${file}, copying to the new destination"
