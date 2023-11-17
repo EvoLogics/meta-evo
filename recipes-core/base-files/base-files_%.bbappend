@@ -2,20 +2,23 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 #PRINC := "${@int(PRINC) + 1}"
 PR .= ".2"
-SRC_URI += "file://issue*        \
-           "
+
+SRC_URI:append:sama5d2-roadrunner-evo = " \
+    file://issue.base \
+    file://issue.wise \
+    "
+
+SRC_URI:append:mx6-evobb = " \
+    file://issue.tx6 \
+    "
 
 SRC_URI:append:mx6ul-comm-module = "    \
     file://print_issue.sh               \
-    file://share/dot.bashrc             \
-    file://share/dot.profile            \
-"
+    "
 
 SRC_URI:append:tegra194-evo      = "    \
     file://print_issue.sh               \
-    file://share/dot.bashrc             \
-    file://share/dot.profile            \
-"
+    "
 
 dirs755:append = " ${sysconfdir}/profile.d"
 
