@@ -1,0 +1,27 @@
+From 140e0469df395c0ab3a1e93a1d8e5e3f15423bf9 Mon Sep 17 00:00:00 2001
+From: Victor Voronin <viktor.voronin@evologics.de>
+Date: Tue, 21 Nov 2023 14:43:12 +0100
+Subject: [PATCH] allow work with socat pty
+
+---
+ gpsd/timehint.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/gpsd/timehint.c b/gpsd/timehint.c
+index ec44f6670..4a9385443 100644
+--- a/gpsd/timehint.c
++++ b/gpsd/timehint.c
+@@ -417,10 +417,6 @@ void ntpshm_link_deactivate(struct gps_device_t *session)
+ /* set up ntpshm storage for a session */
+ void ntpshm_link_activate(struct gps_device_t *session)
+ {
+-    /* don't talk to NTP when we're running inside the test harness */
+-    if (SOURCE_PTY == session->sourcetype)
+-        return;
+-
+     if (SOURCE_PPS != session->sourcetype) {
+         /* allocate a shared-memory segment for "NMEA" time data */
+         session->shm_clock = ntpshm_alloc(session->context);
+-- 
+2.25.1
+
