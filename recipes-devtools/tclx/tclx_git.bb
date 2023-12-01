@@ -8,7 +8,7 @@ SECTION = "devel"
 HOMEPAGE = "http://tclx.sourceforge.net/"
 LIC_FILES_CHKSUM = "file://license.terms;md5=d1b75cd3cd65de13adee2b067107a694"
 
-SRC_URI = "git://github.com/flightaware/tclx;protocol=https \
+SRC_URI = "git://github.com/flightaware/tclx;branch=master;protocol=https \
            file://0001-Allow-cross-compiling.patch \
            file://0002-Fix-library-search-path-usr-lib-is-unsafe-for-cross-.patch \
            "
