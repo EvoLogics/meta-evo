@@ -22,7 +22,7 @@ DEPENDS += "readline"
 
 S = "${WORKDIR}/git"
 
-inherit autotools-brokensep pkgconfig
+inherit autotools-brokensep pkgconfig perlnative
 
 PACKAGES =+ "${PN}-filters"
 RDEPENDS:${PN}-filters += "rlwrap"
