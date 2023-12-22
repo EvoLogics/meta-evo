@@ -20,7 +20,7 @@ PR = "r0"
 S = "${WORKDIR}/git"
 
 SRC_URI = " \
-    git://github.com/LSTS/dune.git \
+    git://github.com/LSTS/dune.git;protocol=https \
     "
 
 PACKAGES += "${PN}-scripts ${PN}-www ${PN}-etc ${PN}-tools"
