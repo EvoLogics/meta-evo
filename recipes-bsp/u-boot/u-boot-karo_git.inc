@@ -7,7 +7,7 @@ PV = "v2015.10-rc2+git${SRCPV}"
 SRCREV = "20bdf53cb7ed384fc831a38370143afe58fb037d"
 SRCBRANCH = "master"
 SRC_URI = " \
-  git://github.com/karo-electronics/karo-tx-uboot.git;branch=${SRCBRANCH} \
+  git://github.com/karo-electronics/karo-tx-uboot.git;branch=${SRCBRANCH};protocol=https \
   file://mx6-soc-l2en.patch \
 	file://mx6-clock-div.patch \
   file://0004-tools-env-include-compiler.h.patch \
