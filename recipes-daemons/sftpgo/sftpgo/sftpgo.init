@@ -1,14 +1,16 @@
 #!/bin/sh
 
 NAME=sftpgo
+DAEMON=/usr/bin/${NAME}
 
 [ -e /etc/default/${NAME} ] && . /etc/default/${NAME} 
 [ -e /mnt/storage/etc/${NAME} ] && . /mnt/storage/etc/${NAME} 
 
 : ${LOG:=/var/log/${NAME}.log}
 : ${PID_FILE:=/var/run/${NAME}.pid}
+: ${DB_PATH:=/mnt/storage/${NAME}}
 
-[ -x /opt/${NAME}/${NAME} ] || exit 0
+[ -x ${DAEMON} ] || exit 0
 
 if [ "${1}" = "stop" -o "${1}" = "restart" ]
 then
@@ -22,6 +24,12 @@ fi
 
 if [ "${1}" = "start" -o "${1}" = "restart" ]
 then
+    if [ ! -e ${DB_PATH}/${NAME}.db ]; then
+      echo "Initializing database..."
+      mkdir -p ${DB_PATH}
+      ${DAEMON} initprovider -c /etc/${NAME}
+    fi
+
     echo "Starting ${NAME}: "
-    daemonize -a -e ${LOG} -p ${PID_FILE} -- /opt/${NAME}/${NAME} serve -c /etc/${NAME}
+    daemonize -p ${PID_FILE} -- ${DAEMON} serve -c /etc/${NAME} -l ${LOG}
 fi
