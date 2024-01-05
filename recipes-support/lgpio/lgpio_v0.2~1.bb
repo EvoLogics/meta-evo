@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://UNLICENCE;md5=61287f92700ec1bdf13bc86d8228cd13"
 
 SECTION = "utils"
 
-SRC_URI = "git://github.com/joan2937/lg.git;protocol=https"
+SRC_URI = "git://github.com/joan2937/lg.git;protocol=https;branch=master"
 
 # Last commit before changing to using gpiochip API v2,
 # introduced in linux v5.10. Last commit before v0.2 :)
