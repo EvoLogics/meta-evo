@@ -7,14 +7,14 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=2d862e836f92129cdc0ecccc54eed5e0"
 DEPENDS = "libpcre openssl zlib  ${@bb.utils.contains("DISTRO_FEATURES","systemd",'systemd','',d)}"
 RDEPENDS:${PN} = "openssl"
 
-SRC_URI = "http://www.haproxy.org/download/2.6/src/haproxy-2.6.6.tar.gz \
+SRC_URI = "http://www.haproxy.org/download/2.6/src/${PN}-${PV}.tar.gz \
            file://haproxy.cfg \
            file://haproxy.init \
            file://haproxy.service \
           "
 
-SRC_URI[md5sum] = "09de5e3ad5a4be36ce6398ce37ce801e"
-SRC_URI[sha256sum] = "d0c80c90c04ae79598b58b9749d53787f00f7b515175e7d8203f2796e6a6594d"
+SRC_URI[md5sum] = "b01e605cdaf2742fcedf214a61e187b4"
+SRC_URI[sha256sum] = "faac6f9564caf6e106fe22c77a1fb35406afc8cd484c35c2c844aaf0d7a097fb"
 
 inherit systemd useradd
 
