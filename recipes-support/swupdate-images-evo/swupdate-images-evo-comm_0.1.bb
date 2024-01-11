@@ -4,8 +4,8 @@
 SUMMARY = "Evologics Communication Module SWU image"
 DESCRIPTION = "Evologics recipe generating SWU image for communication module "
 
-LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.GPLv2;md5=751419260aa954499f7abaabaa882bbe"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
 DEPENDS = ""
 
