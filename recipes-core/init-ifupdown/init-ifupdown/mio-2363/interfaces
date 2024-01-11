@@ -17,4 +17,4 @@ iface eth1 inet static
   address 0.0.0.0
   netmask 255.255.255.255
   pre-up /sbin/ip link set $IFACE promisc on
-  post-up /etc/network/if-up.d/br0.sh
+  post-up /etc/network/if-up.d/br0-up.sh
