@@ -8,6 +8,7 @@ DAEMON=/usr/bin/${NAME}
 
 : ${LOG:=/var/log/${NAME}.log}
 : ${PID_FILE:=/var/run/${NAME}.pid}
+: ${CONFIG_DIR:=/etc/${NAME}}
 : ${DB_PATH:=/mnt/storage/${NAME}}
 
 [ -x ${DAEMON} ] || exit 0
@@ -27,9 +28,13 @@ then
     if [ ! -e ${DB_PATH}/${NAME}.db ]; then
       echo "Initializing database..."
       mkdir -p ${DB_PATH}
-      ${DAEMON} initprovider -c /etc/${NAME}
+      if [ -e ${CONFIG_DIR}/initdump.json ]; then
+        ${DAEMON} initprovider --config-dir ${CONFIG_DIR} --loaddata-from ${CONFIG_DIR}/initdump.json
+      else
+        ${DAEMON} initprovider --config-dir ${CONFIG_DIR}
+      fi
     fi
 
     echo "Starting ${NAME}: "
-    daemonize -p ${PID_FILE} -- ${DAEMON} serve -c /etc/${NAME} -l ${LOG}
+    daemonize -p ${PID_FILE} -- ${DAEMON} serve --config-dir ${CONFIG_DIR} --log-file-path ${LOG}
 fi
