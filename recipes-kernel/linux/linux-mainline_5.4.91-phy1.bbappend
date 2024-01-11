@@ -4,8 +4,6 @@ SRC_URI:append:mx6ul-comm-module = " 		                \
     file://${MACHINE}.cfg                                   \
     file://imx6ul-comm-module.dtsi 			                \
     file://imx6ul-comm-module.dts 			                \
-    file://0001-Added-Kernel-drivers-for-VEML6030.patch     \ 
-    file://0001-fix-sdma-event-bug-applicable-for-uart6-on-imx-contr.patch     \
 "
 
 
