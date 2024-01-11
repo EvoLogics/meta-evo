@@ -1,8 +1,7 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI += "file://0001-enabled-fec2.patch \
-            file://0001-Changed-hostname.patch \
-            file://0001-add-state-for-2-boot-partitions.patch \
+SRC_URI += "file://0001-Change-hostname.patch \
+            file://0001-Enable-FEC2.patch \
             "
 
 
