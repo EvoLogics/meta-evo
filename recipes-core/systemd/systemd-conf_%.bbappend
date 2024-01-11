@@ -21,6 +21,7 @@ SRC_URI:append:mx6ul-comm-module = "  \
     file://11-br0.network       \
     file://br0.netdev           \
     file://10-wwan0.network     \
+    file://system.conf          \
     ${@bb.utils.contains("IMAGE_CONFIGS", "can", "file://can0.service", "", d)} \
 "
 
@@ -36,13 +37,16 @@ SYSTEMD_SERVICE:${PN}:mx6ul-comm-module = "${@bb.utils.contains("IMAGE_CONFIGS",
 SYSTEMD_SERVICE:${PN}:tegra194-evo = "${@bb.utils.contains("IMAGE_CONFIGS", "can", "can0.service", "", d)}"
 
 
-do_install:mx6ul-comm-module(){
+do_install:append:mx6ul-comm-module(){
     install -d ${D}${systemd_unitdir}/network/
     install -m 0644 ${WORKDIR}/10-eth0.network ${D}${systemd_unitdir}/network/
     install -m 0644 ${WORKDIR}/10-eth1.network  ${D}${systemd_unitdir}/network/
     install -m 0644 ${WORKDIR}/11-br0.network ${D}${systemd_unitdir}/network/
     install -m 0644 ${WORKDIR}/br0.netdev ${D}${systemd_unitdir}/network/
     install -m 0644 ${WORKDIR}/10-wwan0.network ${D}${systemd_unitdir}/network/
+
+    install -d ${D}${sysconfdir}/systemd/
+    install -m 0644 ../system.conf ${D}${sysconfdir}/systemd/system.conf
 
     if [ -n "${BRIDGE_ADDRESS}" ]
     then
@@ -58,7 +62,7 @@ do_install:mx6ul-comm-module(){
     then
       # Disable bridge network
       rm -f ${D}${systemd_unitdir}/network/11-br0.network
-      rm -f ${D}${systemd_unitdir}/network/Bridge.netdev
+      rm -f ${D}${systemd_unitdir}/network/br0.netdev
       rm -f ${D}${systemd_unitdir}/network/10-wwan0.network
 
       sed -i -e 's!Bridge=br0!Address=10.0.0.2/24!g' ${D}${systemd_unitdir}/network/10-eth1.network
@@ -82,6 +86,9 @@ do_install:mx6ul-comm-module(){
         echo "Gateway=${EXTERNAL_GATEWAY}"             >> ${D}${systemd_unitdir}/network/10-eth0.network
       fi
     fi
+
+    [ -e ${WORKDIR}/10-watchdog.conf ] && \
+      install -m 0644 ${WORKDIR}/10-watchdog.conf ${D}${systemd_unitdir}/system.conf.d/10-watchdog.conf
 
     if ${@bb.utils.contains("IMAGE_CONFIGS","EC25",'true','false',d)};
     then
