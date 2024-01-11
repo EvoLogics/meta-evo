@@ -15,10 +15,11 @@ ALLOW_EMPTY:${PN} = "1"
 PACKAGES = "${PN}"
 
 SRC_URI:append:mx6ul-comm-module = "  \
+    file://10-watchdog.conf     \
     file://10-eth0.network      \
     file://10-eth1.network      \
-    file://Bridge.network       \
-    file://Bridge.netdev        \
+    file://11-br0.network       \
+    file://br0.netdev           \
     file://10-wwan0.network     \
     ${@bb.utils.contains("IMAGE_CONFIGS", "can", "file://can0.service", "", d)} \
 "
@@ -39,24 +40,24 @@ do_install:mx6ul-comm-module(){
     install -d ${D}${systemd_unitdir}/network/
     install -m 0644 ${WORKDIR}/10-eth0.network ${D}${systemd_unitdir}/network/
     install -m 0644 ${WORKDIR}/10-eth1.network  ${D}${systemd_unitdir}/network/
-    install -m 0644 ${WORKDIR}/Bridge.network ${D}${systemd_unitdir}/network/
-    install -m 0644 ${WORKDIR}/Bridge.netdev ${D}${systemd_unitdir}/network/
+    install -m 0644 ${WORKDIR}/11-br0.network ${D}${systemd_unitdir}/network/
+    install -m 0644 ${WORKDIR}/br0.netdev ${D}${systemd_unitdir}/network/
     install -m 0644 ${WORKDIR}/10-wwan0.network ${D}${systemd_unitdir}/network/
 
     if [ -n "${BRIDGE_ADDRESS}" ]
     then
-        sed -i -e 's!Address=10.0.0.2/24!Address=${BRIDGE_ADDRESS}!g' ${D}${systemd_unitdir}/network/Bridge.network
+        sed -i -e 's!Address=10.0.0.2/24!Address=${BRIDGE_ADDRESS}!g' ${D}${systemd_unitdir}/network/11-br0.network
     fi
 
     if [ -n "${BRIDGE_GATEWAY}" ]
     then
-        sed -i -e 's!Gateway=10.0.0.1!Gateway=${BRIDGE_GATEWAY}!g' ${D}${systemd_unitdir}/network/Bridge.network
+        sed -i -e 's!Gateway=10.0.0.1!Gateway=${BRIDGE_GATEWAY}!g' ${D}${systemd_unitdir}/network/11-br0.network
     fi
 
     if ${@bb.utils.contains("IMAGE_CONFIGS","streamcaster",'true','false',d)};
     then
       # Disable bridge network
-      rm -f ${D}${systemd_unitdir}/network/Bridge.network
+      rm -f ${D}${systemd_unitdir}/network/11-br0.network
       rm -f ${D}${systemd_unitdir}/network/Bridge.netdev
       rm -f ${D}${systemd_unitdir}/network/10-wwan0.network
 
@@ -85,7 +86,7 @@ do_install:mx6ul-comm-module(){
     if ${@bb.utils.contains("IMAGE_CONFIGS","EC25",'true','false',d)};
     then
         sed -i -e 's!Bridge=br0!DHCP=ipv4!g' ${D}${systemd_unitdir}/network/10-wwan0.network
-        sed -i -e 's!Gateway=10.0.0.1! !g' ${D}${systemd_unitdir}/network/Bridge.network
+        sed -i -e 's!Gateway=10.0.0.1! !g' ${D}${systemd_unitdir}/network/11-br0.network
     fi
 
     install -d ${D}${systemd_system_unitdir}/
