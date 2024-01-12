@@ -10,66 +10,66 @@ software =
                 system0: {
                         files: (
                         {
-                            filename = "core-image-minimal-mx6ul-comm-module.tar.gz";
+                            filename = "core-image-minimal-@@MACHINE@@.tar.gz";
                             type = "archive";
                             device = "/dev/mmcblk1p2";
                             filesystem = "ext4";
                             path = "/";
-                            sha256 = "@core-image-minimal-mx6ul-comm-module.tar.gz";
+                            sha256 = "$swupdate_get_sha256(core-image-minimal-@@MACHINE@@.tar.gz)";
                         },
                         {
-                            filename = "zImage-mx6ul-comm-module.bin";
-                            path = "/zImage-mx6ul-comm-module.bin";
+                            filename = "zImage-@@MACHINE@@.bin";
+                            path = "/zImage-@@MACHINE@@.bin";
                             device = "/dev/mmcblk1p1";
-                            filesystem = "vfat"
-                            sha256 = "@zImage-mx6ul-comm-module.bin"
+                            filesystem = "vfat";
+                            sha256 = "$swupdate_get_sha256(zImage-@@MACHINE@@.bin)";
                         },
                         {
-                            filename = "imx6ul-comm-module-mx6ul-comm-module.dtb";
-                            path = "/imx6ul-comm-module-mx6ul-comm-module.dtb";
+                            filename = "imx6ul-comm-module-@@MACHINE@@.dtb";
+                            path = "/imx6ul-comm-module-@@MACHINE@@.dtb";
                             device = "/dev/mmcblk1p1";
-                            filesystem = "vfat"
-                            sha256 = "@imx6ul-comm-module-mx6ul-comm-module.dtb"
+                            filesystem = "vfat";
+                            sha256 = "$swupdate_get_sha256(imx6ul-comm-module-@@MACHINE@@.dtb)";
                         }
                         );
                         scripts: (
                         {
                             filename = "evo-swu-emb-system0.sh";
                             type = "shellscript";
-                            sha256 = "@evo-swu-emb-system0.sh";
+                            sha256 = "$swupdate_get_sha256(evo-swu-emb-system0.sh)";
                         }
                         );
                     }
                 system1: {
                         files: (
                         {
-                            filename = "core-image-minimal-mx6ul-comm-module.tar.gz";
+                            filename = "core-image-minimal-@@MACHINE@@.tar.gz";
                             type = "archive";
                             filesystem = "ext4"
                             device = "/dev/mmcblk1p4";
                             path = "/";
-                            sha256 = "@core-image-minimal-mx6ul-comm-module.tar.gz";
+                            sha256 = "$swupdate_get_sha256(core-image-minimal-@@MACHINE@@.tar.gz)";
                         },
                         {
-                            filename = "zImage-mx6ul-comm-module.bin";
-                            path = "/zImage-mx6ul-comm-module.bin";
+                            filename = "zImage-@@MACHINE@@.bin";
+                            path = "/zImage-@@MACHINE@@.bin";
                             device = "/dev/mmcblk1p3";
-                            filesystem = "vfat"
-                            sha256 = "@zImage-mx6ul-comm-module.bin";
+                            filesystem = "vfat";
+                            sha256 = "$swupdate_get_sha256(zImage-@@MACHINE@@.bin)";
                         },
                         {
-                            filename = "imx6ul-comm-module-mx6ul-comm-module.dtb";
-                            path = "/imx6ul-comm-module-mx6ul-comm-module.dtb";
+                            filename = "imx6ul-comm-module-@@MACHINE@@.dtb";
+                            path = "/imx6ul-comm-module-@@MACHINE@@.dtb";
                             device = "/dev/mmcblk1p3";
-                            filesystem = "vfat"
-                            sha256 = "@imx6ul-comm-module-mx6ul-comm-module.dtb"
+                            filesystem = "vfat";
+                            sha256 = "$swupdate_get_sha256(imx6ul-comm-module-@@MACHINE@@.dtb)";
                         }
                         );
                         scripts: (
                         {
                             filename = "evo-swu-emb-system1.sh";
                             type = "shellscript";
-                            sha256 = "@evo-swu-emb-system1.sh";
+                            sha256 = "$swupdate_get_sha256(evo-swu-emb-system1.sh)";
                         }
                         );
                     }
