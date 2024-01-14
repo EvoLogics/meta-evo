@@ -4,10 +4,9 @@ FILESEXTRAPATHS:prepend:mx6-evobb := "${THISDIR}/${PN}/mx6:"
 DEPENDS += "librsync json-c e2fsprogs "
 DEPENDS:append:tegra194-evo = "systemd"
 
-SRC_URI:append:mx6ul-comm-module = "			\
-				file://defconfig   				\
-				file://swupdate.service     	\
-				file://hwrevision				\
+SRC_URI:append:mx6ul-comm-module = "			 \
+				file://defconfig   				         \
+				file://swupdate.service     	     \
 				"
 
 SRC_URI:append:tegra194-evo = "                       \
@@ -25,15 +24,6 @@ SRC_URI:append:tegra194-evo = "                       \
 
 SYSTEMD_SERVICE:${PN}:mx6ul-comm-module = "swupdate.service"
 
-do_install:append:mx6ul-comm-module(){
-	install -d ${D}/${sysconfdir}
-	install -m 0644 ${WORKDIR}/hwrevision ${D}/${sysconfdir}
-
-	if [ -n "${HW_REVISION}" ]
-	then
-		sed -i -e 's!comm-mod 1.0!comm-mod ${HW_REVISION}!g' ${D}/${sysconfdir}/hwrevision
-	fi
-}
 
 do_install:append:tegra194-evo(){
   install -d ${D}/${sysconfdir}
