@@ -23,9 +23,10 @@ Documentation=man:monit(1) https://mmonit.com/wiki/Monit/HowTo
 [Service]
 Type=simple
 KillMode=process
-ExecStart=/bin/bash /sbin/start-monit.sh start
-ExecStop=/bin/bash /sbin/start-monit.sh stop
-ExecReload=/bin/bash /sbin/start-monit.sh reload
+Environment=MONIT_CONF=/etc/monitrc
+ExecStart=/usr/bin/monit -c ${MONIT_CONF} -I
+ExecStop=/usr/bin/monit -c ${MONIT_CONF} quit
+ExecReload=/usr/bin/monit -c ${MONIT_CONF} reload
 Restart=on-abnormal
 StandardOutput=null
 
