@@ -10,7 +10,7 @@ software =
                 system0: {
                         files: (
                         {
-                            filename = "core-image-minimal-@@MACHINE@@.tar.gz";
+                            filename = "evologics-base-image-mx-@@MACHINE@@.tar.gz";
                             type = "archive";
                             device = "/dev/mmcblk1p2";
                             filesystem = "ext4";
@@ -43,7 +43,7 @@ software =
                 system1: {
                         files: (
                         {
-                            filename = "core-image-minimal-@@MACHINE@@.tar.gz";
+                            filename = "evologics-base-image-mx-@@MACHINE@@.tar.gz";
                             type = "archive";
                             filesystem = "ext4"
                             device = "/dev/mmcblk1p4";

@@ -22,15 +22,15 @@ SRC_URI:append:mx6ul-comm-module = "file://sw-description			\
 									file://evo-swu-emb-system1.sh 	\
 "
 
-SWUPDATE_IMAGES = "core-image-minimal								\
+SWUPDATE_IMAGES = "	evologics-base-image-mx							\
 					imx6ul-comm-module-mx6ul-comm-module			\
 					zImage											\
 "
 
 # images to build before building swupdate image
-IMAGE_DEPENDS = "core-image-minimal virtual/kernel"
+IMAGE_DEPENDS = "evologics-base-image-mx virtual/kernel"
 
-SWUPDATE_IMAGES_FSTYPES[core-image-minimal] = ".tar.gz"
+SWUPDATE_IMAGES_FSTYPES[evologics-base-image-mx] = ".tar.gz"
 
 SWUPDATE_IMAGES_FSTYPES[imx6ul-comm-module-mx6ul-comm-module] = ".dtb"
 SWUPDATE_IMAGES_NOAPPEND_MACHINE[imx6ul-comm-module-mx6ul-comm-module] = "1"
