@@ -5,6 +5,7 @@ DEPENDS += "libuv json-c zlib libwebsockets"
 
 SRC_URI = "git://github.com/tsl0922/ttyd.git;branch=main;protocol=https \
            file://ttyd.init \
+           ${@bb.utils.contains('DISTRO_FEATURES','systemd','file://${BPN}.service','',d)}
           "
 
 SRCREV = "020e2f3ded508d5fca95196a647fde09f05758b3"
