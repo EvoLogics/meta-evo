@@ -5,13 +5,15 @@ DEPENDS += "libuv json-c zlib libwebsockets"
 
 SRC_URI = "git://github.com/tsl0922/ttyd.git;branch=main;protocol=https \
            file://ttyd.init \
-           ${@bb.utils.contains('DISTRO_FEATURES','systemd','file://${BPN}.service','',d)}
+           ${@bb.utils.contains('DISTRO_FEATURES','systemd','file://${BPN}.service','',d)} \
           "
 
 SRCREV = "020e2f3ded508d5fca95196a647fde09f05758b3"
 
 S = "${WORKDIR}/git"
-inherit cmake
+inherit cmake systemd
+
+SYSTEMD_SERVICE:${PN}:mx6ul-comm-module = "${BPN}.service"
 
 do_install:append() {
   if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
