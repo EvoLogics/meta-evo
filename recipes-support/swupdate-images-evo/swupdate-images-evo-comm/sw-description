@@ -15,7 +15,7 @@ software =
                             device = "/dev/mmcblk1p2";
                             filesystem = "ext4";
                             path = "/";
-                            sha256 = "$swupdate_get_sha256(core-image-minimal-@@MACHINE@@.tar.gz)";
+                            sha256 = "$swupdate_get_sha256(evologics-base-image-mx-@@MACHINE@@.tar.gz)";
                         },
                         {
                             filename = "zImage-@@MACHINE@@.bin";
@@ -48,7 +48,7 @@ software =
                             filesystem = "ext4"
                             device = "/dev/mmcblk1p4";
                             path = "/";
-                            sha256 = "$swupdate_get_sha256(core-image-minimal-@@MACHINE@@.tar.gz)";
+                            sha256 = "$swupdate_get_sha256(evologics-base-image-mx-@@MACHINE@@.tar.gz)";
                         },
                         {
                             filename = "zImage-@@MACHINE@@.bin";
