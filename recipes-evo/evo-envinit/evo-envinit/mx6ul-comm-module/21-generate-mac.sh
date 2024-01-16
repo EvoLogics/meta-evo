@@ -1,6 +1,6 @@
 #!/bin/sh
 
-FILE=/lib/systemd/network/Bridge.netdev
+FILE=/lib/systemd/network/br0.netdev
 if test -f "$FILE"; then
     echo "$FILE exists."
     #Create a random MAC Address for Bridge Interface
