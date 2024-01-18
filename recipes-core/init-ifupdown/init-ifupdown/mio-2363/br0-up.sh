@@ -1,6 +1,8 @@
 #!/bin/sh
 
-# TODO: handle ifdown or existing br0
+if [ -e /tmp/br0.done ]; then
+  exit 0
+fi
 
 # that will break docker networking, do not use
 # do not query iptables for packet routing
@@ -16,6 +18,8 @@ echo 0 > /sys/devices/virtual/net/br0/bridge/multicast_snooping
 
 # do iptables istead
 iptables -I FORWARD -m physdev --physdev-is-bridged -j ACCEPT
+# deny tinkering with posmv settings
+iptables -A OUTPUT -d 192.168.53.100/32 -p tcp --dport 5601 -j REJECT
 
 # aliasing
 ip addr add 10.0.0.8/24 dev br0
