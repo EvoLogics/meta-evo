@@ -16,6 +16,8 @@
 /dts-v1/;
 #include "common/tegra194-common.dtsi"
 #include "common/tegra194-base.dtsi"
+#include "common/tegra194-avt-camera-csi.dtsi"
+
 
 / {
   nvidia,dtsfilename = __FILE__;
@@ -142,5 +144,3 @@
     status = "okay";
   };
 };
-
-

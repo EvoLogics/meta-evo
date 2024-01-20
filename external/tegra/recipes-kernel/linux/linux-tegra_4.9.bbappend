@@ -1,11 +1,13 @@
 FILESEXTRAPATHS:prepend:tegra194-evo := "${THISDIR}/linux-tegra:"
 
 SRC_URI:append:tegra194-evo = "  \
-    file://Makefile              \
-    file://tegra194-evo.dts      \
-    file://tegra194-common.dtsi  \
-    file://tegra194-base.dtsi    \
-    file://dm-crypt.cfg          \
+    file://Makefile               \
+    file://tegra194-evo.dts       \
+    file://tegra194-common.dtsi   \
+    file://tegra194-base.dtsi     \
+    file://tegra194-avt-camera-csi.dtsi \
+    file://0001-Add-allied-vision-drivers.patch \
+    file://allied-vision-alvium.cfg \
 "
 
 do_configure:prepend:tegra194-evo() {

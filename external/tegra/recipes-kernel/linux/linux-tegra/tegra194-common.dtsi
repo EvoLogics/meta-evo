@@ -17,7 +17,7 @@
 #include "dt-bindings/gpio/tegra194-gpio.h"
 #include <dt-bindings/pwm/pwm.h>
 #include <tegra194-soc/tegra194-soc-cvm.dtsi>
-
+#include "tegra194-fixed-regulator-p3668.dtsi"
 #include <t19x-common-platforms/tegra194-comms.dtsi>
 #include <t19x-common-platforms/tegra194-platforms-eqos.dtsi>
 #include "tegra194-powermon-p3668.dtsi"
