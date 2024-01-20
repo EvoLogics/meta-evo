@@ -20,6 +20,7 @@ SRC_URI:append:mx6ul-comm-module = "  \
     file://Bridge.network       \
     file://Bridge.netdev        \
     file://10-wwan0.network     \
+    file://system.conf          \
     ${@bb.utils.contains("IMAGE_CONFIGS", "can", "file://can0.service", "", d)} \
 "
 
@@ -39,6 +40,8 @@ SYSTEMD_SERVICE:${PN}:tegra194-evo = "${@bb.utils.contains("IMAGE_CONFIGS", "can
 
 
 do_install:mx6ul-comm-module(){
+    install -d ${D}${sysconfdir}/systemd/
+    install -m 0644 ${WORKDIR}/system.conf ${D}${sysconfdir}/systemd/system.conf
     install -d ${D}${systemd_unitdir}/network/
     install -m 0644 ${WORKDIR}/10-eth0.network ${D}${systemd_unitdir}/network/
     install -m 0644 ${WORKDIR}/10-eth1.network  ${D}${systemd_unitdir}/network/
