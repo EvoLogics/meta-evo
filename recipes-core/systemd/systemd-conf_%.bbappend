@@ -25,7 +25,10 @@ SRC_URI:append:mx6ul-comm-module = "  \
 
 SRC_URI:append:tegra194-evo = "     \
     file://10-watchdog.conf         \
-    file://10-eth0.network          \
+    ${@bb.utils.contains("IMAGE_CONFIGS", "WIC", "file://10-eth0-br0.network", "file://10-eth0.network", d)} \
+    ${@bb.utils.contains("IMAGE_CONFIGS", "WIC", "file://10-eth1-br0.network", "", d)} \
+    ${@bb.utils.contains("IMAGE_CONFIGS", "WIC", "file://11-br0.network", "", d)} \
+    ${@bb.utils.contains("IMAGE_CONFIGS", "WIC", "file://br0.netdev", "", d)} \
     file://90-dhcp-default.network  \
     file://system.conf              \
     ${@bb.utils.contains("IMAGE_CONFIGS", "can", "file://can0.service", "", d)} \
@@ -95,13 +98,27 @@ do_install:mx6ul-comm-module(){
 }
 
 do_install:append:tegra194-evo() {
+    NETWORK_FILE="10-eth0.network"
+    LABEL="eth0"
     install -d ${D}${sysconfdir}/systemd/network
-
     install -m 0644 ../system.conf ${D}${sysconfdir}/systemd/system.conf
-
     for file in $(find ${WORKDIR} -maxdepth 1 -type f -name *.network); do
         install -m 0644 "$file" ${D}${sysconfdir}/systemd/network/
     done
+
+    if ${@bb.utils.contains('IMAGE_CONFIGS','WIC','true','false',d)}; then
+      NETWORK_FILE="11-br0.network"
+      LABEL="br0"
+      mv ${D}${sysconfdir}/systemd/network/10-eth0-br0.network ${D}${sysconfdir}/systemd/network/10-eth0.network
+      mv ${D}${sysconfdir}/systemd/network/10-eth1-br0.network ${D}${sysconfdir}/systemd/network/10-eth1.network
+      install -m 0644 ${WORKDIR}/br0.netdev ${D}${sysconfdir}/systemd/network/
+
+      # Add IP address for WIC
+      echo "\n\n[Address]\nLabel=${LABEL}:wic\nAddress=169.254.0.8/16" >> ${D}${sysconfdir}/systemd/network/${NETWORK_FILE}
+    else
+      rm -f ${D}${sysconfdir}/systemd/network/10-eth0-br0.network
+    fi
+
     install -d ${D}${systemd_system_unitdir}/
     for file in $(find ${WORKDIR} -maxdepth 1 -type f -name *.service); do
         install -m 0644 "$file" ${D}${systemd_system_unitdir}/
@@ -115,9 +132,9 @@ do_install:append:tegra194-evo() {
 
     if [ -n "${IP_ALIAS}" ]
     then
-      echo "\n\n[Address]\nLabel=eth0:evo\nAddress=${IP_ALIAS}" >> ${D}${sysconfdir}/systemd/network/10-eth0.network
+      echo "\n\n[Address]\nLabel=${LABEL}:evo\nAddress=${IP_ALIAS}" >> ${D}${sysconfdir}/systemd/network/${NETWORK_FILE}
       # Do not add route for IP alias
-      echo "\nAddPrefixRoute=false\n" >> ${D}${sysconfdir}/systemd/network/10-eth0.network
+      echo "\nAddPrefixRoute=false\n" >> ${D}${sysconfdir}/systemd/network/${NETWORK_FILE}
     fi
 }
 
