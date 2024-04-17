@@ -1,5 +1,7 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 FILESEXTRAPATHS:prepend:mx6-evobb := "${THISDIR}/mx6:"
+FILESEXTRAPATHS:prepend:tegra194-evo := "${THISDIR}/tegra194-evo:"
+
 
 SRC_URI:append = "                        \
     file://chrony.conf                    \
