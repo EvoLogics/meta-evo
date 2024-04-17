@@ -2,7 +2,7 @@ DESCRIPTION = "Cuda tools and libraries for tegra"
 
 inherit packagegroup
 
-RDEPENDS:${PN} = "          	\
+RDEPENDS:${PN} = "            \
     cuda-nvrtc                \
     cuda-nvgraph              \
     cuda-cudart               \
@@ -27,6 +27,7 @@ RDEPENDS:${PN} = "          	\
     libcublas                 \
     tensorrt-core             \
     tensorrt-plugins-prebuilt \
+    tensorrt-plugins-dev      \
 "
 
 COMPATIBLE_MACHINE = "(tegra)"

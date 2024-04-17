@@ -2,7 +2,7 @@ DESCRIPTION = "Gstreamer tools and plugins"
 
 inherit packagegroup
 
-RDEPENDS_${PN} = "                 \
+RDEPENDS:${PN} = "                 \
     gstreamer1.0                   \
     gstreamer1.0-dev               \
     gstreamer1.0-meta-base         \

@@ -2,7 +2,7 @@ DESCRIPTION = "OpenCV for Image processing"
 
 inherit packagegroup
 
-RDEPENDS_${PN} = "            \
+RDEPENDS:${PN} = "            \
         opencv                \
         opencv-dev            \
         opencv-staticdev      \
