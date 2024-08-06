@@ -1,0 +1,6 @@
+[Match]
+Name=eth2
+
+[Network]
+ConfigureWithoutCarrier=true
+Bridge=br0

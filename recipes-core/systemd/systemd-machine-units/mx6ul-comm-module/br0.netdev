@@ -1,0 +1,8 @@
+[NetDev]
+Name=br0
+Kind=bridge
+
+[Bridge]
+STP=1
+MulticastSnooping=false
+MulticastQuerier=false
