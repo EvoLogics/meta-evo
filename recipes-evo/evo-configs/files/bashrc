@@ -108,6 +108,7 @@ export PATH=$HOME/bin:$PATH
 alias tree='tree -ifF'
 alias treee='tree -ifFpugsh'
 alias rp=realpath
+alias ntpdate='busybox ntpd -qnp'
 
 tmuxx() {
     NAME=$PWD:t:gs/./_/
