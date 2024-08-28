@@ -123,8 +123,10 @@ DEPENDS += "\
     ekermit \
     lgpio \
     \
-    pps-tools \
     rng-tools \
+    pps-tools \
+    gpsd-tiny \
+    chrony \
     \
     usbutils \
     \
