@@ -9,7 +9,7 @@ if [ -f /sys/firmware/devicetree/base/rootfs-type ]; then
     if [ "$TYPE" = "sd" ]; then
         #/usr/sbin/cryptsetup open --type=plain --key-file=/rootfs.pass /dev/mmcblk0p1 sd-rootfs
         printf "mnt: "
-        for i in $(/bin/seq 100); do
+        for i in $(/bin/seq 500); do
             /sbin/cryptsetup-plain-static open /rootfs.pass /dev/mmcblk0p2 sd-rootfs > /dev/null 2>&1 && \
                 /bin/mount -o ro /dev/mapper/sd-rootfs /mnt && \
                     SD_BOOT=1 && break
