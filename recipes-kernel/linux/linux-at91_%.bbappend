@@ -54,7 +54,7 @@ do_install_append() {
                 #mv ${D}/${KERNEL_IMAGEDEST}/$dtb_base_name.$dtb_ext \
                 #   ${D}/${KERNEL_IMAGEDEST}/$dtb_base_name.dtbo
                 dtb_ext=dtbo
-                xz ${D}/${KERNEL_IMAGEDEST}/$dtb_base_name.$dtb_ext
+                xz -k ${D}/${KERNEL_IMAGEDEST}/$dtb_base_name.$dtb_ext
             ;;
             *)
                 xz -k ${D}/${KERNEL_IMAGEDEST}/$dtb_base_name.$dtb_ext
@@ -62,15 +62,12 @@ do_install_append() {
         esac
     done
 }
+
 do_deploy_append() {
 	for dtbf in ${KERNEL_DEVICETREE}; do
 		dtb=`normalize_dtb "$dtbf"`
 		dtb_ext=${dtb##*.}
         dtb_base_name=`basename $dtb .$dtb_ext`
-
-        rm ${DEPLOYDIR}/$dtb_base_name-${KERNEL_DTB_NAME}.$dtb_ext \
-           ${DEPLOYDIR}/$dtb_base_name.$dtb_ext \
-           ${DEPLOYDIR}/$dtb_base_name-${KERNEL_DTB_LINK_NAME}.$dtb_ext
 
         case $dtbf in
             overlays/*)

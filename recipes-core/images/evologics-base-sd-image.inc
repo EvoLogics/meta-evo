@@ -17,9 +17,3 @@ IMAGE_CMD_wic_prepend () {
     fi
 }
 
-IMAGE_CMD_wic_append () {
-    if [ -e ${DEPLOY_DIR_IMAGE}/evologics-base-luks-image-${MACHINE}.ext4.luks.xz ]; then
-        rm -f ${DEPLOY_DIR_IMAGE}/evologics-base-luks-image-${MACHINE}.ext4.luks
-    fi
-}
-
