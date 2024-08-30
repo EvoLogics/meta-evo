@@ -12,12 +12,14 @@ TOOLCHAIN_TARGET_TASK_append = " readline readline-staticdev \
 # for needed tcl-staticdev for libplconv for lbl-node
 TOOLCHAIN_TARGET_TASK_append = " tcl-staticdev"
 
+TOOLCHAIN_TARGET_TASK_append = " dccl"
 ##################### install nativesdk packages ##################################
 TOOLCHAIN_HOST_TASK_append = " nativesdk-erlang nativesdk-rebar3 \
                                nativesdk-erlang-modules-dev \
                                nativesdk-tcl-staticdev"
 
 TOOLCHAIN_HOST_TASK_append = " nativesdk-opkg-arch-config"
+TOOLCHAIN_HOST_TASK_append = " nativesdk-dccl nativesdk-dccl-dev"
 
 IMAGE_INSTALL = "\
     kernel-devicetree-compressed \
