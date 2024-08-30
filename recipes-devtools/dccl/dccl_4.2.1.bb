@@ -19,7 +19,14 @@ S = "${WORKDIR}/git"
 # ld: ../../../lib/libdccl.so.4.2.1+0+gite3e42672-dirty: undefined reference to `luaopen_pb(lua_State*)'
 #DEPENDS = "boost protobuf dccl-native lua"
 
-DEPENDS = "boost protobuf dccl-native"
+# Split DEPENDS to DEPENDS_class-* as workaround to fail nativesdk build
+# cmake find_library/find_program found nativesdk, but need to find native .so/ELF
+DEPENDS_class-target    = "boost protobuf dccl-native"
+DEPENDS_class-native    = "boost protobuf-native dccl-native"
+DEPENDS_class-nativesdk = "boost protobuf-native dccl-native"
+
+RDEPENDS_${PN}_append_class-nativesdk     = " nativesdk-protobuf nativesdk-protobuf-compiler "
+RDEPENDS_${PN}-dev_append_class-nativesdk = " nativesdk-protobuf"
 
 inherit cmake
 
@@ -33,5 +40,3 @@ FILES_${PN}-dev += "${bindir}/analyze_dccl \
                     "
 
 BBCLASSEXTEND = "native nativesdk"
-
-
