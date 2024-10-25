@@ -2,11 +2,10 @@ DESCRIPTION = "OpenCV for Image processing"
 
 inherit packagegroup
 
-RDEPENDS_${PN} = "            \
+RDEPENDS:${PN} = "            \
         opencv                \
-        opencv-dev            \
-        opencv-staticdev      \
         libopencv-core        \
+	       opencv-staticdev      \
 "
 
 COMPATIBLE_MACHINE = "(tegra)"
