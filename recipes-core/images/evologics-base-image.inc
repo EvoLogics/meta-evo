@@ -159,6 +159,7 @@ DEPENDS += "\
     tcllib \
     tclx \
     tcludp \
+    tdom \
     \
     fftw \
 "
