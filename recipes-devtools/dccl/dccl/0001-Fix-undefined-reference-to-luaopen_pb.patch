@@ -1,0 +1,24 @@
+From 96eeeaad13c99b5a6bd0f32172fbf29e6ac1a243 Mon Sep 17 00:00:00 2001
+From: Maksym Komar <komar@evologics.de>
+Date: Fri, 30 Aug 2024 15:54:23 +0200
+Subject: [PATCH] Fix undefined reference to luaopen_pb()
+
+---
+ src/dynamic_conditions.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/dynamic_conditions.cpp b/src/dynamic_conditions.cpp
+index 53ae1502..190abb36 100644
+--- a/src/dynamic_conditions.cpp
++++ b/src/dynamic_conditions.cpp
+@@ -26,7 +26,9 @@
+ #if DCCL_HAS_LUA
+ #include "thirdparty/sol/sol.hpp"
+ // symbol in lua-protobuf/pb.c so we can load this using sol's require call
+-LUALIB_API int luaopen_pb(lua_State* L);
++extern "C" {
++    LUALIB_API int luaopen_pb(lua_State* L);
++}
+ #define SOL_ALL_SAFETIES_ON 1
+ #define SOL_PRINT_ERRORS 1
+ #endif

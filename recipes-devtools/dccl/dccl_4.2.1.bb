@@ -8,7 +8,9 @@ LICENSE = "GPLv2 & LGPLv2.1 & MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fcbf15b48fc20083a9a865c4b57a76f0 \
                     file://scripts/clang-format-hooks/COPYING;md5=ea40b5e96d17860e79bfab21f006c3fd"
 
-SRC_URI = "git://github.com/GobySoft/dccl.git;branch=4.0;protocol=https"
+SRC_URI = "git://github.com/GobySoft/dccl.git;branch=4.0;protocol=https \
+           file://0001-Fix-undefined-reference-to-luaopen_pb.patch \
+           "
 
 PV = "4.2.1"
 SRCREV = "e3e426728677be19d806ef9ba22b18e53bca29d1"
@@ -21,9 +23,9 @@ S = "${WORKDIR}/git"
 
 # Split DEPENDS to DEPENDS_class-* as workaround to fail nativesdk build
 # cmake find_library/find_program found nativesdk, but need to find native .so/ELF
-DEPENDS_class-target    = "boost protobuf dccl-native"
-DEPENDS_class-native    = "boost protobuf-native dccl-native"
-DEPENDS_class-nativesdk = "boost protobuf-native dccl-native"
+DEPENDS_class-target    = "boost protobuf dccl-native lua"
+DEPENDS_class-native    = "boost protobuf-native dccl-native lua-native"
+DEPENDS_class-nativesdk = "boost protobuf-native dccl-native lua"
 
 RDEPENDS_${PN}_append_class-nativesdk     = " nativesdk-protobuf nativesdk-protobuf-compiler "
 RDEPENDS_${PN}-dev_append_class-nativesdk = " nativesdk-protobuf"
