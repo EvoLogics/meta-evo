@@ -4,4 +4,7 @@
 
 PACKAGES =+ "${PN}-sftp-server-dev"
 RDEPENDS_${PN}-sftp-server-dev += "${PN}-sftp-server"
+PACKAGECONFIG = "hostkey-ecdsa"
 
+# without this sshd build without support SK algorithms used by Yubikey
+PACKAGECONFIG[fido2] = "--with-security-key-builtin,,libfido2"
