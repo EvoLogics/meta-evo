@@ -20,7 +20,6 @@ SRC_URI_append_mx6ul-comm-module = "  \
     file://10-eth2.network      \
     file://11-br0.network       \
     file://br0.netdev           \
-    file://10-wwan0.network     \
     ${@bb.utils.contains("IMAGE_CONFIGS", "can", "file://can0.service", "", d)} \
 "
 
@@ -33,7 +32,6 @@ do_install_mx6ul-comm-module(){
     install -m 0644 ${WORKDIR}/10-eth2.network  ${D}${systemd_unitdir}/network/
     install -m 0644 ${WORKDIR}/11-br0.network ${D}${systemd_unitdir}/network/
     install -m 0644 ${WORKDIR}/br0.netdev ${D}${systemd_unitdir}/network/
-    install -m 0644 ${WORKDIR}/10-wwan0.network ${D}${systemd_unitdir}/network/
 
     if [ -n "${BRIDGE_ADDRESS}" ]
     then
@@ -45,9 +43,8 @@ do_install_mx6ul-comm-module(){
         sed -i -e 's!Gateway=10.0.0.1!Gateway=${BRIDGE_GATEWAY}!g' ${D}${systemd_unitdir}/network/11-br0.network
     fi
 
-    if [ ${@bb.utils.contains("IMAGE_CONFIGS","streamcaster",'true','false',d)} ] || [ ${@bb.utils.contains("IMAGE_CONFIGS","doodle",'true','false',d)} ];
+    if ${@bb.utils.contains("IMAGE_CONFIGS","streamcaster",'true','false',d)};
     then
-
       # Remove eth1 from Bridge and also add IP address for eth1
       sed -i -e 's!Bridge=br0!Address=10.0.0.2/24!g' ${D}${systemd_unitdir}/network/10-eth1.network
       echo "Address=10.0.0.1/24"                  >> ${D}${systemd_unitdir}/network/10-eth1.network
@@ -59,25 +56,24 @@ do_install_mx6ul-comm-module(){
       fi
 
       if [ -n "${EXTERNAL_IP}" ]
-      then
-        sed -i -e 's!Address=10.0.0.2/24!Address=${EXTERNAL_IP}!g' ${D}${systemd_unitdir}/network/11-br0.network
-      else
-        sed -i -e 's!Address=10.0.0.2/24!Address=172.16.222.2/16!g' ${D}${systemd_unitdir}/network/11-br0.network
+        then
+          sed -i -e 's!Address=10.0.0.2/24!Address=${EXTERNAL_IP}!g' ${D}${systemd_unitdir}/network/11-br0.network
+        else
+          sed -i -e 's!Address=10.0.0.2/24!Address=172.16.222.2/16!g' ${D}${systemd_unitdir}/network/11-br0.network
       fi
 
       if [ -n "${EXTERNAL_GATEWAY}" ]
-      then
-        sed -i -e 's!Gateway=10.0.0.1!Gateway=${EXTERNAL_IP}!g' ${D}${systemd_unitdir}/network/11-br0.network
-      else
-        sed -i -e 's!Gateway=10.0.0.1! !g' ${D}${systemd_unitdir}/network/11-br0.network
+        then
+          sed -i -e 's!Gateway=10.0.0.1!Gateway=${EXTERNAL_IP}!g' ${D}${systemd_unitdir}/network/11-br0.network
+        else
+          sed -i -e 's!Gateway=10.0.0.1! !g' ${D}${systemd_unitdir}/network/11-br0.network
       fi
-
     fi
 
     if ${@bb.utils.contains("IMAGE_CONFIGS","EC25",'true','false',d)};
     then
-        sed -i -e 's!Bridge=br0!DHCP=ipv4!g' ${D}${systemd_unitdir}/network/10-wwan0.network
         sed -i -e 's!Gateway=10.0.0.1! !g' ${D}${systemd_unitdir}/network/11-br0.network
+        sed -i -e 's!Gateway=192.168.0.1! !g' ${D}${systemd_unitdir}/network/11-br0.network
     fi
 
     install -d ${D}${systemd_system_unitdir}/

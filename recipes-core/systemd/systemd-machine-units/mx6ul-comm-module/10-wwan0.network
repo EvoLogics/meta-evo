@@ -2,4 +2,4 @@
 Name=wwan0
 
 [Network]
-Bridge=br0
+DHCP=ipv4
