@@ -5,7 +5,8 @@ inherit packagegroup
 RDEPENDS:${PN} = "            \
         opencv                \
         libopencv-core        \
-	       opencv-staticdev      \
+        opencv-dev            \
+        opencv-staticdev      \
 "
 
 COMPATIBLE_MACHINE = "(tegra)"
