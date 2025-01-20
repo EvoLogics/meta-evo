@@ -76,6 +76,14 @@
     status = "okay";
   };
 
+  spi@3210000 {
+    status = "disabled";
+  };
+
+  spi@3230000 {
+    status = "disabled";
+  };
+
   soctherm-oc-event {
     status = "okay";
   };
@@ -145,6 +153,37 @@
   };
 
   thermal-zones {
+    status = "okay";
+  };
+
+  gpio@c2f0000 {
+    status = "okay";
+  };
+
+  gpio@6000d000 {
+    status = "okay";
+  };
+
+  gpio@2200000 {
+    status = "okay";
+    cam2_pwr {
+      gpio-hog;
+      output-low;
+      gpios = <TEGRA194_MAIN_GPIO(Y, 0) 0>;
+      label = "cam2_pwr";
+      status = "okay";
+    };
+
+    cam3_pwr {
+      gpio-hog;
+      output-low;
+      gpios = <TEGRA194_MAIN_GPIO(Y, 1) 0>;
+      label = "cam3_pwr";
+      status = "okay";
+    };
+  };
+
+  gpio@c2f0000 {
     status = "okay";
   };
 };
