@@ -90,6 +90,7 @@ IMAGE_INSTALL = "\
     \
     vim-xxd \
     pv \
+    jq \
     \
     libcsv \
     ${CORE_IMAGE_EXTRA_INSTALL} \
@@ -133,8 +134,6 @@ DEPENDS += "\
     chrony \
     \
     usbutils \
-    \
-    jq \
     \
     tmux \
     bash-completion \
