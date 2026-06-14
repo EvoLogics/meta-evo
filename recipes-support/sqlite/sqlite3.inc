@@ -24,8 +24,8 @@ CVE_PRODUCT = "sqlite"
 inherit pkgconfig siteinfo
 
 # enable those which are enabled by default in configure
-PACKAGECONFIG ?= "fts4 fts5 rtree dyn_ext"
-PACKAGECONFIG_class-native ?= "fts4 fts5 rtree dyn_ext"
+PACKAGECONFIG ?= "fts4 fts5 rtree dyn_ext session geopoly"
+PACKAGECONFIG_class-native ?= "fts4 fts5 rtree dyn_ext session geopoly"
 
 PACKAGECONFIG[editline] = "--enable-editline --with-readline-header=${includedir}/editline/readline.h,--disable-editline,libedit ncurses"
 PACKAGECONFIG[readline] = "--enable-readline --with-readline-header=${includedir}/readline/readline.h,--disable-readline,readline ncurses"
@@ -33,6 +33,7 @@ PACKAGECONFIG[fts3] = "--enable-fts3,--disable-fts3"
 PACKAGECONFIG[fts4] = "--enable-fts4,--disable-fts4"
 PACKAGECONFIG[fts5] = "--enable-fts5,--disable-fts5"
 PACKAGECONFIG[rtree] = "--enable-rtree,--disable-rtree"
+PACKAGECONFIG[geopoly] = "--enable-geopoly,--disable-geopoly"
 PACKAGECONFIG[session] = "--enable-session,--disable-session"
 PACKAGECONFIG[zlib] = "--enable-zlib,--disable-zlib,zlib"
 PACKAGECONFIG[dyn_ext] = "--enable-load-extension,--disable-load-extension"
@@ -50,6 +51,22 @@ CFLAGS += "-DUSE_PREAD"
 
 # Provide column meta-data API
 CFLAGS += "-DSQLITE_ENABLE_COLUMN_METADATA"
+
+# Match the feature set the erl-sqlite NIF is compiled with. Features that have
+# a configure option are enabled via PACKAGECONFIG above (rtree, geopoly,
+# session -> also defines SQLITE_ENABLE_PREUPDATE_HOOK; math functions are on by
+# default). The defines below have no configure option, so set them here.
+CFLAGS += " \
+    -DSQLITE_DQS=0 \
+    -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 \
+    -DSQLITE_USE_ALLOCA \
+    -DSQLITE_LIKE_DOESNT_MATCH_BLOBS \
+    -DSQLITE_OMIT_DEPRECATED \
+    -DSQLITE_OMIT_SHARED_CACHE \
+    -DSQLITE_ENABLE_EXPLAIN_COMMENTS \
+    -DSQLITE_ENABLE_MEMORY_MANAGEMENT \
+    -DSQLITE_ENABLE_NULL_TRIM \
+"
 
 # Unless SQLITE_BYTEORDER is predefined, the code falls back to build time
 # huristics, which are not always correct
