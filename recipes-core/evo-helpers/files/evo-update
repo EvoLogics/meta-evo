@@ -325,11 +325,18 @@ update_system_update_stage_1() {
     fi
 
     mount_ramfs
+
+    # Move the SWU into the RAM root BEFORE copying the system. /tmp lives on
+    # the /var/volatile tmpfs, so mk_ram_root's "tar ... var ..." would otherwise
+    # sweep the uploaded SWU into $NEW_ROOT a second time (~30 MB duplicate that
+    # never gets installed). Moving it out of /var first means the system-copy
+    # tar never sees it, so only the single /update/<swu> copy exists.
+    mkdir $NEW_ROOT/update
+    mv "$SWU" $NEW_ROOT/update
+
     mk_ram_root
 
     cd $NEW_ROOT
-    mkdir $NEW_ROOT/update
-    mv "$SWU" $NEW_ROOT/update
     store_params $NEW_ROOT/update
 
     mount --bind . .
