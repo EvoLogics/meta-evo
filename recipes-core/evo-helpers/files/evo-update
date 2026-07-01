@@ -244,8 +244,12 @@ flash_attach() {
     get_ubi_names
 
     mount -t ubifs $UBIDEV:$ROOTFS_NAME /$ROOTFS_OLD
+    # can't just mount -a here, as this is also used to attach the new system,
+    # which may have partitions unsupported by the old kernel in fstab (e.g. pstore)
+    chroot /$ROOTFS_OLD mount -t ubifs $UBIDEV:etc1 /usr/local/etc/vol1
+    chroot /$ROOTFS_OLD mount -t ubifs $UBIDEV:etc2 /usr/local/etc/vol2
+    chroot /$ROOTFS_OLD mount -t ubifs $UBIDEV:data /data
     chroot /$ROOTFS_OLD mount -t devtmpfs none dev
-    chroot /$ROOTFS_OLD mount -a
 }
 
 chroot_mount_all() {
