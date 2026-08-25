@@ -206,7 +206,7 @@ var_data_restore() {
     if [ -f $VAR_DATA_BAK ]; then
         tar -C "$1" $TAR_VERBOSE -xf $VAR_DATA_BAK
     else
-        warn "There is no data from old system"
+        msg warn "There is no data from old system"
     fi
     remount_all /$ROOTFS_OLD ro
 }
@@ -270,7 +270,7 @@ END
 load_params() {
     P="$1/$PARAMS_FILE"
     if [ ! -f "$P" ]; then
-        warn "No parameters file \"$P\""
+        msg warn "No parameters file \"$P\""
         return
     fi
     . "$P"
@@ -486,18 +486,18 @@ check_dtb () {
     rm -f $CFG_TMP
 
     if [ -z "$CUR_MODEL" ]; then
-        warn "Can't determinate model type from current dtb: $MTD_DEV"
+        msg warn "Can't determinate model type from current dtb: $MTD_DEV"
         $OPT_FORCE || exit 1
     fi
 
     NEW_MODEL=$(fdtget $1 / model | sed 's/.*Baseboard //' | tr A-Z a-z)
     if [ -z "$NEW_MODEL" ]; then
-        warn "Can't determinate model type from new dtb: $1"
+        msg warn "Can't determinate model type from new dtb: $1"
         $OPT_FORCE || exit 1
     fi
 
     if [ "$CUR_MODEL" != "$NEW_MODEL" ]; then
-        $OPT_QUIET || warn "Current model from dtb do not match new model: $CUR_MODEL != $NEW_MODEL"
+        $OPT_QUIET || msg warn "Current model from dtb do not match new model: $CUR_MODEL != $NEW_MODEL"
         $OPT_FORCE || exit 1
     fi
 
