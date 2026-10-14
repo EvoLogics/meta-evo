@@ -390,6 +390,13 @@ update_system_update_stage_2() {
     var_data_backup /$ROOTFS_OLD
     flash_detach
 
+    # Needed because swupdate will not overwrite all blocks if rootfs image is smaller than volume.
+    # That means old blocks will hang around and cause issues.
+    # Would be better to use swupdate's ubi support instead of raw "flash",
+    # but of course that's broken on the old system... le sigh
+    msg info "Erasing rootfs from flash..."
+    flash_erase /dev/$ROOTFS_MTD 0 0
+
     msg info "Flashing new images..."
     if $OPT_VERBOSE; then
         msg info "\n"
