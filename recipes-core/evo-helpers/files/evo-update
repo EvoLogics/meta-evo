@@ -137,7 +137,7 @@ var_data_backup() {
 
     BAK_ADD_DIR=
     if ! $OPT_CLEAN_VAR_DATA; then
-        for DIR in usr/local/etc opt/evins data; do
+        for DIR in usr/local/etc data; do
             if [ -e /$1/$DIR ]; then
                 msg info "Will backup $DIR\n"
                 BAK_ADD_DIR="$DIR $BAK_ADD_DIR"
