@@ -550,7 +550,6 @@ install_dtb () {
     fw_printenv > $VAR_DT_PARAM_BAK
     install_to_mtd dtb "$1"
     fw_setenv -q -f -s $VAR_DT_PARAM_BAK
-    set +e
 
     rm -f $VAR_DT_PARAM_BAK
     return 0
