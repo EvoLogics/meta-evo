@@ -110,10 +110,38 @@ is_update_rootfs() {
     awk '$2 == "/" && $3 == "tmpfs" {rc=1} END{exit !rc}' /proc/mounts
 }
 
+check_hardware() {
+    # 256M boards report ~246M MemTotal, 128M ones less than 128M
+    RAM_KB=$(awk '$1 == "MemTotal:" {print $2}' /proc/meminfo)
+    if [ "$RAM_KB" -lt $((200 * 1024)) ]; then
+        die "System update requires 256M RAM, found $((RAM_KB / 1024))M"
+    fi
+
+    if [ ! -e /sys/block/mmcblk0 ]; then
+        die "System update requires SD card, none found"
+    fi
+
+    # Whole flash chip is not exposed as mtd, so take the end of the last partition
+    # (the kernel truncates partitions to the chip size)
+    FLASH_SIZE=0
+    for MTD in /sys/class/mtd/mtd*; do
+        [ -f $MTD/offset ] || continue
+        END=$(($(cat $MTD/offset) + $(cat $MTD/size)))
+        if [ $END -gt $FLASH_SIZE ]; then
+            FLASH_SIZE=$END
+        fi
+    done
+    if [ $FLASH_SIZE -lt $((64 * 1024 * 1024)) ]; then
+        die "System update requires >= 64M flash, found $((FLASH_SIZE / 1024 / 1024))M"
+    fi
+}
+
 check_system_update_stage() {
     if $OPT_CLEAN_VAR_DATA && $OPT_BACKUP; then
         die "For system update -b and -c cannot use toogether"
     fi
+
+    check_hardware
 
     case "$STAGE" in
         1)
