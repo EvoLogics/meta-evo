@@ -222,14 +222,17 @@ var_data_restore() {
 
     remount_all /$ROOTFS_OLD rw
 
-    grep '^\(root\|toor\):' /etc/passwd > /tmp/pwd.txt
-    sed -i '/\(root\|toor\):/d' /$ROOTFS_OLD/etc/passwd
-    # cat /tmp/pwd.txt >> /$ROOTFS_OLD/etc/passwd
+    # Only carry over toor. root stays the new system's sandbox login, its password
+    # in the new /etc/shadow is the sandbox one, so the old uid 0 root line must not be used.
+    if grep '^toor:' /etc/passwd > /tmp/pwd.txt; then
+        sed -i '/^toor:/d' /$ROOTFS_OLD/etc/passwd
+        # cat /tmp/pwd.txt >> /$ROOTFS_OLD/etc/passwd
 
-    # Add /tmp/pwd.txt in the beginning of /$ROOTFS_OLD/etc/passwd
-    sed -i -ne '1{h;s/.*//;r /tmp/pwd.txt' \
-        -e '};2{H;g;s/\(.*\)\n\(.*\)/\2\n\1/}' \
-        -e '/\(root\|toor\):/d;/^$/!p' /$ROOTFS_OLD/etc/passwd
+        # Add /tmp/pwd.txt in the beginning of /$ROOTFS_OLD/etc/passwd
+        sed -i -ne '1{h;s/.*//;r /tmp/pwd.txt' \
+            -e '};2{H;g;s/\(.*\)\n\(.*\)/\2\n\1/}' \
+            -e '/^toor:/d;/^$/!p' /$ROOTFS_OLD/etc/passwd
+    fi
 
     if [ -f $VAR_DATA_BAK ]; then
         tar -C "$1" $TAR_VERBOSE -xf $VAR_DATA_BAK
