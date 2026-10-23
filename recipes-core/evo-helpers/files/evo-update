@@ -31,7 +31,7 @@ fi
 
 die() {
     msg err "$1\n"
-    exit $2
+    exit ${2:-1}
 }
 
 msg() {
