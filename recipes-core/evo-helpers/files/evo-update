@@ -587,10 +587,11 @@ install_modules () {
 }
 
 rootfs_type () {
-    awk '$2 != "/"         {next}             \
-         $1 ~ /^ubi0:/     {print "ubi";exit} \
-         $1 ~ /sd-rootfs$/ {print "sd"; exit} \
-         {print "uknown"}' < /proc/mounts
+    # Several entries can be mounted on / (e.g. initramfs rootfs), print one result
+    awk '$2 != "/"         {next}              \
+         $1 ~ /^ubi0:/     {type="ubi"; exit} \
+         $1 ~ /sd-rootfs$/ {type="sd"; exit}  \
+         END {print (type ? type : "unknown")}' < /proc/mounts
 }
 
 mount_rootfs_sd() {
@@ -651,9 +652,9 @@ do_sync_rootfs () {
 
     keep_run -m || true
 
-    [ "$OPT_VERBOSE" ] && RSYNC_OPT="$RSYNC_OPT -v"
-    [ "$OPT_TRACE" ]   && RSYNC_OPT="$RSYNC_OPT -v"
-    [ "$OPT_QUIET" ]   && RSYNC_OPT="$RSYNC_OPT -q"
+    $OPT_VERBOSE && RSYNC_OPT="$RSYNC_OPT -v"
+    $OPT_TRACE   && RSYNC_OPT="$RSYNC_OPT -v"
+    $OPT_QUIET   && RSYNC_OPT="$RSYNC_OPT -q"
     rsync -ax $RSYNC_OPT --delete $SRC_DIR $DST_DIR
 
     umount /mnt
