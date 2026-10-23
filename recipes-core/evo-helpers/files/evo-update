@@ -430,8 +430,14 @@ update_system_update_stage_2() {
         msg info "\n"
         swupdate -k $UPDATER_PUB -i "$SWU" -v
     else
+        # Pass swupdate's exit status through, expect itself always exits 0.
+        # A killed child has status 0 followed by CHILDKILLED <signal> <description>.
+        # If flashing failed report failure up the chain so it's possible to try again
+        # rather than rebooting with wiped flash.
         expect -c "log_user 0; spawn swupdate -k $UPDATER_PUB -i $SWU;\
-            expect -re .+ exp_continue -timeout 5 timeout {send_user .;exp_continue}"
+            expect -re .+ exp_continue -timeout 5 timeout {send_user .;exp_continue};\
+            set status [wait]; if {[llength \$status] > 4} {exit 1}; exit [lindex \$status 3]" ||
+            die "Flashing failed, not attaching new system"
         msg info " done\n"
     fi
 
