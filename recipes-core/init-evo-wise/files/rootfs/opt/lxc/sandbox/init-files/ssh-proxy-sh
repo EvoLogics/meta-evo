@@ -24,7 +24,7 @@ if [ "$1" = "-c" ]; then
         exec ssh -oProtocol=2 -s $SSH_OPT -- sftp 
     ;;
     scp\ *)
-        if ! ssh -o PasswordAuthentication=no $SSH_OPT true; then
+        if ! ssh -o PasswordAuthentication=no $SSH_OPT true >/dev/null 2>&1 </dev/null; then
             IP="$(echo $SSH_CONNECTION | awk '{print $3}')"
             echo "You can use scp/sftp only with ssh keys and ForwardAgent=yes. In order to use them you need to create wrapper:" >&2
             echo "\$ printf '#!/bin/bash\\ncase \"\$@\" in *sftp) set -- \${@// /=};; esac\\nexec ssh \${@/-oForwardAgent?no/-oForwardAgent=yes}\\n' > ssh-fwd-agent-on.sh" >&2
@@ -38,7 +38,7 @@ if [ "$1" = "-c" ]; then
         exec ssh $SSH_OPT $@
         ;;
     *)
-        if ! ssh -o PasswordAuthentication=no $SSH_OPT true; then
+        if ! ssh -o PasswordAuthentication=no $SSH_OPT true >/dev/null 2>&1 </dev/null; then
             if [ ! -t 0 ]; then
                 echo Please run ssh with flag -t
                 exit 1

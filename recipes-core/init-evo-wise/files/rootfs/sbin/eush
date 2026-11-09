@@ -288,7 +288,7 @@ proc handle_command {cmd} {
         {^help$}      { show_help }
         {^exit$}      { exit 0 }
         {^reboot$}    { exec reboot }
-        .+            { send_user -- "unknown command $cmd\r\n" }
+        .+            { send_error -- "unknown command $cmd\r\n" }
     }
 }
 
