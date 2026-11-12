@@ -2,7 +2,7 @@ DESCRIPTION = "Linux Containers tools console login"
 SECTION = "extended"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM="file://${WORKDIR}/lxc-login-sh.c;beginline=4;endline=15;md5=840dbf26bec65cb9092f42bf1242debf"
-PR = "r2"
+PR = "r3"
 
 SRC_URI = " \
   file://lxc-login-sh.c\
@@ -20,13 +20,19 @@ do_install () {
 }
 
 pkg_postinst_${PN} () {
+    # if installing package with sendbox enabled, it will make root:root permission
+    # which is 10000:10000 id
+    chown 0:0 $D${bindir}/lxc-login-sh
+    chmod 6755 $D${bindir}/lxc-login-sh
     touch $D${sysconfdir}/shells
     grep -q "usr/bin/lxc-login-sh" $D${sysconfdir}/shells || echo "/usr/bin/lxc-login-sh" >> $D${sysconfdir}/shells
 }
 
 pkg_postrm_${PN} () {
     if [ -e $D${sysconfdir}/shells ]; then
-        sed -i -e '/\/usr/\/bin\/lxc-login-sh/d' $D${sysconfdir}/shells
+        # for some reason busybox sed in postrm was give an error "sed: unsupported command \"
+        # if /\/usr/\/... was used
+        sed -i -e '\,usr/bin/lxc-login-sh,d' $D${sysconfdir}/shells
     fi
 }
 

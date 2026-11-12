@@ -42,7 +42,9 @@ int main()
     setenv("HOME",  HOME, 1);
     setenv("SHELL", "/bin/bash", 1);
 
-    execl(SHELL, SHELL, "-e", "0","-qn", SB_NAME, NULL);
+    /* lxc 4.0.9 etoc() returns 1+(c-'Z'): "Y" -> 0 = escape disabled;
+     * "0" wraps to 0xD7 on unsigned-char ARM, escape stays active (breaks ZMODEM) */
+    execl(SHELL, SHELL, "-e", "Y","-qn", SB_NAME, NULL);
     err(6, "execlp()");
 
     return 0;
