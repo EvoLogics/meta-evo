@@ -13,6 +13,8 @@ PARAMS_FILE=$PROG.params.txt
 # TODO: add rootfs for updating to swu?
 ROOT_TGZ=rootfs-update.tar.xz
 
+BUNDLED_FW_PKG=/tmp/s2c-fw.ipk
+
 CONSPY_TTY_NUM=42
 CONSPY_TTY=/dev/tty$CONSPY_TTY_NUM
 
@@ -235,7 +237,32 @@ var_data_restore() {
     else
         msg warn "There is no data from old system"
     fi
+
+    install_bundled_fw "$1"
+
     remount_all /$ROOTFS_OLD ro
+}
+
+# Installs the firmware package bundled in the system .swu into the new rootfs at $1.
+install_bundled_fw() {
+    PKG_NAME=$(basename $BUNDLED_FW_PKG)
+
+    if [ ! -f $BUNDLED_FW_PKG ]; then
+        msg warn "No package $PKG_NAME in the .swu\n"
+        return 0
+    fi
+
+    msg info "Installing bundled package $PKG_NAME... "
+    # Copy through the chroot: /tmp in the new rootfs is an absolute symlink to /var/volatile/tmp,
+    # so "$1/tmp" would resolve to the RAM root's /var/volatile/tmp
+    chroot "$1" sh -c "cat > /tmp/$PKG_NAME" < $BUNDLED_FW_PKG
+    if ! chroot "$1" opkg install --force-reinstall --force-overwrite "/tmp/$PKG_NAME"; then
+        chroot "$1" rm -f "/tmp/$PKG_NAME"
+        msg warn "Installing $PKG_NAME failed, firmware must be installed manually\n"
+        return 0
+    fi
+    chroot "$1" rm -f "/tmp/$PKG_NAME"
+    msg info "done\n"
 }
 
 get_rootfs_mtd() {
