@@ -117,10 +117,6 @@ check_hardware() {
         die "System update requires 256M RAM, found $((RAM_KB / 1024))M"
     fi
 
-    if [ ! -e /sys/block/mmcblk0 ]; then
-        die "System update requires SD card, none found"
-    fi
-
     # Whole flash chip is not exposed as mtd, so take the end of the last partition
     # (the kernel truncates partitions to the chip size)
     FLASH_SIZE=0
