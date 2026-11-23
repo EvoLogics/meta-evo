@@ -18,6 +18,7 @@ software =
             filename = "at91bootstrap-sama5d2_roadrunner.bin";
             device = "/dev/mtd0";
             type = "flash";
+            installed-directly = true;
             sha256 = "@at91bootstrap-sama5d2_roadrunner.bin";
         },
         {
@@ -25,6 +26,7 @@ software =
             filename = "zImage-sama5d2-roadrunner-evo.bin";
             device = "/dev/mtd2";
             type = "flash";
+            installed-directly = true;
             sha256 = "@zImage-sama5d2-roadrunner-evo.bin";
         },
         {
@@ -32,6 +34,7 @@ software =
             filename = "evologics-base-image-sama5d2-roadrunner-evo.ubi";
             device = "/dev/mtd3";
             type = "flash";
+            installed-directly = true;
             sha256 = "@evologics-base-image-sama5d2-roadrunner-evo.ubi";
         }
      );
@@ -44,6 +47,7 @@ software =
                  filename = "sama5d2-roadrunner-evo-eth.dtb";
                  device = "/dev/mtd1";
                  type = "flash";
+                 installed-directly = true;
                  sha256 = "@sama5d2-roadrunner-evo-eth.dtb";
              },
              /*
@@ -56,6 +60,7 @@ software =
                  filename = "at91bootstrap-sama5d2_roadrunner.bin";
                  device = "/dev/mtd0";
                  type = "flash";
+                 installed-directly = true;
                  sha256 = "@at91bootstrap-sama5d2_roadrunner.bin";
              },
              {
@@ -63,6 +68,7 @@ software =
                  filename = "zImage-sama5d2-roadrunner-evo.bin";
                  device = "/dev/mtd2";
                  type = "flash";
+                 installed-directly = true;
                  sha256 = "@zImage-sama5d2-roadrunner-evo.bin";
              },
              {
@@ -70,6 +76,7 @@ software =
                  filename = "evologics-base-image-sama5d2-roadrunner-evo.ubi";
                  device = "/dev/mtd3";
                  type = "flash";
+                 installed-directly = true;
                  sha256 = "@evologics-base-image-sama5d2-roadrunner-evo.ubi";
              }
              );
@@ -87,6 +94,7 @@ software =
                  filename = "sama5d2-roadrunner-evo-rs422.dtb";
                  device = "/dev/mtd1";
                  type = "flash";
+                 installed-directly = true;
                  sha256 = "@sama5d2-roadrunner-evo-rs422.dtb";
              },
              {
@@ -103,6 +111,7 @@ software =
                  filename = "sama5d2-roadrunner-evo-rs485.dtb";
                  device = "/dev/mtd1";
                  type = "flash";
+                 installed-directly = true;
                  sha256 = "@sama5d2-roadrunner-evo-rs485.dtb";
              },
              {
@@ -119,6 +128,7 @@ software =
                  filename = "sama5d2-roadrunner-evo-can.dtb";
                  device = "/dev/mtd1";
                  type = "flash";
+                 installed-directly = true;
                  sha256 = "@sama5d2-roadrunner-evo-can.dtb";
              },
              {
